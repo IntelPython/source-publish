@@ -1,0 +1,537 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Patterns &mdash; Pycairo v1.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.10.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pycairo v1.10.0 documentation" href="../index.html" />
+    <link rel="up" title="Reference" href="index.html" />
+    <link rel="next" title="Surfaces" href="surfaces.html" />
+    <link rel="prev" title="Paths" href="paths.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="surfaces.html" title="Surfaces"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="paths.html" title="Paths"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="patterns">
+<span id="id1"></span><h1>Patterns<a class="headerlink" href="#patterns" title="Permalink to this headline">¶</a></h1>
+<p>Patterns are the paint with which cairo draws. The primary use of patterns is
+as the source for all cairo drawing operations, although they can also be used
+as masks, that is, as the brush too.</p>
+<p>A cairo <em>Pattern</em> is created by using one of the <em>PatternType</em> constructors
+listed below, or implicitly through <em>Context.set_source_&lt;type&gt;()</em> methods.</p>
+<div class="section" id="class-pattern">
+<h2>class Pattern()<a class="headerlink" href="#class-pattern" title="Permalink to this headline">¶</a></h2>
+<p><em>Pattern</em> is the abstract base class from which all the other pattern classes
+derive. It cannot be instantiated directly.</p>
+<dl class="class">
+<dt id="cairo.Pattern">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">Pattern</tt><a class="headerlink" href="#cairo.Pattern" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="cairo.Pattern.get_extend">
+<tt class="descname">get_extend</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Pattern.get_extend" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current extend strategy used for drawing the <em>Pattern</em>.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the current extend mode for the <em>Pattern</em>. See
+<a class="reference internal" href="constants.html#constants-extend"><em>EXTEND attributes</em></a>
+for details on the semantics of each extend strategy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Pattern.get_matrix">
+<tt class="descname">get_matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Pattern.get_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">a new <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> which stores a copy of the <em>Pattern&#8217;s</em> transformation matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Pattern.set_extend">
+<tt class="descname">set_extend</tt><big>(</big><em>extend</em><big>)</big><a class="headerlink" href="#cairo.Pattern.set_extend" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>extend</strong> &#8211; an <a class="reference internal" href="constants.html#constants-extend"><em>EXTEND</em></a> describing how the
+area outside of the <em>Pattern</em> will be drawn</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the mode to be used for drawing outside the area of a <em>Pattern</em>.</p>
+<p>The default extend mode is <a class="reference internal" href="constants.html#cairo.EXTEND_NONE" title="cairo.EXTEND_NONE"><tt class="xref py py-data docutils literal"><span class="pre">cairo.EXTEND_NONE</span></tt></a> for
+<a class="reference internal" href="#cairo.SurfacePattern" title="cairo.SurfacePattern"><tt class="xref py py-class docutils literal"><span class="pre">SurfacePattern</span></tt></a> and <a class="reference internal" href="constants.html#cairo.EXTEND_PAD" title="cairo.EXTEND_PAD"><tt class="xref py py-data docutils literal"><span class="pre">cairo.EXTEND_PAD</span></tt></a> for
+<a class="reference internal" href="#cairo.Gradient" title="cairo.Gradient"><tt class="xref py py-class docutils literal"><span class="pre">Gradient</span></tt></a> Patterns.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Pattern.set_matrix">
+<tt class="descname">set_matrix</tt><big>(</big><em>matrix</em><big>)</big><a class="headerlink" href="#cairo.Pattern.set_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>matrix</strong> &#8211; a <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>Sets the <em>Pattern&#8217;s</em> transformation matrix to <em>matrix</em>. This matrix is a
+transformation from user space to pattern space.</p>
+<p>When a <em>Pattern</em> is first created it always has the identity matrix for
+its transformation matrix, which means that pattern space is initially
+identical to user space.</p>
+<p>Important: Please note that the direction of this transformation matrix
+is from user space to pattern space. This means that if you imagine the
+flow from a <em>Pattern</em> to user space (and on to device space), then
+coordinates in that flow will be transformed by the inverse of the
+<em>Pattern</em> matrix.</p>
+<p>For example, if you want to make a <em>Pattern</em> appear twice as large as it
+does by default the correct code to use is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">matrix</span> <span class="o">=</span> <span class="n">cairo</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">xx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">yy</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">pattern</span><span class="o">.</span><span class="n">set_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Meanwhile, using values of 2.0 rather than 0.5 in the code above would
+cause the <em>Pattern</em> to appear at half of its default size.</p>
+<p>Also, please note the discussion of the user-space locking semantics of
+<a class="reference internal" href="context.html#cairo.Context.set_source" title="cairo.Context.set_source"><tt class="xref py py-class docutils literal"><span class="pre">Context.set_source</span></tt></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-solidpattern-pattern">
+<h2>class SolidPattern(<a class="reference internal" href="#cairo.Pattern" title="cairo.Pattern"><tt class="xref py py-class docutils literal"><span class="pre">Pattern</span></tt></a>)<a class="headerlink" href="#class-solidpattern-pattern" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cairo.SolidPattern">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">SolidPattern</tt><big>(</big><em>red</em>, <em>green</em>, <em>blue</em>, <em>alpha=1.0</em><big>)</big><a class="headerlink" href="#cairo.SolidPattern" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>red</strong> (<em>float</em>) &#8211; red component of the color</li>
+<li><strong>green</strong> (<em>float</em>) &#8211; green component of the color</li>
+<li><strong>blue</strong> (<em>float</em>) &#8211; blue component of the color</li>
+<li><strong>alpha</strong> (<em>float</em>) &#8211; alpha component of the color</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a new <em>SolidPattern</em></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>MemoryError</em> in case of no memory</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a new <em>SolidPattern</em> corresponding to a translucent color. The
+color components are floating point numbers in the range 0 to 1. If the
+values passed in are outside that range, they will be clamped.</p>
+<dl class="method">
+<dt id="cairo.SolidPattern.get_rgba">
+<tt class="descname">get_rgba</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.SolidPattern.get_rgba" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(red, green, blue, alpha) a tuple of float</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the solid color for a <em>SolidPattern</em>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-surfacepattern-pattern">
+<h2>class SurfacePattern(<a class="reference internal" href="#cairo.Pattern" title="cairo.Pattern"><tt class="xref py py-class docutils literal"><span class="pre">Pattern</span></tt></a>)<a class="headerlink" href="#class-surfacepattern-pattern" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cairo.SurfacePattern">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">SurfacePattern</tt><big>(</big><em>surface</em><big>)</big><a class="headerlink" href="#cairo.SurfacePattern" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>surface</strong> &#8211; a cairo <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">a newly created <em>SurfacePattern</em> for the given surface.</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><em>MemoryError</em> in case of no memory.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cairo.SurfacePattern.get_filter">
+<tt class="descname">get_filter</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.SurfacePattern.get_filter" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="constants.html#constants-filter"><em>FILTER</em></a> used for
+resizing the <em>SurfacePattern</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.SurfacePattern.get_surface">
+<tt class="descname">get_surface</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.SurfacePattern.get_surface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a> of the <em>SurfacePattern</em>.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.SurfacePattern.set_filter">
+<tt class="descname">set_filter</tt><big>(</big><em>filter</em><big>)</big><a class="headerlink" href="#cairo.SurfacePattern.set_filter" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter</strong> &#8211; a <a class="reference internal" href="constants.html#constants-filter"><em>FILTER</em></a> describing the filter
+to use for resizing the <em>Pattern</em></td>
+</tr>
+</tbody>
+</table>
+<p>Note that you might want to control filtering even when you do not have
+an explicit <em>Pattern</em> object, (for example when using
+<a class="reference internal" href="context.html#cairo.Context.set_source_surface" title="cairo.Context.set_source_surface"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_source_surface()</span></tt></a>). In these cases, it is convenient to use
+<a class="reference internal" href="context.html#cairo.Context.get_source" title="cairo.Context.get_source"><tt class="xref py py-meth docutils literal"><span class="pre">Context.get_source()</span></tt></a> to get access to the pattern that cairo creates
+implicitly. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">context</span><span class="o">.</span><span class="n">set_source_surface</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">surfacepattern</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">get_source</span><span class="p">(),</span> <span class="n">cairo</span><span class="o">.</span><span class="n">FILTER_NEAREST</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-gradient-pattern">
+<h2>class Gradient(<a class="reference internal" href="#cairo.Pattern" title="cairo.Pattern"><tt class="xref py py-class docutils literal"><span class="pre">Pattern</span></tt></a>)<a class="headerlink" href="#class-gradient-pattern" title="Permalink to this headline">¶</a></h2>
+<p><em>Gradient</em> is an abstract base class from which other <em>Pattern</em> classes
+derive. It cannot be instantiated directly.</p>
+<dl class="class">
+<dt id="cairo.Gradient">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">Gradient</tt><a class="headerlink" href="#cairo.Gradient" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="cairo.Gradient.add_color_stop_rgb">
+<tt class="descname">add_color_stop_rgb</tt><big>(</big><em>offset</em>, <em>red</em>, <em>green</em>, <em>blue</em><big>)</big><a class="headerlink" href="#cairo.Gradient.add_color_stop_rgb" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>offset</strong> (<em>float</em>) &#8211; an offset in the range [0.0 .. 1.0]</li>
+<li><strong>red</strong> (<em>float</em>) &#8211; red component of color</li>
+<li><strong>green</strong> (<em>float</em>) &#8211; green component of color</li>
+<li><strong>blue</strong> (<em>float</em>) &#8211; blue component of color</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds an opaque color stop to a <em>Gradient</em> pattern. The offset specifies
+the location along the gradient&#8217;s control vector. For example, a
+<em>LinearGradient&#8217;s</em> control vector is from (x0,y0) to (x1,y1) while a
+<em>RadialGradient&#8217;s</em> control vector is from any point on the start circle
+to the corresponding point on the end circle.</p>
+<p>The color is specified in the same way as in <a class="reference internal" href="context.html#cairo.Context.set_source_rgb" title="cairo.Context.set_source_rgb"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_source_rgb()</span></tt></a>.</p>
+<p>If two (or more) stops are specified with identical offset values, they
+will be sorted according to the order in which the stops are added,
+(stops added earlier will compare less than stops added later). This can
+be useful for reliably making sharp color transitions instead of the
+typical blend.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Gradient.add_color_stop_rgba">
+<tt class="descname">add_color_stop_rgba</tt><big>(</big><em>offset</em>, <em>red</em>, <em>green</em>, <em>blue</em>, <em>alpha</em><big>)</big><a class="headerlink" href="#cairo.Gradient.add_color_stop_rgba" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>offset</strong> (<em>float</em>) &#8211; an offset in the range [0.0 .. 1.0]</li>
+<li><strong>red</strong> (<em>float</em>) &#8211; red component of color</li>
+<li><strong>green</strong> (<em>float</em>) &#8211; green component of color</li>
+<li><strong>blue</strong> (<em>float</em>) &#8211; blue component of color</li>
+<li><strong>alpha</strong> (<em>float</em>) &#8211; alpha component of color</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds an opaque color stop to a <em>Gradient</em> pattern. The offset specifies
+the location along the gradient&#8217;s control vector. For example, a
+<em>LinearGradient&#8217;s</em> control vector is from (x0,y0) to (x1,y1) while a
+<em>RadialGradient&#8217;s</em> control vector is from any point on the start circle
+to the corresponding point on the end circle.</p>
+<p>The color is specified in the same way as in <a class="reference internal" href="context.html#cairo.Context.set_source_rgb" title="cairo.Context.set_source_rgb"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_source_rgb()</span></tt></a>.</p>
+<p>If two (or more) stops are specified with identical offset values, they
+will be sorted according to the order in which the stops are added,
+(stops added earlier will compare less than stops added later). This can
+be useful for reliably making sharp color transitions instead of the
+typical blend.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-lineargradient-gradient">
+<h2>class LinearGradient(<a class="reference internal" href="#cairo.Gradient" title="cairo.Gradient"><tt class="xref py py-class docutils literal"><span class="pre">Gradient</span></tt></a>)<a class="headerlink" href="#class-lineargradient-gradient" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cairo.LinearGradient">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">LinearGradient</tt><big>(</big><em>x0</em>, <em>y0</em>, <em>x1</em>, <em>y1</em><big>)</big><a class="headerlink" href="#cairo.LinearGradient" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x0</strong> (<em>float</em>) &#8211; x coordinate of the start point</li>
+<li><strong>y0</strong> (<em>float</em>) &#8211; y coordinate of the start point</li>
+<li><strong>x1</strong> (<em>float</em>) &#8211; x coordinate of the end point</li>
+<li><strong>y1</strong> (<em>float</em>) &#8211; y coordinate of the end point</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a new <em>LinearGradient</em></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>MemoryError</em> in case of no memory</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Create a new <em>LinearGradient</em> along the line defined by (x0, y0) and (x1,
+y1).  Before using the <em>Gradient</em> pattern, a number of color stops should
+be defined using <a class="reference internal" href="#cairo.Gradient.add_color_stop_rgb" title="cairo.Gradient.add_color_stop_rgb"><tt class="xref py py-meth docutils literal"><span class="pre">Gradient.add_color_stop_rgb()</span></tt></a> or
+<a class="reference internal" href="#cairo.Gradient.add_color_stop_rgba" title="cairo.Gradient.add_color_stop_rgba"><tt class="xref py py-meth docutils literal"><span class="pre">Gradient.add_color_stop_rgba()</span></tt></a></p>
+<p>Note: The coordinates here are in pattern space. For a new <em>Pattern</em>,
+pattern space is identical to user space, but the relationship between the
+spaces can be changed with <a class="reference internal" href="#cairo.Pattern.set_matrix" title="cairo.Pattern.set_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">Pattern.set_matrix()</span></tt></a></p>
+<dl class="method">
+<dt id="cairo.LinearGradient.get_linear_points">
+<tt class="descname">get_linear_points</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.LinearGradient.get_linear_points" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x0, y0, x1, y1) - a tuple of float<ul class="simple">
+<li>x0: return value for the x coordinate of the first point</li>
+<li>y0: return value for the y coordinate of the first point</li>
+<li>x1: return value for the x coordinate of the second point</li>
+<li>y1: return value for the y coordinate of the second point</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the gradient endpoints for a <em>LinearGradient</em>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-radialgradient-gradient">
+<h2>class RadialGradient(<a class="reference internal" href="#cairo.Gradient" title="cairo.Gradient"><tt class="xref py py-class docutils literal"><span class="pre">Gradient</span></tt></a>)<a class="headerlink" href="#class-radialgradient-gradient" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cairo.RadialGradient">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">RadialGradient</tt><big>(</big><em>cx0</em>, <em>cy0</em>, <em>radius0</em>, <em>cx1</em>, <em>cy1</em>, <em>radius1</em><big>)</big><a class="headerlink" href="#cairo.RadialGradient" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cx0</strong> (<em>float</em>) &#8211; x coordinate for the center of the start circle</li>
+<li><strong>cy0</strong> (<em>float</em>) &#8211; y coordinate for the center of the start circle</li>
+<li><strong>radius0</strong> (<em>float</em>) &#8211; radius of the start circle</li>
+<li><strong>cx1</strong> (<em>float</em>) &#8211; x coordinate for the center of the end circle</li>
+<li><strong>cy1</strong> (<em>float</em>) &#8211; y coordinate for the center of the end circle</li>
+<li><strong>radius1</strong> (<em>float</em>) &#8211; radius of the end circle</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the newly created <em>RadialGradient</em></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>MemoryError</em> in case of no memory</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a new <em>RadialGradient</em> pattern between the two circles defined by
+(cx0, cy0, radius0) and (cx1, cy1, radius1).  Before using the gradient
+pattern, a number of color stops should be defined using
+<a class="reference internal" href="#cairo.Gradient.add_color_stop_rgb" title="cairo.Gradient.add_color_stop_rgb"><tt class="xref py py-meth docutils literal"><span class="pre">Gradient.add_color_stop_rgb()</span></tt></a> or <a class="reference internal" href="#cairo.Gradient.add_color_stop_rgba" title="cairo.Gradient.add_color_stop_rgba"><tt class="xref py py-meth docutils literal"><span class="pre">Gradient.add_color_stop_rgba()</span></tt></a>.</p>
+<p>Note: The coordinates here are in pattern space. For a new pattern, pattern
+space is identical to user space, but the relationship between the spaces
+can be changed with <a class="reference internal" href="#cairo.Pattern.set_matrix" title="cairo.Pattern.set_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">Pattern.set_matrix()</span></tt></a>.</p>
+<dl class="method">
+<dt id="cairo.RadialGradient.get_radial_circles">
+<tt class="descname">get_radial_circles</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.RadialGradient.get_radial_circles" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x0, y0, r0, x1, y1, r1) - a tuple of float<ul class="simple">
+<li>x0: return value for the x coordinate of the center of the first circle</li>
+<li>y0: return value for the y coordinate of the center of the first circle</li>
+<li>r0: return value for the radius of the first circle</li>
+<li>x1: return value for the x coordinate of the center of the second circle</li>
+<li>y1: return value for the y coordinate of the center of the second circle</li>
+<li>r1: return value for the radius of the second circle</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the <em>Gradient</em> endpoint circles for a <em>RadialGradient</em>, each
+specified as a center coordinate and a radius.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Patterns</a><ul>
+<li><a class="reference internal" href="#class-pattern">class Pattern()</a></li>
+<li><a class="reference internal" href="#class-solidpattern-pattern">class SolidPattern(<tt class="docutils literal"><span class="pre">Pattern</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-surfacepattern-pattern">class SurfacePattern(<tt class="docutils literal"><span class="pre">Pattern</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-gradient-pattern">class Gradient(<tt class="docutils literal"><span class="pre">Pattern</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-lineargradient-gradient">class LinearGradient(<tt class="docutils literal"><span class="pre">Gradient</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-radialgradient-gradient">class RadialGradient(<tt class="docutils literal"><span class="pre">Gradient</span></tt>)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="paths.html"
+                        title="previous chapter">Paths</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="surfaces.html"
+                        title="next chapter">Surfaces</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/patterns.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="surfaces.html" title="Surfaces"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="paths.html" title="Paths"
+             >previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2008, Steve Chaplin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

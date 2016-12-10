@@ -1,0 +1,37 @@
+Overview of changes from pycairo 1.8.10 to pycairo 1.10.0 (2011-04-18)
+======================================================================
+General Changes:
+    Pycairo 1.10.0 requires cairo 1.10.0 (or later).
+
+New Constants:
+    cairo.FORMAT_RGB16_565
+
+API Changes:
+    Added support for Python 3.2 PyCapsule. This means modules which use the
+    pycairo C API will need to be updated too.      #30289
+
+Bug Fixes:
+    context.get_source().get_surface() fails        #33013
+    Add support for './waf configure --libdir=XXX'  #30230
+
+Documentation Changes:
+    Add documentation (using Sphinx 1.0.7).
+    Include html documentation in the pycairo archive file.
+
+Build Changes:
+    Update waf to 1.6.3, and patch to work with Python 3.2.
+
+Other Changes:
+    Improve/simplify unicode filename support.
+    Improve/simplify unicode text support.
+
+
+pycairo 1.8.10 (2010-09-12)
+===========================
+A new version of pycairo which requires and supports Python 3.
+The current pycairo for Python 2 has been renamed to py2cairo.
+
+Waf is the tool used to build and install the package.
+It is licensed under the LGPL version 3.
+The functions image_surface_create_for_data, image_surface_get_data, and
+xpyb2struct use the old Python 2.x buffer protocol, and have been disabled.

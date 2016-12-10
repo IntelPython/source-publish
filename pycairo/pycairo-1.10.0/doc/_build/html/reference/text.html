@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Text &mdash; Pycairo v1.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.10.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pycairo v1.10.0 documentation" href="../index.html" />
+    <link rel="up" title="Reference" href="index.html" />
+    <link rel="next" title="FAQ" href="../faq.html" />
+    <link rel="prev" title="Surfaces" href="surfaces.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../faq.html" title="FAQ"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="surfaces.html" title="Surfaces"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="text">
+<span id="id1"></span><h1>Text<a class="headerlink" href="#text" title="Permalink to this headline">¶</a></h1>
+<p>Cairo has two sets of text rendering capabilities:</p>
+<ul class="simple">
+<li>The functions with text in their name form cairo&#8217;s toy text API. The toy API
+takes UTF-8 encoded text and is limited in its functionality to rendering
+simple left-to-right text with no advanced features. That means for example
+that most complex scripts like Hebrew, Arabic, and Indic scripts are out of
+question. No kerning or correct positioning of diacritical marks either. The
+font selection is pretty limited too and doesn&#8217;t handle the case that the
+selected font does not cover the characters in the text. This set of
+functions are really that, a toy text API, for testing and demonstration
+purposes. Any serious application should avoid them.</li>
+<li>The functions with glyphs in their name form cairo&#8217;s low-level text API. The
+low-level API relies on the user to convert text to a set of glyph indexes
+and positions. This is a very hard problem and is best handled by external
+libraries, like the pangocairo that is part of the Pango text layout and
+rendering library. Pango is available from <a class="reference external" href="http://www.pango.org/">http://www.pango.org/</a>.</li>
+</ul>
+<div class="section" id="class-fontface">
+<h2>class FontFace()<a class="headerlink" href="#class-fontface" title="Permalink to this headline">¶</a></h2>
+<p>A <em>cairo.FontFace</em> specifies all aspects of a font other than the size or font
+matrix (a font matrix is used to distort a font by sheering it or scaling it
+unequally in the two directions). A <em>FontFace</em> can be set on a
+<a class="reference internal" href="context.html#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> by using <a class="reference internal" href="context.html#cairo.Context.set_font_face" title="cairo.Context.set_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_font_face()</span></tt></a> the size and font
+matrix are set with <a class="reference internal" href="context.html#cairo.Context.set_font_size" title="cairo.Context.set_font_size"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_font_size()</span></tt></a> and
+<a class="reference internal" href="context.html#cairo.Context.set_font_matrix" title="cairo.Context.set_font_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_font_matrix()</span></tt></a>.</p>
+<p>There are various types of <em>FontFace</em>, depending on the font backend they
+use.</p>
+<dl class="class">
+<dt id="cairo.FontFace">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">FontFace</tt><a class="headerlink" href="#cairo.FontFace" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This class cannot be instantiated directly, it is returned by
+<a class="reference internal" href="context.html#cairo.Context.get_font_face" title="cairo.Context.get_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">Context.get_font_face()</span></tt></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="class-freetypefontface-fontface">
+<h2>class FreeTypeFontFace(<a class="reference internal" href="#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a>)<a class="headerlink" href="#class-freetypefontface-fontface" title="Permalink to this headline">¶</a></h2>
+<p>FreeType Fonts - Font support for FreeType.</p>
+<p>The FreeType font backend is primarily used to render text on GNU/Linux
+systems, but can be used on other platforms too.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">FreeType Fonts are not implemented in pycairo because there is no open source Python bindings to FreeType (and fontconfig) that provides a C API. This a possible project idea for anyone interested in adding FreeType support to pycairo.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="class-toyfontface-fontface">
+<h2>class ToyFontFace(<a class="reference internal" href="#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a>)<a class="headerlink" href="#class-toyfontface-fontface" title="Permalink to this headline">¶</a></h2>
+<p>The <em>cairo.ToyFontFace</em> class can be used instead of <a class="reference internal" href="context.html#cairo.Context.select_font_face" title="cairo.Context.select_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">Context.select_font_face()</span></tt></a> to create a toy font independently of a context.</p>
+<dl class="class">
+<dt id="cairo.ToyFontFace">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">ToyFontFace</tt><big>(</big><em>family</em><span class="optional">[</span>, <em>slant</em><span class="optional">[</span>, <em>weight</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.ToyFontFace" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>family</strong> (<em>str</em>) &#8211; a font family name</li>
+<li><strong>slant</strong> &#8211; the <a class="reference internal" href="constants.html#constants-font-slant"><em>FONT_SLANT</em></a> of the font,
+defaults to <a class="reference internal" href="constants.html#cairo.FONT_SLANT_NORMAL" title="cairo.FONT_SLANT_NORMAL"><tt class="xref py py-data docutils literal"><span class="pre">cairo.FONT_SLANT_NORMAL</span></tt></a>.</li>
+<li><strong>weight</strong> &#8211; the <a class="reference internal" href="constants.html#constants-font-weight"><em>FONT_WEIGHT</em></a> of the font,
+defaults to <a class="reference internal" href="constants.html#cairo.FONT_WEIGHT_NORMAL" title="cairo.FONT_WEIGHT_NORMAL"><tt class="xref py py-data docutils literal"><span class="pre">cairo.FONT_WEIGHT_NORMAL</span></tt></a>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a new <em>ToyFontFace</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a <em>ToyFontFace</em> from a triplet of family, slant, and weight. These
+font faces are used in implementation of the the &#8220;toy&#8221; font API.</p>
+<p>If family is the zero-length string &#8220;&#8221;, the platform-specific default
+family is assumed. The default family then can be queried using
+<a class="reference internal" href="#cairo.ToyFontFace.get_family" title="cairo.ToyFontFace.get_family"><tt class="xref py py-meth docutils literal"><span class="pre">get_family()</span></tt></a>.</p>
+<p>The <a class="reference internal" href="context.html#cairo.Context.select_font_face" title="cairo.Context.select_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">Context.select_font_face()</span></tt></a> method uses this to create font
+faces. See that function for limitations of toy font faces.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.4.</span></p>
+<dl class="method">
+<dt id="cairo.ToyFontFace.get_family">
+<tt class="descname">get_family</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ToyFontFace.get_family" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the family name of a toy font</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ToyFontFace.get_slant">
+<tt class="descname">get_slant</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ToyFontFace.get_slant" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="constants.html#constants-font-slant"><em>FONT_SLANT</em></a> value</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ToyFontFace.get_weight">
+<tt class="descname">get_weight</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ToyFontFace.get_weight" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="constants.html#constants-font-weight"><em>FONT_WEIGHT</em></a> value</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.4.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-userfontface-fontface">
+<h2>class UserFontFace(<a class="reference internal" href="#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a>)<a class="headerlink" href="#class-userfontface-fontface" title="Permalink to this headline">¶</a></h2>
+<p>The user-font feature allows the cairo user to provide drawings for glyphs in
+a font. This is most useful in implementing fonts in non-standard formats,
+like SVG fonts and Flash fonts, but can also be used by games and other
+application to draw &#8220;funky&#8221; fonts.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">UserFontFace support has not (yet) been added to pycairo. If you
+need this feature in pycairo register your interest by sending a message
+to the cairo mailing list, or by opening a pycairo bug report.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="class-scaledfont">
+<h2>class ScaledFont()<a class="headerlink" href="#class-scaledfont" title="Permalink to this headline">¶</a></h2>
+<p>A <em>ScaledFont</em> is a font scaled to a particular size and device resolution. A
+<em>ScaledFont</em> is most useful for low-level font usage where a library or
+application wants to cache a reference to a scaled font to speed up the
+computation of metrics.</p>
+<p>There are various types of scaled fonts, depending on the font backend they
+use.</p>
+<dl class="class">
+<dt id="cairo.ScaledFont">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">ScaledFont</tt><big>(</big><em>font_face</em>, <em>font_matrix</em>, <em>ctm</em>, <em>options</em><big>)</big><a class="headerlink" href="#cairo.ScaledFont" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>font_face</strong> &#8211; a <a class="reference internal" href="#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a> instance</li>
+<li><strong>font_matrix</strong> &#8211; font space to user space transformation <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a>
+for the font. In the simplest case of a N point font, this matrix is just
+a scale by N, but it can also be used to shear the font or stretch it
+unequally along the two axes. See <a class="reference internal" href="context.html#cairo.Context.set_font_matrix" title="cairo.Context.set_font_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_font_matrix()</span></tt></a>.</li>
+<li><strong>ctm</strong> &#8211; user to device transformation <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> with which the
+font will be used.</li>
+<li><strong>options</strong> &#8211; a <a class="reference internal" href="#cairo.FontOptions" title="cairo.FontOptions"><tt class="xref py py-class docutils literal"><span class="pre">FontOptions</span></tt></a> instance to use when getting metrics
+for the font and rendering with it.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a <em>ScaledFont</em> object from a <em>FontFace</em> and matrices that describe
+the size of the font and the environment in which it will be used.</p>
+<dl class="method">
+<dt id="cairo.ScaledFont.extents">
+<tt class="descname">extents</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(ascent, descent, height, max_x_advance, max_y_advance), a tuple of float values.</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the metrics for a <em>ScaledFont</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.get_ctm">
+<tt class="descname">get_ctm</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.get_ctm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.get_font_face">
+<tt class="descname">get_font_face</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.get_font_face" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a> that this <em>ScaledFont</em> was created for.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.get_font_matrix">
+<tt class="descname">get_font_matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.get_font_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.get_font_options">
+<tt class="descname">get_font_options</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.get_font_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.get_scale_matrix">
+<tt class="descname">get_scale_matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.get_scale_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the scale <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>The scale matrix is product of the font matrix and the ctm associated
+with the scaled font, and hence is the matrix mapping from font space to
+device space.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.glyph_extents">
+<tt class="descname">glyph_extents</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.glyph_extents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.text_extents">
+<tt class="descname">text_extents</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#cairo.ScaledFont.text_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>str</em>) &#8211; text</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x_bearing, y_bearing, width, height, x_advance, y_advance)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">6-tuple of float</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the extents for a string of text. The extents describe a user-space
+rectangle that encloses the &#8220;inked&#8221; portion of the text drawn at the
+origin (0,0) (as it would be drawn by <a class="reference internal" href="context.html#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a> if the
+cairo graphics state were set to the same font_face, font_matrix, ctm,
+and font_options as <em>ScaledFont</em>).  Additionally, the x_advance and
+y_advance values indicate the amount by which the current point would be
+advanced by <a class="reference internal" href="context.html#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a>.</p>
+<p>Note that whitespace characters do not directly contribute to the size
+of the rectangle (width and height). They do contribute indirectly by
+changing the position of non-whitespace characters. In particular,
+trailing whitespace characters are likely to not affect the size of the
+rectangle, though they will affect the x_advance and y_advance values.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ScaledFont.text_to_glyphs">
+<tt class="descname">text_to_glyphs</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ScaledFont.text_to_glyphs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-fontoptions">
+<h2>class FontOptions()<a class="headerlink" href="#class-fontoptions" title="Permalink to this headline">¶</a></h2>
+<p>An opaque structure holding all options that are used when rendering fonts.</p>
+<p>Individual features of a <em>FontOptions</em> can be set or accessed using functions
+named <em>FontOptions.set_&lt;feature_name&gt;</em> and
+<em>FontOptions.get_&lt;feature_name&gt;</em>,  like <a class="reference internal" href="#cairo.FontOptions.set_antialias" title="cairo.FontOptions.set_antialias"><tt class="xref py py-meth docutils literal"><span class="pre">FontOptions.set_antialias()</span></tt></a>
+and <a class="reference internal" href="#cairo.FontOptions.get_antialias" title="cairo.FontOptions.get_antialias"><tt class="xref py py-meth docutils literal"><span class="pre">FontOptions.get_antialias()</span></tt></a>.</p>
+<p>New features may be added to a <em>FontOptions</em> in the future. For this reason,
+<tt class="xref py py-meth docutils literal"><span class="pre">FontOptions.copy()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">FontOptions.equal()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">FontOptions.merge()</span></tt>, and <tt class="xref py py-meth docutils literal"><span class="pre">FontOptions.hash()</span></tt> should be used to
+copy, check for equality, merge, or compute a hash value of FontOptions
+objects.</p>
+<dl class="class">
+<dt id="cairo.FontOptions">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">FontOptions</tt><a class="headerlink" href="#cairo.FontOptions" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">a newly allocated <em>FontOptions</em>.</td>
+</tr>
+</tbody>
+</table>
+<p>Allocates a new <em>FontOptions</em> object with all options initialized to default values.</p>
+<dl class="method">
+<dt id="cairo.FontOptions.get_antialias">
+<tt class="descname">get_antialias</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.FontOptions.get_antialias" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="constants.html#constants-antialias"><em>ANTIALIAS</em></a> mode for the <em>FontOptions</em> object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.FontOptions.get_hint_metrics">
+<tt class="descname">get_hint_metrics</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.FontOptions.get_hint_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="constants.html#constants-hint-metrics"><em>HINT METRICS</em></a> mode for the <em>FontOptions</em> object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.FontOptions.get_hint_style">
+<tt class="descname">get_hint_style</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.FontOptions.get_hint_style" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="constants.html#constants-hint-style"><em>HINT STYLE</em></a> for the <em>FontOptions</em> object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.FontOptions.get_subpixel_order">
+<tt class="descname">get_subpixel_order</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.FontOptions.get_subpixel_order" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="constants.html#constants-subpixel-order"><em>SUBPIXEL_ORDER</em></a> for the <em>FontOptions</em> object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.FontOptions.set_antialias">
+<tt class="descname">set_antialias</tt><big>(</big><em>antialias</em><big>)</big><a class="headerlink" href="#cairo.FontOptions.set_antialias" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>antialias</strong> &#8211; the <a class="reference internal" href="constants.html#constants-antialias"><em>ANTIALIAS</em></a> mode</td>
+</tr>
+</tbody>
+</table>
+<p>This specifies the type of antialiasing to do when rendering text.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.FontOptions.set_hint_metrics">
+<tt class="descname">set_hint_metrics</tt><big>(</big><em>hint_metrics</em><big>)</big><a class="headerlink" href="#cairo.FontOptions.set_hint_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hint_metrics</strong> &#8211; the <a class="reference internal" href="constants.html#constants-hint-metrics"><em>HINT METRICS</em></a> mode</td>
+</tr>
+</tbody>
+</table>
+<p>This controls whether metrics are quantized to integer values in device
+units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.FontOptions.set_hint_style">
+<tt class="descname">set_hint_style</tt><big>(</big><em>hint_style</em><big>)</big><a class="headerlink" href="#cairo.FontOptions.set_hint_style" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hint_style</strong> &#8211; the <a class="reference internal" href="constants.html#constants-hint-style"><em>HINT STYLE</em></a></td>
+</tr>
+</tbody>
+</table>
+<p>This controls whether to fit font outlines to the pixel grid, and if so,
+whether to optimize for fidelity or contrast.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.FontOptions.set_subpixel_order">
+<tt class="descname">set_subpixel_order</tt><big>(</big><em>subpixel_order</em><big>)</big><a class="headerlink" href="#cairo.FontOptions.set_subpixel_order" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subpixel_order</strong> &#8211; the <a class="reference internal" href="constants.html#constants-subpixel-order"><em>SUBPIXEL_ORDER</em></a></td>
+</tr>
+</tbody>
+</table>
+<p>The subpixel order specifies the order of color elements within each
+pixel on the display device when rendering with an antialiasing mode of
+<a class="reference internal" href="constants.html#cairo.ANTIALIAS_SUBPIXEL" title="cairo.ANTIALIAS_SUBPIXEL"><tt class="xref py py-data docutils literal"><span class="pre">cairo.ANTIALIAS_SUBPIXEL</span></tt></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Text</a><ul>
+<li><a class="reference internal" href="#class-fontface">class FontFace()</a></li>
+<li><a class="reference internal" href="#class-freetypefontface-fontface">class FreeTypeFontFace(<tt class="docutils literal"><span class="pre">FontFace</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-toyfontface-fontface">class ToyFontFace(<tt class="docutils literal"><span class="pre">FontFace</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-userfontface-fontface">class UserFontFace(<tt class="docutils literal"><span class="pre">FontFace</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-scaledfont">class ScaledFont()</a></li>
+<li><a class="reference internal" href="#class-fontoptions">class FontOptions()</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="surfaces.html"
+                        title="previous chapter">Surfaces</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../faq.html"
+                        title="next chapter">FAQ</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/text.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../faq.html" title="FAQ"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="surfaces.html" title="Surfaces"
+             >previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2008, Steve Chaplin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

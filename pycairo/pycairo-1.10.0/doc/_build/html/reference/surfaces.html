@@ -1,0 +1,1088 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Surfaces &mdash; Pycairo v1.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.10.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pycairo v1.10.0 documentation" href="../index.html" />
+    <link rel="up" title="Reference" href="index.html" />
+    <link rel="next" title="Text" href="text.html" />
+    <link rel="prev" title="Patterns" href="patterns.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="text.html" title="Text"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="patterns.html" title="Patterns"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="surfaces">
+<span id="id1"></span><h1>Surfaces<a class="headerlink" href="#surfaces" title="Permalink to this headline">¶</a></h1>
+<p>cairo.Surface is the abstract type representing all different drawing targets
+that cairo can render to. The actual drawings are performed using a
+<a class="reference internal" href="context.html#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>A cairo.Surface is created by using backend-specific constructors
+of the form cairo.&lt;XXX&gt;Surface().</p>
+<div class="section" id="class-surface">
+<h2>class Surface()<a class="headerlink" href="#class-surface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cairo.Surface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">Surface</tt><a class="headerlink" href="#cairo.Surface" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Surface</em> is the abstract base class from which all the other surface
+classes derive. It cannot be instantiated directly.</p>
+<dl class="method">
+<dt id="cairo.Surface.copy_page">
+<tt class="descname">copy_page</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.copy_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emits the current page for backends that support multiple pages, but
+doesn&#8217;t clear it, so that the contents of the current page will be
+retained for the next page.  Use <a class="reference internal" href="#cairo.Surface.show_page" title="cairo.Surface.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">show_page()</span></tt></a> if you want to get an
+empty page after the emission.</p>
+<p><a class="reference internal" href="context.html#cairo.Context.copy_page" title="cairo.Context.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_page()</span></tt></a> is a convenience function for this.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.create_similar">
+<tt class="descname">create_similar</tt><big>(</big><em>content</em>, <em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#cairo.Surface.create_similar" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>content</strong> &#8211; the <a class="reference internal" href="constants.html#constants-content"><em>CONTENT</em></a> for the new
+surface</li>
+<li><strong>width</strong> (<em>int</em>) &#8211; width of the new surface, (in device-space units)</li>
+<li><strong>height</strong> &#8211; height of the new surface (in device-space units)</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a newly allocated <em>Surface</em>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Create a <em>Surface</em> that is as compatible as possible with the existing
+surface. For example the new surface will have the same fallback
+resolution and <a class="reference internal" href="text.html#cairo.FontOptions" title="cairo.FontOptions"><tt class="xref py py-class docutils literal"><span class="pre">FontOptions</span></tt></a>. Generally, the new surface will
+also use the same backend, unless that is not possible for some
+reason.</p>
+<p>Initially the surface contents are all 0 (transparent if contents have
+transparency, black otherwise.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.finish">
+<tt class="descname">finish</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method finishes the <em>Surface</em> and drops all references to external
+resources. For example, for the Xlib backend it means that cairo will no
+longer access the drawable, which can be freed.  After calling finish()
+the only valid operations on a <em>Surface</em> are flushing and finishing it.
+Further drawing to the surface will not affect the surface but will
+instead trigger a <a class="reference internal" href="exceptions.html#cairo.cairo.Error" title="cairo.cairo.Error"><tt class="xref py py-exc docutils literal"><span class="pre">cairo.Error</span></tt></a> exception.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.flush">
+<tt class="descname">flush</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do any pending drawing for the <em>Surface</em> and also restore any temporary
+modification&#8217;s cairo has made to the <em>Surface&#8217;s</em> state. This method
+must be called before switching from drawing on the <em>Surface</em> with cairo
+to drawing on it directly with native APIs. If the <em>Surface</em> doesn&#8217;t
+support direct access, then this function does nothing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.get_content">
+<tt class="descname">get_content</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.get_content" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">The <a class="reference internal" href="constants.html#constants-content"><em>CONTENT</em></a> type of <em>Surface</em>,
+which indicates whether the <em>Surface</em> contains color and/or alpha
+information.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.get_device_offset">
+<tt class="descname">get_device_offset</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.get_device_offset" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x_offset, y_offset) a tuple of float<ul class="simple">
+<li>x_offset: the offset in the X direction, in device units</li>
+<li>y_offset: the offset in the Y direction, in device units</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This method returns the previous device offset set by
+<a class="reference internal" href="#cairo.Surface.set_device_offset" title="cairo.Surface.set_device_offset"><tt class="xref py py-meth docutils literal"><span class="pre">set_device_offset()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.get_fallback_resolution">
+<tt class="descname">get_fallback_resolution</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.get_fallback_resolution" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x_pixels_per_inch, y_pixels_per_inch) a tuple of float<ul class="simple">
+<li>x_pixels_per_inch: horizontal pixels per inch</li>
+<li>y_pixels_per_inch: vertical pixels per inch</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This method returns the previous fallback resolution set by
+<a class="reference internal" href="#cairo.Surface.set_fallback_resolution" title="cairo.Surface.set_fallback_resolution"><tt class="xref py py-meth docutils literal"><span class="pre">set_fallback_resolution()</span></tt></a>, or default fallback resolution if
+never set.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.get_font_options">
+<tt class="descname">get_font_options</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.get_font_options" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">a <a class="reference internal" href="text.html#cairo.FontOptions" title="cairo.FontOptions"><tt class="xref py py-class docutils literal"><span class="pre">FontOptions</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>Retrieves the default font rendering options for the <em>Surface</em>. This
+allows display surfaces to report the correct subpixel order for
+rendering on them, print surfaces to disable hinting of metrics and so
+forth. The result can then be used with <a class="reference internal" href="text.html#cairo.ScaledFont" title="cairo.ScaledFont"><tt class="xref py py-class docutils literal"><span class="pre">ScaledFont</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.mark_dirty">
+<tt class="descname">mark_dirty</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.mark_dirty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells cairo that drawing has been done to <em>Surface</em> using means other
+than cairo, and that cairo should reread any cached areas. Note that you
+must call <a class="reference internal" href="#cairo.Surface.flush" title="cairo.Surface.flush"><tt class="xref py py-meth docutils literal"><span class="pre">flush()</span></tt></a> before doing such drawing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.mark_dirty_rectangle">
+<tt class="descname">mark_dirty_rectangle</tt><big>(</big><em>x</em>, <em>y</em>, <em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#cairo.Surface.mark_dirty_rectangle" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>int</em>) &#8211; X coordinate of dirty rectangle</li>
+<li><strong>y</strong> (<em>int</em>) &#8211; Y coordinate of dirty rectangle</li>
+<li><strong>width</strong> (<em>int</em>) &#8211; width of dirty rectangle</li>
+<li><strong>height</strong> (<em>int</em>) &#8211; height of dirty rectangle</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Like <a class="reference internal" href="#cairo.Surface.mark_dirty" title="cairo.Surface.mark_dirty"><tt class="xref py py-meth docutils literal"><span class="pre">mark_dirty()</span></tt></a>, but drawing has been done only to the
+specified rectangle, so that cairo can retain cached contents for other
+parts of the surface.</p>
+<p>Any cached clip set on the <em>Surface</em> will be reset by this function, to
+make sure that future cairo calls have the clip set that they expect.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.set_device_offset">
+<tt class="descname">set_device_offset</tt><big>(</big><em>x_offset</em>, <em>y_offset</em><big>)</big><a class="headerlink" href="#cairo.Surface.set_device_offset" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x_offset</strong> (<em>float</em>) &#8211; the offset in the X direction, in device units</li>
+<li><strong>y_offset</strong> (<em>float</em>) &#8211; the offset in the Y direction, in device units</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Sets an offset that is added to the device coordinates determined by the
+CTM when drawing to <em>Surface</em>. One use case for this function is when we
+want to create a <em>Surface</em> that redirects drawing for a portion of an
+onscreen surface to an offscreen surface in a way that is completely
+invisible to the user of the cairo API. Setting a transformation via
+<a class="reference internal" href="context.html#cairo.Context.translate" title="cairo.Context.translate"><tt class="xref py py-meth docutils literal"><span class="pre">Context.translate()</span></tt></a> isn&#8217;t sufficient to do this, since functions
+like <a class="reference internal" href="context.html#cairo.Context.device_to_user" title="cairo.Context.device_to_user"><tt class="xref py py-meth docutils literal"><span class="pre">Context.device_to_user()</span></tt></a> will expose the hidden offset.</p>
+<p>Note that the offset affects drawing to the surface as well as using the
+surface in a source pattern.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.set_fallback_resolution">
+<tt class="descname">set_fallback_resolution</tt><big>(</big><em>x_pixels_per_inch</em>, <em>y_pixels_per_inch</em><big>)</big><a class="headerlink" href="#cairo.Surface.set_fallback_resolution" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x_pixels_per_inch</strong> (<em>float</em>) &#8211; horizontal setting for pixels per inch</li>
+<li><strong>y_pixels_per_inch</strong> (<em>float</em>) &#8211; vertical setting for pixels per inch</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Set the horizontal and vertical resolution for image fallbacks.</p>
+<p>When certain operations aren&#8217;t supported natively by a backend, cairo
+will fallback by rendering operations to an image and then overlaying
+that image onto the output. For backends that are natively
+vector-oriented, this function can be used to set the resolution used
+for these image fallbacks, (larger values will result in more detailed
+images, but also larger file sizes).</p>
+<p>Some examples of natively vector-oriented backends are the ps, pdf, and
+svg backends.</p>
+<p>For backends that are natively raster-oriented, image fallbacks are
+still possible, but they are always performed at the native device
+resolution. So this function has no effect on those backends.</p>
+<p>Note: The fallback resolution only takes effect at the time of
+completing a page (with <a class="reference internal" href="context.html#cairo.Context.show_page" title="cairo.Context.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_page()</span></tt></a> or
+<a class="reference internal" href="context.html#cairo.Context.copy_page" title="cairo.Context.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_page()</span></tt></a>) so there is currently no way to have more
+than one fallback resolution in effect on a single page.</p>
+<p>The default fallback resoultion is 300 pixels per inch in both
+dimensions.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.show_page">
+<tt class="descname">show_page</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Surface.show_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emits and clears the current page for backends that support multiple
+pages. Use <a class="reference internal" href="#cairo.Surface.copy_page" title="cairo.Surface.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">copy_page()</span></tt></a> if you don&#8217;t want to clear the page.</p>
+<p>There is a convenience function for this that takes a
+<a class="reference internal" href="context.html#cairo.Context.show_page" title="cairo.Context.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_page()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Surface.write_to_png">
+<tt class="descname">write_to_png</tt><big>(</big><em>fobj</em><big>)</big><a class="headerlink" href="#cairo.Surface.write_to_png" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fobj</strong> (<em>str, file or file-like object</em>) &#8211; the file to write to</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first"><em>MemoryError</em> if memory could not be allocated for the operation</p>
+<p class="last"><em>IOError</em> if an I/O error occurs while attempting to write the file</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Writes the contents of <em>Surface</em> to <em>fobj</em> as a PNG image.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-imagesurface-surface">
+<h2>class ImageSurface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-imagesurface-surface" title="Permalink to this headline">¶</a></h2>
+<p>A <em>cairo.ImageSurface</em> provides the ability to render to memory buffers either
+allocated by cairo or by the calling code. The supported image formats are
+those defined in <a class="reference internal" href="constants.html#constants-format"><em>FORMAT attributes</em></a>.</p>
+<dl class="class">
+<dt id="cairo.ImageSurface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">ImageSurface</tt><big>(</big><em>format</em>, <em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#cairo.ImageSurface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>format</strong> &#8211; <a class="reference internal" href="constants.html#constants-format"><em>FORMAT</em></a> of pixels in the surface to create</li>
+<li><strong>width</strong> &#8211; width of the surface, in pixels</li>
+<li><strong>height</strong> &#8211; height of the surface, in pixels</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a new <em>ImageSurface</em></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>MemoryError</em> in case of no memory</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Creates an <em>ImageSurface</em> of the specified format and dimensions. Initially
+the surface contents are all 0. (Specifically, within each pixel, each
+color or alpha channel belonging to format will be 0. The contents of bits
+within a pixel, but not belonging to the given format are undefined).</p>
+<dl class="classmethod">
+<dt id="cairo.ImageSurface.create_for_data">
+<em class="property">classmethod </em><tt class="descname">create_for_data</tt><big>(</big><em>data</em>, <em>format</em>, <em>width</em>, <em>height</em><span class="optional">[</span>, <em>stride</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.ImageSurface.create_for_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not yet available in Python 3</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cairo.ImageSurface.create_from_png">
+<em class="property">classmethod </em><tt class="descname">create_from_png</tt><big>(</big><em>fobj</em><big>)</big><a class="headerlink" href="#cairo.ImageSurface.create_from_png" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fobj</strong> &#8211; a filename, file, or file-like object of the PNG to load.</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">a new <em>ImageSurface</em> initialized the contents to the given
+PNG file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cairo.ImageSurface.format_stride_for_width">
+<em class="property">static </em><tt class="descname">format_stride_for_width</tt><big>(</big><em>format</em>, <em>width</em><big>)</big><a class="headerlink" href="#cairo.ImageSurface.format_stride_for_width" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>format</strong> &#8211; a cairo <a class="reference internal" href="constants.html#constants-format"><em>FORMAT</em></a> value</li>
+<li><strong>width</strong> &#8211; the desired width of an <em>ImageSurface</em> to be created.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the appropriate stride to use given the desired format and
+width, or -1 if either the format is invalid or the width too large.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This method provides a stride value that will respect all alignment
+requirements of the accelerated image-rendering code within
+cairo. Typical usage will be of the form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stride</span> <span class="o">=</span> <span class="n">cairo</span><span class="o">.</span><span class="n">ImageSurface</span><span class="o">.</span><span class="n">format_stride_for_width</span> <span class="p">(</span><span class="n">format</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="n">cairo</span><span class="o">.</span><span class="n">ImageSurface</span><span class="o">.</span><span class="n">create_for_data</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">format</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">stride</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ImageSurface.get_data">
+<tt class="descname">get_data</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ImageSurface.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not yet available in Python 3</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ImageSurface.get_format">
+<tt class="descname">get_format</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ImageSurface.get_format" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the <a class="reference internal" href="constants.html#constants-format"><em>FORMAT</em></a> of the <em>ImageSurface</em>.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ImageSurface.get_height">
+<tt class="descname">get_height</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ImageSurface.get_height" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the height of the <em>ImageSurface</em> in pixels.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ImageSurface.get_stride">
+<tt class="descname">get_stride</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ImageSurface.get_stride" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the stride of the <em>ImageSurface</em> in bytes. The stride is the distance in bytes from the beginning of one row of the image data to the beginning of the next row.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.ImageSurface.get_width">
+<tt class="descname">get_width</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.ImageSurface.get_width" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the width of the <em>ImageSurface</em> in pixels.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-pdfsurface-surface">
+<h2>class PDFSurface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-pdfsurface-surface" title="Permalink to this headline">¶</a></h2>
+<p>The PDFSurface is used to render cairo graphics to Adobe PDF files and is a
+multi-page vector surface backend.</p>
+<dl class="class">
+<dt id="cairo.PDFSurface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">PDFSurface</tt><big>(</big><em>fobj</em>, <em>width_in_points</em>, <em>height_in_points</em><big>)</big><a class="headerlink" href="#cairo.PDFSurface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fobj</strong> (<em>None, str, file or file-like object</em>) &#8211; a filename or writable file object. None may be used to specify no output. This will generate a <em>PDFSurface</em> that may be queried and used as a source, without generating a temporary file.</li>
+<li><strong>width_in_points</strong> (<em>float</em>) &#8211; width of the surface, in points
+(1 point == 1/72.0 inch)</li>
+<li><strong>height_in_points</strong> (<em>float</em>) &#8211; height of the surface, in points
+(1 point == 1/72.0 inch)</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a new <em>PDFSurface</em> of the specified size in points to be written
+to <em>fobj</em>.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>MemoryError</em> in case of no memory</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+<dl class="method">
+<dt id="cairo.PDFSurface.set_size">
+<tt class="descname">set_size</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.PDFSurface.set_size" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>width_in_points</strong> (<em>float</em>) &#8211; new surface width, in points
+(1 point == 1/72.0 inch)</li>
+<li><strong>height_in_points</strong> (<em>float</em>) &#8211; new surface height, in points
+(1 point == 1/72.0 inch)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Changes the size of a <em>PDFSurface</em> for the current (and subsequent) pages.</p>
+<p>This function should only be called before any drawing operations have
+been performed on the current page. The simplest way to do this is to
+call this function immediately after creating the surface or immediately
+after completing a page with either <a class="reference internal" href="context.html#cairo.Context.show_page" title="cairo.Context.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_page()</span></tt></a> or
+<a class="reference internal" href="context.html#cairo.Context.copy_page" title="cairo.Context.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_page()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-pssurface-surface">
+<h2>class PSSurface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-pssurface-surface" title="Permalink to this headline">¶</a></h2>
+<p>The <em>PSSurface</em> is used to render cairo graphics to Adobe PostScript files and
+is a multi-page vector surface backend.</p>
+<dl class="class">
+<dt id="cairo.PSSurface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">PSSurface</tt><big>(</big><em>fobj</em>, <em>width_in_points</em>, <em>height_in_points</em><big>)</big><a class="headerlink" href="#cairo.PSSurface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fobj</strong> (<em>None, str, file or file-like object</em>) &#8211; a filename or writable file object. None may be used to specify no output. This will generate a <em>PSSurface</em> that may be queried and used as a source, without generating a temporary file.</li>
+<li><strong>width_in_points</strong> (<em>float</em>) &#8211; width of the surface, in points
+(1 point == 1/72.0 inch)</li>
+<li><strong>height_in_points</strong> (<em>float</em>) &#8211; height of the surface, in points
+(1 point == 1/72.0 inch)</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a new <em>PDFSurface</em> of the specified size in points to be written
+to <em>fobj</em>.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>MemoryError</em> in case of no memory</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the size of individual pages of the PostScript output can
+vary. See <a class="reference internal" href="#cairo.PSSurface.set_size" title="cairo.PSSurface.set_size"><tt class="xref py py-meth docutils literal"><span class="pre">set_size()</span></tt></a>.</p>
+<dl class="method">
+<dt id="cairo.PSSurface.dsc_begin_page_setup">
+<tt class="descname">dsc_begin_page_setup</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.PSSurface.dsc_begin_page_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method indicates that subsequent calls to
+<a class="reference internal" href="#cairo.PSSurface.dsc_comment" title="cairo.PSSurface.dsc_comment"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_comment()</span></tt></a> should direct comments to the PageSetup
+section of the PostScript output.</p>
+<p>This method call is only needed for the first page of a surface. It
+should be called after any call to <a class="reference internal" href="#cairo.PSSurface.dsc_begin_setup" title="cairo.PSSurface.dsc_begin_setup"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_begin_setup()</span></tt></a> and
+before any drawing is performed to the surface.</p>
+<p>See <a class="reference internal" href="#cairo.PSSurface.dsc_comment" title="cairo.PSSurface.dsc_comment"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_comment()</span></tt></a> for more details.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.PSSurface.dsc_begin_setup">
+<tt class="descname">dsc_begin_setup</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.PSSurface.dsc_begin_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function indicates that subsequent calls to <a class="reference internal" href="#cairo.PSSurface.dsc_comment" title="cairo.PSSurface.dsc_comment"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_comment()</span></tt></a>
+should direct comments to the Setup section of the PostScript output.</p>
+<p>This function should be called at most once per surface, and must be
+called before any call to <a class="reference internal" href="#cairo.PSSurface.dsc_begin_page_setup" title="cairo.PSSurface.dsc_begin_page_setup"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_begin_page_setup()</span></tt></a> and before any
+drawing is performed to the surface.</p>
+<p>See <a class="reference internal" href="#cairo.PSSurface.dsc_comment" title="cairo.PSSurface.dsc_comment"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_comment()</span></tt></a> for more details.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.PSSurface.dsc_comment">
+<tt class="descname">dsc_comment</tt><big>(</big><em>comment</em><big>)</big><a class="headerlink" href="#cairo.PSSurface.dsc_comment" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>comment</strong> (<em>str</em>) &#8211; a comment string to be emitted into the PostScript output</td>
+</tr>
+</tbody>
+</table>
+<p>Emit a comment into the PostScript output for the given surface.</p>
+<p>The comment is expected to conform to the PostScript Language
+Document Structuring Conventions (DSC). Please see that manual for
+details on the available comments and their meanings. In
+particular, the %%IncludeFeature comment allows a
+device-independent means of controlling printer device features. So
+the PostScript Printer Description Files Specification will also be
+a useful reference.</p>
+<p>The comment string must begin with a percent character (%) and the
+total length of the string (including any initial percent
+characters) must not exceed 255 characters. Violating either of
+these conditions will place <em>PSSurface</em> into an error state. But
+beyond these two conditions, this function will not enforce
+conformance of the comment with any particular specification.</p>
+<p>The comment string should not have a trailing newline.</p>
+<p>The DSC specifies different sections in which particular comments
+can appear. This function provides for comments to be emitted
+within three sections: the header, the Setup section, and the
+PageSetup section.  Comments appearing in the first two sections
+apply to the entire document while comments in the BeginPageSetup
+section apply only to a single page.</p>
+<p>For comments to appear in the header section, this function should
+be called after the surface is created, but before a call to
+<a class="reference internal" href="#cairo.PSSurface.dsc_begin_setup" title="cairo.PSSurface.dsc_begin_setup"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_begin_setup()</span></tt></a>.</p>
+<p>For comments to appear in the Setup section, this function should be
+called after a call to <a class="reference internal" href="#cairo.PSSurface.dsc_begin_setup" title="cairo.PSSurface.dsc_begin_setup"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_begin_setup()</span></tt></a> but before a call to
+<a class="reference internal" href="#cairo.PSSurface.dsc_begin_page_setup" title="cairo.PSSurface.dsc_begin_page_setup"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_begin_page_setup()</span></tt></a>.</p>
+<p>For comments to appear in the PageSetup section, this function should be
+called after a call to <a class="reference internal" href="#cairo.PSSurface.dsc_begin_page_setup" title="cairo.PSSurface.dsc_begin_page_setup"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_begin_page_setup()</span></tt></a>.</p>
+<p>Note that it is only necessary to call <a class="reference internal" href="#cairo.PSSurface.dsc_begin_page_setup" title="cairo.PSSurface.dsc_begin_page_setup"><tt class="xref py py-meth docutils literal"><span class="pre">dsc_begin_page_setup()</span></tt></a> for
+the first page of any surface. After a call to <a class="reference internal" href="context.html#cairo.Context.show_page" title="cairo.Context.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_page()</span></tt></a>
+or <a class="reference internal" href="context.html#cairo.Context.copy_page" title="cairo.Context.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_page()</span></tt></a> comments are unambiguously directed to the
+PageSetup section of the current page. But it doesn&#8217;t hurt to call this
+function at the beginning of every page as that consistency may make the
+calling code simpler.</p>
+<p>As a final note, cairo automatically generates several comments on
+its own. As such, applications must not manually generate any of
+the following comments:</p>
+<p>Header section: %!PS-Adobe-3.0, %Creator, %CreationDate, %Pages,
+%BoundingBox, %DocumentData, %LanguageLevel, %EndComments.</p>
+<p>Setup section: %BeginSetup, %EndSetup</p>
+<p>PageSetup section: %BeginPageSetup, %PageBoundingBox,
+%EndPageSetup.</p>
+<p>Other sections: %BeginProlog, %EndProlog, %Page, %Trailer, %EOF</p>
+<p>Here is an example sequence showing how this function might be used:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">surface</span> <span class="o">=</span> <span class="n">PSSurface</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">Title: My excellent document&quot;</span><span class="p">)</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">Copyright: Copyright (C) 2006 Cairo Lover&quot;</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_begin_setup</span> <span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">IncludeFeature: *MediaColor White&quot;</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_begin_page_setup</span> <span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">IncludeFeature: *PageSize A3&quot;</span><span class="p">)</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">IncludeFeature: *InputSlot LargeCapacity&quot;</span><span class="p">)</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">IncludeFeature: *MediaType Glossy&quot;</span><span class="p">)</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">IncludeFeature: *MediaColor Blue&quot;</span><span class="p">)</span>
+<span class="o">...</span> <span class="n">draw</span> <span class="n">to</span> <span class="n">first</span> <span class="n">page</span> <span class="n">here</span> <span class="o">..</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">show_page</span> <span class="p">(</span><span class="n">cr</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">surface</span><span class="o">.</span><span class="n">dsc_comment</span> <span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">IncludeFeature:  PageSize A5&quot;</span><span class="p">);</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.PSSurface.get_eps">
+<tt class="descname">get_eps</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.PSSurface.get_eps" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">True iff the <em>PSSurface</em> will output Encapsulated PostScript.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="cairo.PSSurface.ps_level_to_string">
+<em class="property">static </em><tt class="descname">ps_level_to_string</tt><big>(</big><em>level</em><big>)</big><a class="headerlink" href="#cairo.PSSurface.ps_level_to_string" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> &#8211; a <a class="reference internal" href="constants.html#constants-ps-level"><em>PS_LEVEL</em></a></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the string associated to given level.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="exceptions.html#cairo.cairo.Error" title="cairo.cairo.Error"><tt class="xref py py-exc docutils literal"><span class="pre">cairo.Error</span></tt></a> if <em>level</em> isn&#8217;t valid.</td>
+</tr>
+</tbody>
+</table>
+<p>Get the string representation of the given <em>level</em>.  See
+<tt class="xref py py-meth docutils literal"><span class="pre">ps_get_levels()</span></tt> for a way to get the list of valid level
+ids.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.PSSurface.restrict_to_level">
+<tt class="descname">restrict_to_level</tt><big>(</big><em>level</em><big>)</big><a class="headerlink" href="#cairo.PSSurface.restrict_to_level" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>level</strong> &#8211; a <a class="reference internal" href="constants.html#constants-ps-level"><em>PS_LEVEL</em></a></td>
+</tr>
+</tbody>
+</table>
+<p>Restricts the generated PostSript file to <em>level</em>. See
+<tt class="xref py py-meth docutils literal"><span class="pre">ps_get_levels()</span></tt> for a list of available level values that
+can be used here.</p>
+<p>This function should only be called before any drawing operations have
+been performed on the given surface. The simplest way to do this is to
+call this function immediately after creating the surface.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.PSSurface.set_eps">
+<tt class="descname">set_eps</tt><big>(</big><em>eps</em><big>)</big><a class="headerlink" href="#cairo.PSSurface.set_eps" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>eps</strong> (<em>bool</em>) &#8211; True to output EPS format PostScript</td>
+</tr>
+</tbody>
+</table>
+<p>If <em>eps</em> is True, the PostScript surface will output Encapsulated
+PostScript.</p>
+<p>This function should only be called before any drawing operations have
+been performed on the current page. The simplest way to do this is to
+call this function immediately after creating the surface. An
+Encapsulated PostScript file should never contain more than one page.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.PSSurface.set_size">
+<tt class="descname">set_size</tt><big>(</big><em>width_in_points</em>, <em>height_in_points</em><big>)</big><a class="headerlink" href="#cairo.PSSurface.set_size" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>width_in_points</strong> (<em>float</em>) &#8211; new surface width, in points (1 point == 1/72.0 inch)</li>
+<li><strong>height_in_points</strong> (<em>float</em>) &#8211; new surface height, in points (1 point == 1/72.0 inch)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Changes the size of a PostScript surface for the current (and
+subsequent) pages.</p>
+<p>This function should only be called before any drawing operations
+have been performed on the current page. The simplest way to do
+this is to call this function immediately after creating the
+surface or immediately after completing a page with either
+<a class="reference internal" href="context.html#cairo.Context.show_page" title="cairo.Context.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_page()</span></tt></a> or <a class="reference internal" href="context.html#cairo.Context.copy_page" title="cairo.Context.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_page()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-svgsurface-surface">
+<h2>class SVGSurface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-svgsurface-surface" title="Permalink to this headline">¶</a></h2>
+<p>The <em>SVGSurface</em> is used to render cairo graphics to SVG files and is a
+multi-page vector surface backend</p>
+<dl class="class">
+<dt id="cairo.SVGSurface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">SVGSurface</tt><big>(</big><em>fobj</em>, <em>width_in_points</em>, <em>height_in_points</em><big>)</big><a class="headerlink" href="#cairo.SVGSurface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fobj</strong> (<em>None, str, file or file-like object</em>) &#8211; a filename or writable file object. None may be used to specify no output. This will generate a <em>SVGSurface</em> that may be queried and used as a source, without generating a temporary file.</li>
+<li><strong>width_in_points</strong> (<em>float</em>) &#8211; width of the surface, in points (1 point == 1/72.0 inch)</li>
+<li><strong>height_in_points</strong> (<em>float</em>) &#8211; height of the surface, in points (1 point == 1/72.0 inch)</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a new <em>SVGSurface</em> of the specified size in points to be written to <em>fobj</em>.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><em>MemoryError</em> in case of no memory</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cairo.SVGSurface.get_versions">
+<tt class="descname">get_versions</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.SVGSurface.get_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.SVGSurface.restrict_to_version">
+<tt class="descname">restrict_to_version</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.SVGSurface.restrict_to_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.SVGSurface.version_to_string">
+<tt class="descname">version_to_string</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.SVGSurface.version_to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented in pycairo (yet)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="class-win32surface-surface">
+<h2>class Win32Surface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-win32surface-surface" title="Permalink to this headline">¶</a></h2>
+<p>The Microsoft Windows surface is used to render cairo graphics to Microsoft
+Windows windows, bitmaps, and printing device contexts.</p>
+<dl class="class">
+<dt id="cairo.Win32Surface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">Win32Surface</tt><big>(</big><em>hdc</em><big>)</big><a class="headerlink" href="#cairo.Win32Surface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hdc</strong> (<em>int</em>) &#8211; the DC to create a surface for</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the newly created surface</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a cairo surface that targets the given DC. The DC will be queried
+for its initial clip extents, and this will be used as the size of the
+cairo surface. The resulting surface will always be of format
+cairo.FORMAT_RGB24, see <a class="reference internal" href="constants.html#constants-format"><em>FORMAT attributes</em></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-win32printingsurface-surface">
+<h2>class Win32PrintingSurface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-win32printingsurface-surface" title="Permalink to this headline">¶</a></h2>
+<p>The Win32PrintingSurface is a multi-page vector surface type.</p>
+<dl class="class">
+<dt id="cairo.Win32PrintingSurface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">Win32PrintingSurface</tt><big>(</big><em>hdc</em><big>)</big><a class="headerlink" href="#cairo.Win32PrintingSurface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hdc</strong> (<em>int</em>) &#8211; the DC to create a surface for</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the newly created surface</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a cairo surface that targets the given DC. The DC will be queried
+for its initial clip extents, and this will be used as the size of the
+cairo surface. The DC should be a printing DC; antialiasing will be
+ignored, and GDI will be used as much as possible to draw to the surface.</p>
+<p>The returned surface will be wrapped using the paginated surface to provide
+correct complex rendering behaviour; <a class="reference internal" href="#cairo.Surface.show_page" title="cairo.Surface.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">cairo.Surface.show_page()</span></tt></a> and
+associated methods must be used for correct output.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-xcbsurface-surface">
+<h2>class XCBSurface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-xcbsurface-surface" title="Permalink to this headline">¶</a></h2>
+<p>The XCB surface is used to render cairo graphics to X Window System windows
+and pixmaps using the XCB library.</p>
+<p>Note that the XCB surface automatically takes advantage of the X render
+extension if it is available.</p>
+<dl class="class">
+<dt id="cairo.XCBSurface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">XCBSurface</tt><a class="headerlink" href="#cairo.XCBSurface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>connection</strong> &#8211; an XCB connection</li>
+<li><strong>drawable</strong> &#8211; a X drawable</li>
+<li><strong>visualtype</strong> &#8211; a X visualtype</li>
+<li><strong>width</strong> &#8211; The surface width</li>
+<li><strong>height</strong> &#8211; The surface height</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a cairo surface that targets the given drawable (pixmap or window).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This methods works using xpyb.</p>
+</div>
+<dl class="method">
+<dt id="cairo.XCBSurface.set_size">
+<tt class="descname">set_size</tt><big>(</big><em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#cairo.XCBSurface.set_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>width</strong> &#8211; The width of the surface</li>
+<li><strong>height</strong> &#8211; The height of the surface</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Informs cairo of the new size of the X Drawable underlying the surface. For a surface created
+for a Window (rather than a Pixmap), this function must be called each time the size of the
+window changes. (For a subwindow, you are normally resizing the window yourself, but for a
+toplevel window, it is necessary to listen for ConfigureNotify events.)</p>
+<p>A Pixmap can never change size, so it is never necessary to call this function on a surface
+created for a Pixmap.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="class-xlibsurface-surface">
+<h2>class XlibSurface(<a class="reference internal" href="#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>)<a class="headerlink" href="#class-xlibsurface-surface" title="Permalink to this headline">¶</a></h2>
+<p>The XLib surface is used to render cairo graphics to X Window System windows
+and pixmaps using the XLib library.</p>
+<p>Note that the XLib surface automatically takes advantage of X render extension
+if it is available.</p>
+<dl class="class">
+<dt id="cairo.XlibSurface">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">XlibSurface</tt><a class="headerlink" href="#cairo.XlibSurface" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><em>XlibSurface</em> cannot be instantiated directly because Python
+interaction with Xlib would require open source Python bindings to Xlib
+which provided a C API.
+However, an <em>XlibSurface</em> instance can be returned from a function call
+when using pygtk <a class="reference external" href="http://www.pygtk.org/">http://www.pygtk.org/</a>.</p>
+</div>
+<dl class="method">
+<dt id="cairo.XlibSurface.get_depth">
+<tt class="descname">get_depth</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.XlibSurface.get_depth" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the number of bits used to represent each pixel value.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.XlibSurface.get_height">
+<tt class="descname">get_height</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.XlibSurface.get_height" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the height of the X Drawable underlying the surface in pixels.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.XlibSurface.get_width">
+<tt class="descname">get_width</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.XlibSurface.get_width" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the width of the X Drawable underlying the surface in pixels.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Surfaces</a><ul>
+<li><a class="reference internal" href="#class-surface">class Surface()</a></li>
+<li><a class="reference internal" href="#class-imagesurface-surface">class ImageSurface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-pdfsurface-surface">class PDFSurface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-pssurface-surface">class PSSurface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-svgsurface-surface">class SVGSurface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-win32surface-surface">class Win32Surface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-win32printingsurface-surface">class Win32PrintingSurface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-xcbsurface-surface">class XCBSurface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+<li><a class="reference internal" href="#class-xlibsurface-surface">class XlibSurface(<tt class="docutils literal"><span class="pre">Surface</span></tt>)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="patterns.html"
+                        title="previous chapter">Patterns</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="text.html"
+                        title="next chapter">Text</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/surfaces.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="text.html" title="Text"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="patterns.html" title="Patterns"
+             >previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2008, Steve Chaplin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

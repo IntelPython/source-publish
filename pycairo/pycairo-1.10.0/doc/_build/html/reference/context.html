@@ -1,0 +1,2223 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Cairo Context &mdash; Pycairo v1.10.0 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.10.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Pycairo v1.10.0 documentation" href="../index.html" />
+    <link rel="up" title="Reference" href="index.html" />
+    <link rel="next" title="Exceptions" href="exceptions.html" />
+    <link rel="prev" title="Module Functions and Constants" href="constants.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="Exceptions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="constants.html" title="Module Functions and Constants"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cairo-context">
+<span id="context"></span><h1>Cairo Context<a class="headerlink" href="#cairo-context" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="class-context">
+<h2>class Context()<a class="headerlink" href="#class-context" title="Permalink to this headline">¶</a></h2>
+<p><em>Context</em> is the main object used when drawing with cairo. To draw with cairo,
+you create a <em>Context</em>, set the target surface, and drawing options for the
+<em>Context</em>, create shapes with functions like <a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.move_to()</span></tt></a> and
+<a class="reference internal" href="#cairo.Context.line_to" title="cairo.Context.line_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.line_to()</span></tt></a>, and then draw shapes with <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke()</span></tt></a> or
+<a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a>.</p>
+<p><em>Contexts</em> can be pushed to a stack via <a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">Context.save()</span></tt></a>. They may then
+safely be changed, without loosing the current state. Use
+<a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">Context.restore()</span></tt></a> to restore to the saved state.</p>
+<dl class="class">
+<dt id="cairo.Context">
+<em class="property">class </em><tt class="descclassname">cairo.</tt><tt class="descname">Context</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#cairo.Context" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> &#8211; target <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a> for the context</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">a newly allocated <em>Context</em></td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><em>MemoryError</em> in case of no memory</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a new <em>Context</em> with all graphics state parameters set to default
+values and with <em>target</em> as a target surface. The target surface should be
+constructed with a backend-specific function such as <a class="reference internal" href="surfaces.html#cairo.ImageSurface" title="cairo.ImageSurface"><tt class="xref py py-class docutils literal"><span class="pre">ImageSurface</span></tt></a>
+(or any other cairo backend surface create variant).</p>
+<dl class="method">
+<dt id="cairo.Context.append_path">
+<tt class="descname">append_path</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#cairo.Context.append_path" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; <a class="reference internal" href="paths.html#cairo.Path" title="cairo.Path"><tt class="xref py py-class docutils literal"><span class="pre">Path</span></tt></a> to be appended</td>
+</tr>
+</tbody>
+</table>
+<p>Append the <em>path</em> onto the current path. The <em>path</em> may be either the
+return value from one of <a class="reference internal" href="#cairo.Context.copy_path" title="cairo.Context.copy_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_path()</span></tt></a> or
+<a class="reference internal" href="#cairo.Context.copy_path_flat" title="cairo.Context.copy_path_flat"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_path_flat()</span></tt></a> or it may be constructed manually (in C).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.arc">
+<tt class="descname">arc</tt><big>(</big><em>xc</em>, <em>yc</em>, <em>radius</em>, <em>angle1</em>, <em>angle2</em><big>)</big><a class="headerlink" href="#cairo.Context.arc" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xc</strong> (<em>float</em>) &#8211; X position of the center of the arc</li>
+<li><strong>yc</strong> (<em>float</em>) &#8211; Y position of the center of the arc</li>
+<li><strong>radius</strong> (<em>float</em>) &#8211; the radius of the arc</li>
+<li><strong>angle1</strong> (<em>float</em>) &#8211; the start angle, in radians</li>
+<li><strong>angle2</strong> (<em>float</em>) &#8211; the end angle, in radians</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds a circular arc of the given <em>radius</em> to the current path.  The arc
+is centered at (<em>xc, yc</em>), begins at <em>angle1</em> and proceeds in the
+direction of increasing angles to end at <em>angle2</em>. If <em>angle2</em> is less
+than <em>angle1</em> it will be progressively increased by 2*PI until it is
+greater than <em>angle1</em>.</p>
+<p>If there is a current point, an initial line segment will be added to
+the path to connect the current point to the beginning of the arc. If
+this initial line is undesired, it can be avoided by calling
+<a class="reference internal" href="#cairo.Context.new_sub_path" title="cairo.Context.new_sub_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.new_sub_path()</span></tt></a> before calling <a class="reference internal" href="#cairo.Context.arc" title="cairo.Context.arc"><tt class="xref py py-meth docutils literal"><span class="pre">Context.arc()</span></tt></a>.</p>
+<p>Angles are measured in radians. An angle of 0.0 is in the direction of
+the positive X axis (in user space). An angle of PI/2.0 radians (90
+degrees) is in the direction of the positive Y axis (in user
+space). Angles increase in the direction from the positive X axis toward
+the positive Y axis. So with the default transformation matrix, angles
+increase in a clockwise direction.</p>
+<p>To convert from degrees to radians, use <tt class="docutils literal"><span class="pre">degrees</span> <span class="pre">*</span> <span class="pre">(math.pi</span> <span class="pre">/</span> <span class="pre">180)</span></tt>.</p>
+<p>This function gives the arc in the direction of increasing angles; see
+<a class="reference internal" href="#cairo.Context.arc_negative" title="cairo.Context.arc_negative"><tt class="xref py py-meth docutils literal"><span class="pre">Context.arc_negative()</span></tt></a> to get the arc in the direction of
+decreasing angles.</p>
+<p>The arc is circular in user space. To achieve an elliptical arc,
+you can scale the current transformation matrix by different
+amounts in the X and Y directions. For example, to draw an ellipse
+in the box given by <em>x, y, width, height</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ctx</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">width</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">arc</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">restore</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.arc_negative">
+<tt class="descname">arc_negative</tt><big>(</big><em>xc</em>, <em>yc</em>, <em>radius</em>, <em>angle1</em>, <em>angle2</em><big>)</big><a class="headerlink" href="#cairo.Context.arc_negative" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xc</strong> (<em>float</em>) &#8211; X position of the center of the arc</li>
+<li><strong>yc</strong> (<em>float</em>) &#8211; Y position of the center of the arc</li>
+<li><strong>radius</strong> (<em>float</em>) &#8211; the radius of the arc</li>
+<li><strong>angle1</strong> (<em>float</em>) &#8211; the start angle, in radians</li>
+<li><strong>angle2</strong> (<em>float</em>) &#8211; the end angle, in radians</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds a circular arc of the given <em>radius</em> to the current path. The arc
+is centered at (<em>xc, yc</em>), begins at <em>angle1</em> and proceeds in the
+direction of decreasing angles to end at <em>angle2</em>. If <em>angle2</em> is
+greater than <em>angle1</em> it will be progressively decreased by 2*PI until
+it is less than <em>angle1</em>.</p>
+<p>See <a class="reference internal" href="#cairo.Context.arc" title="cairo.Context.arc"><tt class="xref py py-meth docutils literal"><span class="pre">Context.arc()</span></tt></a> for more details. This function differs only in
+the direction of the arc between the two angles.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.clip">
+<tt class="descname">clip</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.clip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Establishes a new clip region by intersecting the current clip region
+with the current path as it would be filled by <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a> and
+according to the current <a class="reference internal" href="constants.html#constants-fill-rule"><em>FILL RULE</em></a> (see
+<a class="reference internal" href="#cairo.Context.set_fill_rule" title="cairo.Context.set_fill_rule"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_fill_rule()</span></tt></a>).</p>
+<p>After <a class="reference internal" href="#cairo.Context.clip" title="cairo.Context.clip"><tt class="xref py py-meth docutils literal"><span class="pre">clip()</span></tt></a>, the current path will be cleared from the
+<a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>The current clip region affects all drawing operations by effectively
+masking out any changes to the surface that are outside the current clip
+region.</p>
+<p>Calling <a class="reference internal" href="#cairo.Context.clip" title="cairo.Context.clip"><tt class="xref py py-meth docutils literal"><span class="pre">clip()</span></tt></a> can only make the clip region smaller, never
+larger. But the current clip is part of the graphics state, so a
+temporary restriction of the clip region can be achieved by calling
+<a class="reference internal" href="#cairo.Context.clip" title="cairo.Context.clip"><tt class="xref py py-meth docutils literal"><span class="pre">clip()</span></tt></a> within a <a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">Context.save()</span></tt></a>/<a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">Context.restore()</span></tt></a>
+pair. The only other means of increasing the size of the clip region is
+<a class="reference internal" href="#cairo.Context.reset_clip" title="cairo.Context.reset_clip"><tt class="xref py py-meth docutils literal"><span class="pre">Context.reset_clip()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.clip_extents">
+<tt class="descname">clip_extents</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.clip_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x1, y1, x2, y2)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">(float, float, float, float)</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>x1</em>: left of the resulting extents</li>
+<li><em>y1</em>: top of the resulting extents</li>
+<li><em>x2</em>: right of the resulting extents</li>
+<li><em>y2</em>: bottom of the resulting extents</li>
+</ul>
+<p>Computes a bounding box in user coordinates covering the area inside the
+current clip.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.clip_preserve">
+<tt class="descname">clip_preserve</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.clip_preserve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Establishes a new clip region by intersecting the current clip region
+with the current path as it would be filled by <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a> and
+according to the current <a class="reference internal" href="constants.html#constants-fill-rule"><em>FILL RULE</em></a> (see
+<a class="reference internal" href="#cairo.Context.set_fill_rule" title="cairo.Context.set_fill_rule"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_fill_rule()</span></tt></a>).</p>
+<p>Unlike <a class="reference internal" href="#cairo.Context.clip" title="cairo.Context.clip"><tt class="xref py py-meth docutils literal"><span class="pre">Context.clip()</span></tt></a>, <a class="reference internal" href="#cairo.Context.clip_preserve" title="cairo.Context.clip_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">clip_preserve()</span></tt></a> preserves the path
+within the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>The current clip region affects all drawing operations by effectively
+masking out any changes to the surface that are outside the current clip
+region.</p>
+<p>Calling <a class="reference internal" href="#cairo.Context.clip_preserve" title="cairo.Context.clip_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">clip_preserve()</span></tt></a> can only make the clip region smaller,
+never larger. But the current clip is part of the graphics state, so a
+temporary restriction of the clip region can be achieved by calling
+<a class="reference internal" href="#cairo.Context.clip_preserve" title="cairo.Context.clip_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">clip_preserve()</span></tt></a> within a
+<a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">Context.save()</span></tt></a>/<a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">Context.restore()</span></tt></a> pair. The only other means
+of increasing the size of the clip region is <a class="reference internal" href="#cairo.Context.reset_clip" title="cairo.Context.reset_clip"><tt class="xref py py-meth docutils literal"><span class="pre">Context.reset_clip()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.close_path">
+<tt class="descname">close_path</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.close_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a line segment to the path from the current point to the beginning
+of the current sub-path, (the most recent point passed to
+<a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.move_to()</span></tt></a>), and closes this sub-path. After this call the
+current point will be at the joined endpoint of the sub-path.</p>
+<p>The behavior of <a class="reference internal" href="#cairo.Context.close_path" title="cairo.Context.close_path"><tt class="xref py py-meth docutils literal"><span class="pre">close_path()</span></tt></a> is distinct from simply calling
+<a class="reference internal" href="#cairo.Context.line_to" title="cairo.Context.line_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.line_to()</span></tt></a> with the equivalent coordinate in the case of
+stroking. When a closed sub-path is stroked, there are no caps on the
+ends of the sub-path. Instead, there is a line join connecting the final
+and initial segments of the sub-path.</p>
+<p>If there is no current point before the call to <a class="reference internal" href="#cairo.Context.close_path" title="cairo.Context.close_path"><tt class="xref py py-meth docutils literal"><span class="pre">close_path()</span></tt></a>,
+this function will have no effect.</p>
+<p>Note: As of cairo version 1.2.4 any call to <a class="reference internal" href="#cairo.Context.close_path" title="cairo.Context.close_path"><tt class="xref py py-meth docutils literal"><span class="pre">close_path()</span></tt></a> will
+place an explicit MOVE_TO element into the path immediately after the
+CLOSE_PATH element, (which can be seen in <a class="reference internal" href="#cairo.Context.copy_path" title="cairo.Context.copy_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_path()</span></tt></a> for
+example). This can simplify path processing in some cases as it may not
+be necessary to save the &#8220;last move_to point&#8221; during processing as the
+MOVE_TO immediately after the CLOSE_PATH will provide that point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.copy_clip_rectangle_list">
+<tt class="descname">copy_clip_rectangle_list</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.copy_clip_rectangle_list" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current clip region as a list of rectangles in user
+coordinates</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">list of 4-tuples of float</td>
+</tr>
+</tbody>
+</table>
+<p>(The status in the list may be %CAIRO_STATUS_CLIP_NOT_REPRESENTABLE to
+indicate that the clip region cannot be represented as a list of
+user-space rectangles. The status may have other values to indicate
+other errors. - not implemented in pycairo)</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.copy_page">
+<tt class="descname">copy_page</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.copy_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emits the current page for backends that support multiple pages, but
+doesn&#8217;t clear it, so, the contents of the current page will be retained
+for the next page too.  Use <a class="reference internal" href="#cairo.Context.show_page" title="cairo.Context.show_page"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_page()</span></tt></a> if you want to get
+an empty page after the emission.</p>
+<p>This is a convenience function that simply calls
+<a class="reference internal" href="surfaces.html#cairo.Surface.copy_page" title="cairo.Surface.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">Surface.copy_page()</span></tt></a> on <em>Context&#8217;s</em> target.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.copy_path">
+<tt class="descname">copy_path</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.copy_path" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="paths.html#cairo.Path" title="cairo.Path"><tt class="xref py py-class docutils literal"><span class="pre">Path</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><em>MemoryError</em> in case of no memory</td>
+</tr>
+</tbody>
+</table>
+<p>Creates a copy of the current path and returns it to the user as a
+<a class="reference internal" href="paths.html#cairo.Path" title="cairo.Path"><tt class="xref py py-class docutils literal"><span class="pre">Path</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.copy_path_flat">
+<tt class="descname">copy_path_flat</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.copy_path_flat" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="paths.html#cairo.Path" title="cairo.Path"><tt class="xref py py-class docutils literal"><span class="pre">Path</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><em>MemoryError</em> in case of no memory</td>
+</tr>
+</tbody>
+</table>
+<p>Gets a flattened copy of the current path and returns it to the
+user as a <a class="reference internal" href="paths.html#cairo.Path" title="cairo.Path"><tt class="xref py py-class docutils literal"><span class="pre">Path</span></tt></a>.</p>
+<p>This function is like <a class="reference internal" href="#cairo.Context.copy_path" title="cairo.Context.copy_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.copy_path()</span></tt></a> except that any curves
+in the path will be approximated with piecewise-linear approximations,
+(accurate to within the current tolerance value). That is, the result is
+guaranteed to not have any elements of type CAIRO_PATH_CURVE_TO which
+will instead be replaced by a series of CAIRO_PATH_LINE_TO elements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.curve_to">
+<tt class="descname">curve_to</tt><big>(</big><em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em>, <em>x3</em>, <em>y3</em><big>)</big><a class="headerlink" href="#cairo.Context.curve_to" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x1</strong> (<em>float</em>) &#8211; the X coordinate of the first control point</li>
+<li><strong>y1</strong> (<em>float</em>) &#8211; the Y coordinate of the first control point</li>
+<li><strong>x2</strong> (<em>float</em>) &#8211; the X coordinate of the second control point</li>
+<li><strong>y2</strong> (<em>float</em>) &#8211; the Y coordinate of the second control point</li>
+<li><strong>x3</strong> (<em>float</em>) &#8211; the X coordinate of the end of the curve</li>
+<li><strong>y3</strong> (<em>float</em>) &#8211; the Y coordinate of the end of the curve</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds a cubic Bézier spline to the path from the current point to
+position <em>(x3, y3)</em> in user-space coordinates, using <em>(x1, y1)</em> and
+<em>(x2, y2)</em> as the control points. After this call the current point will
+be <em>(x3, y3)</em>.</p>
+<p>If there is no current point before the call to <a class="reference internal" href="#cairo.Context.curve_to" title="cairo.Context.curve_to"><tt class="xref py py-meth docutils literal"><span class="pre">curve_to()</span></tt></a>
+this function will behave as if preceded by a call to
+<tt class="docutils literal"><span class="pre">ctx.move_to(x1,</span> <span class="pre">y1)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.device_to_user">
+<tt class="descname">device_to_user</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#cairo.Context.device_to_user" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; X value of coordinate</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; Y value of coordinate</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(x, y)</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(float, float)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Transform a coordinate from device space to user space by multiplying
+the given point by the inverse of the current transformation matrix
+(CTM).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.device_to_user_distance">
+<tt class="descname">device_to_user_distance</tt><big>(</big><em>dx</em>, <em>dy</em><big>)</big><a class="headerlink" href="#cairo.Context.device_to_user_distance" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dx</strong> (<em>float</em>) &#8211; X component of a distance vector</li>
+<li><strong>dy</strong> (<em>float</em>) &#8211; Y component of a distance vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(dx, dy)</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(float, float)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Transform a distance vector from device space to user space. This
+function is similar to <a class="reference internal" href="#cairo.Context.device_to_user" title="cairo.Context.device_to_user"><tt class="xref py py-meth docutils literal"><span class="pre">Context.device_to_user()</span></tt></a> except that the
+translation components of the inverse CTM will be ignored when
+transforming <em>(dx,dy)</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.fill">
+<tt class="descname">fill</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.fill" title="Permalink to this definition">¶</a></dt>
+<dd><p>A drawing operator that fills the current path according to the current
+<a class="reference internal" href="constants.html#constants-fill-rule"><em>FILL RULE</em></a>, (each sub-path is implicitly
+closed before being filled). After <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">fill()</span></tt></a>, the current path will
+be cleared from the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>. See <a class="reference internal" href="#cairo.Context.set_fill_rule" title="cairo.Context.set_fill_rule"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_fill_rule()</span></tt></a>
+and <a class="reference internal" href="#cairo.Context.fill_preserve" title="cairo.Context.fill_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill_preserve()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.fill_extents">
+<tt class="descname">fill_extents</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.fill_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x1, y1, x2, y2)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">(float, float, float, float)</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>x1</em>: left of the resulting extents</li>
+<li><em>y1</em>: top of the resulting extents</li>
+<li><em>x2</em>: right of the resulting extents</li>
+<li><em>y2</em>: bottom of the resulting extents</li>
+</ul>
+<p>Computes a bounding box in user coordinates covering the area that would
+be affected, (the &#8220;inked&#8221; area), by a <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a> operation
+given the current path and fill parameters. If the current path is
+empty, returns an empty rectangle (0,0,0,0). Surface dimensions and
+clipping are not taken into account.</p>
+<p>Contrast with <a class="reference internal" href="#cairo.Context.path_extents" title="cairo.Context.path_extents"><tt class="xref py py-meth docutils literal"><span class="pre">Context.path_extents()</span></tt></a>, which is similar, but returns
+non-zero extents for some paths with no inked area, (such as a
+simple line segment).</p>
+<p>Note that <a class="reference internal" href="#cairo.Context.fill_extents" title="cairo.Context.fill_extents"><tt class="xref py py-meth docutils literal"><span class="pre">fill_extents()</span></tt></a> must necessarily do more work to compute
+the precise inked areas in light of the fill rule, so
+<a class="reference internal" href="#cairo.Context.path_extents" title="cairo.Context.path_extents"><tt class="xref py py-meth docutils literal"><span class="pre">Context.path_extents()</span></tt></a> may be more desirable for sake of
+performance if the non-inked path extents are desired.</p>
+<p>See <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_fill_rule" title="cairo.Context.set_fill_rule"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_fill_rule()</span></tt></a> and
+<a class="reference internal" href="#cairo.Context.fill_preserve" title="cairo.Context.fill_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill_preserve()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.fill_preserve">
+<tt class="descname">fill_preserve</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.fill_preserve" title="Permalink to this definition">¶</a></dt>
+<dd><p>A drawing operator that fills the current path according to the current
+<a class="reference internal" href="constants.html#constants-fill-rule"><em>FILL RULE</em></a>, (each sub-path is implicitly
+closed before being filled). Unlike <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.fill_preserve" title="cairo.Context.fill_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">fill_preserve()</span></tt></a> preserves the path within the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>See <a class="reference internal" href="#cairo.Context.set_fill_rule" title="cairo.Context.set_fill_rule"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_fill_rule()</span></tt></a> and <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.font_extents">
+<tt class="descname">font_extents</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.font_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(ascent, descent, height, max_x_advance, max_y_advance)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">(float, float, float, float, float)</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the font extents for the currently selected font.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_antialias">
+<tt class="descname">get_antialias</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_antialias" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="constants.html#constants-antialias"><em>ANTIALIAS</em></a> mode,
+as set by <a class="reference internal" href="#cairo.Context.set_antialias" title="cairo.Context.set_antialias"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_antialias()</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_current_point">
+<tt class="descname">get_current_point</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_current_point" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x, y)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">(float, float)</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>x</em>: X coordinate of the current point</li>
+<li><em>y</em>: Y coordinate of the current point</li>
+</ul>
+<p>Gets the current point of the current path, which is conceptually the
+final point reached by the path so far.</p>
+<p>The current point is returned in the user-space coordinate system. If
+there is no defined current point or if <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> is in an error
+status, <em>x</em> and <em>y</em> will both be set to 0.0. It is possible to check this
+in advance with <a class="reference internal" href="#cairo.Context.has_current_point" title="cairo.Context.has_current_point"><tt class="xref py py-meth docutils literal"><span class="pre">Context.has_current_point()</span></tt></a>.</p>
+<p>Most path construction functions alter the current point. See the
+following for details on how they affect the current point:
+<a class="reference internal" href="#cairo.Context.new_path" title="cairo.Context.new_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.new_path()</span></tt></a>, <a class="reference internal" href="#cairo.Context.new_sub_path" title="cairo.Context.new_sub_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.new_sub_path()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.append_path" title="cairo.Context.append_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.append_path()</span></tt></a>, <a class="reference internal" href="#cairo.Context.close_path" title="cairo.Context.close_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.close_path()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.move_to()</span></tt></a>, <a class="reference internal" href="#cairo.Context.line_to" title="cairo.Context.line_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.line_to()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.curve_to" title="cairo.Context.curve_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.curve_to()</span></tt></a>, <a class="reference internal" href="#cairo.Context.rel_move_to" title="cairo.Context.rel_move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.rel_move_to()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.rel_line_to" title="cairo.Context.rel_line_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.rel_line_to()</span></tt></a>, <a class="reference internal" href="#cairo.Context.rel_curve_to" title="cairo.Context.rel_curve_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.rel_curve_to()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.arc" title="cairo.Context.arc"><tt class="xref py py-meth docutils literal"><span class="pre">Context.arc()</span></tt></a>, <a class="reference internal" href="#cairo.Context.arc_negative" title="cairo.Context.arc_negative"><tt class="xref py py-meth docutils literal"><span class="pre">Context.arc_negative()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.rectangle" title="cairo.Context.rectangle"><tt class="xref py py-meth docutils literal"><span class="pre">Context.rectangle()</span></tt></a>, <a class="reference internal" href="#cairo.Context.text_path" title="cairo.Context.text_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.text_path()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.glyph_path" title="cairo.Context.glyph_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.glyph_path()</span></tt></a>, <tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke_to_path()</span></tt>.</p>
+<p>Some functions use and alter the current point but do not otherwise
+change current path:
+<a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a>.</p>
+<p>Some functions unset the current path and as a result, current point:
+<a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a>, <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_dash">
+<tt class="descname">get_dash</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_dash" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(dashes, offset)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">(tuple, float)</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>dashes</em>: return value for the dash array</li>
+<li><em>offset</em>: return value for the current dash offset</li>
+</ul>
+<p>Gets the current dash array.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_dash_count">
+<tt class="descname">get_dash_count</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_dash_count" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the length of the dash array, or 0 if no dash array set.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+<p>See also <a class="reference internal" href="#cairo.Context.set_dash" title="cairo.Context.set_dash"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_dash()</span></tt></a> and <a class="reference internal" href="#cairo.Context.get_dash" title="cairo.Context.get_dash"><tt class="xref py py-meth docutils literal"><span class="pre">Context.get_dash()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_fill_rule">
+<tt class="descname">get_fill_rule</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_fill_rule" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="constants.html#constants-fill-rule"><em>FILL RULE</em></a>, as
+set by <a class="reference internal" href="#cairo.Context.set_fill_rule" title="cairo.Context.set_fill_rule"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_fill_rule()</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_font_face">
+<tt class="descname">get_font_face</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_font_face" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="text.html#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a> for the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_font_matrix">
+<tt class="descname">get_font_matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_font_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> for the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="#cairo.Context.set_font_matrix" title="cairo.Context.set_font_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_font_matrix()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_font_options">
+<tt class="descname">get_font_options</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_font_options" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="text.html#cairo.FontOptions" title="cairo.FontOptions"><tt class="xref py py-class docutils literal"><span class="pre">FontOptions</span></tt></a> for the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+<p>Retrieves font rendering options set via
+<a class="reference internal" href="#cairo.Context.set_font_options" title="cairo.Context.set_font_options"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_font_options()</span></tt></a>. Note that the returned options do not
+include any options derived from the underlying surface; they are
+literally the options passed to <a class="reference internal" href="#cairo.Context.set_font_options" title="cairo.Context.set_font_options"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_font_options()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_group_target">
+<tt class="descname">get_group_target</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_group_target" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the target <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the current destination <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a> for the
+<a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>. This is either the original target surface as passed
+to <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> or the target surface for the current group as
+started by the most recent call to <a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group()</span></tt></a> or
+<a class="reference internal" href="#cairo.Context.push_group_with_content" title="cairo.Context.push_group_with_content"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group_with_content()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_line_cap">
+<tt class="descname">get_line_cap</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_line_cap" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="constants.html#constants-line-cap"><em>LINE_CAP</em></a> style, as
+set by <a class="reference internal" href="#cairo.Context.set_line_cap" title="cairo.Context.set_line_cap"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_line_cap()</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_line_join">
+<tt class="descname">get_line_join</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_line_join" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="constants.html#constants-line-join"><em>LINE_JOIN</em></a> style, as
+set by <a class="reference internal" href="#cairo.Context.set_line_join" title="cairo.Context.set_line_join"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_line_join()</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_line_width">
+<tt class="descname">get_line_width</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_line_width" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current line width</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+<p>This function returns the current line width value exactly as set by
+<a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_line_width()</span></tt></a>. Note that the value is unchanged even if
+the CTM has changed between the calls to <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_line_width()</span></tt></a>
+and <a class="reference internal" href="#cairo.Context.get_line_width" title="cairo.Context.get_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">get_line_width()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_matrix">
+<tt class="descname">get_matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current transformation <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> (CTM)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_miter_limit">
+<tt class="descname">get_miter_limit</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_miter_limit" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current miter limit, as set by
+<a class="reference internal" href="#cairo.Context.set_miter_limit" title="cairo.Context.set_miter_limit"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_miter_limit()</span></tt></a>.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_operator">
+<tt class="descname">get_operator</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_operator" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current compositing <a class="reference internal" href="constants.html#constants-operator"><em>OPERATOR</em></a>
+for a <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_scaled_font">
+<tt class="descname">get_scaled_font</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_scaled_font" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current <a class="reference internal" href="text.html#cairo.ScaledFont" title="cairo.ScaledFont"><tt class="xref py py-class docutils literal"><span class="pre">ScaledFont</span></tt></a> for a <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.4.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_source">
+<tt class="descname">get_source</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_source" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current source <a class="reference internal" href="patterns.html#cairo.Pattern" title="cairo.Pattern"><tt class="xref py py-class docutils literal"><span class="pre">Pattern</span></tt></a> for  a <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_target">
+<tt class="descname">get_target</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_target" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the target <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a> for the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.get_tolerance">
+<tt class="descname">get_tolerance</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.get_tolerance" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">the current tolerance value, as set by
+<a class="reference internal" href="#cairo.Context.set_tolerance" title="cairo.Context.set_tolerance"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_tolerance()</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.glyph_extents">
+<tt class="descname">glyph_extents</tt><big>(</big><em>glyphs</em><span class="optional">[</span>, <em>num_glyphs</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.Context.glyph_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>glyphs</strong> (<em>a sequence of (int, float, float)</em>) &#8211; glyphs</li>
+<li><strong>num_glyphs</strong> (<em>int</em>) &#8211; number of glyphs to measure, defaults to using all</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">x_bearing, y_bearing, width, height, x_advance, y_advance</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">6-tuple of float</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the extents for an array of glyphs. The extents describe a
+user-space rectangle that encloses the &#8220;inked&#8221; portion of the glyphs,
+(as they would be drawn by <a class="reference internal" href="#cairo.Context.show_glyphs" title="cairo.Context.show_glyphs"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_glyphs()</span></tt></a>). Additionally,
+the x_advance and y_advance values indicate the amount by which the
+current point would be advanced by <a class="reference internal" href="#cairo.Context.show_glyphs" title="cairo.Context.show_glyphs"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_glyphs()</span></tt></a>.</p>
+<p>Note that whitespace glyphs do not contribute to the size of the
+rectangle (extents.width and extents.height).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.glyph_path">
+<tt class="descname">glyph_path</tt><big>(</big><em>glyphs</em><span class="optional">[</span>, <em>num_glyphs</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.Context.glyph_path" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>glyphs</strong> (<em>a sequence of (int, float, float)</em>) &#8211; glyphs to show</li>
+<li><strong>num_glyphs</strong> (<em>int</em>) &#8211; number of glyphs to show, defaults to showing all</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds closed paths for the glyphs to the current path. The generated path
+if filled, achieves an effect similar to that of
+<a class="reference internal" href="#cairo.Context.show_glyphs" title="cairo.Context.show_glyphs"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_glyphs()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.has_current_point">
+<tt class="descname">has_current_point</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.has_current_point" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>returns: True iff a current point is defined on the current path.</dt>
+<dd>See <a class="reference internal" href="#cairo.Context.get_current_point" title="cairo.Context.get_current_point"><tt class="xref py py-meth docutils literal"><span class="pre">Context.get_current_point()</span></tt></a> for details on the current point.</dd>
+</dl>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.identity_matrix">
+<tt class="descname">identity_matrix</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.identity_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the current transformation <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> (CTM) by setting it
+equal to the identity matrix. That is, the user-space and device-space
+axes will be aligned and one user-space unit will transform to one
+device-space unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.in_fill">
+<tt class="descname">in_fill</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#cairo.Context.in_fill" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; X coordinate of the point to test</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; Y coordinate of the point to test</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True iff the point is inside the area that would be affected
+by a <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a> operation given the current path and filling
+parameters. Surface dimensions and clipping are not taken into account.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_fill_rule" title="cairo.Context.set_fill_rule"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_fill_rule()</span></tt></a> and
+<a class="reference internal" href="#cairo.Context.fill_preserve" title="cairo.Context.fill_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill_preserve()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.in_stroke">
+<tt class="descname">in_stroke</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#cairo.Context.in_stroke" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; X coordinate of the point to test</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; Y coordinate of the point to test</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">True iff the point is inside the area that would be affected
+by a <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke()</span></tt></a> operation given the current path and
+stroking parameters. Surface dimensions and clipping are not taken
+into account.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_line_width()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.set_line_join" title="cairo.Context.set_line_join"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_line_join()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_line_cap" title="cairo.Context.set_line_cap"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_line_cap()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.set_dash" title="cairo.Context.set_dash"><tt class="xref py py-meth docutils literal"><span class="pre">Context.set_dash()</span></tt></a>, and <a class="reference internal" href="#cairo.Context.stroke_preserve" title="cairo.Context.stroke_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke_preserve()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.line_to">
+<tt class="descname">line_to</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#cairo.Context.line_to" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; the X coordinate of the end of the new line</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; the Y coordinate of the end of the new line</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds a line to the path from the current point to position <em>(x, y)</em> in
+user-space coordinates. After this call the current point will be <em>(x,
+y)</em>.</p>
+<p>If there is no current point before the call to <a class="reference internal" href="#cairo.Context.line_to" title="cairo.Context.line_to"><tt class="xref py py-meth docutils literal"><span class="pre">line_to()</span></tt></a>
+this function will behave as <tt class="docutils literal"><span class="pre">ctx.move_to(x,</span> <span class="pre">y)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.mask">
+<tt class="descname">mask</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#cairo.Context.mask" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> &#8211; a <a class="reference internal" href="patterns.html#cairo.Pattern" title="cairo.Pattern"><tt class="xref py py-class docutils literal"><span class="pre">Pattern</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>A drawing operator that paints the current source using the alpha
+channel of <em>pattern</em> as a mask. (Opaque areas of <em>pattern</em> are painted
+with the source, transparent areas are not painted.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.mask_surface">
+<tt class="descname">mask_surface</tt><big>(</big><em>surface</em>, <em>x=0.0</em>, <em>y=0.0</em><big>)</big><a class="headerlink" href="#cairo.Context.mask_surface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>surface</strong> &#8211; a <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a></li>
+<li><strong>x</strong> (<em>float</em>) &#8211; X coordinate at which to place the origin of <em>surface</em></li>
+<li><strong>y</strong> (<em>float</em>) &#8211; Y coordinate at which to place the origin of <em>surface</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>A drawing operator that paints the current source using the alpha
+channel of <em>surface</em> as a mask. (Opaque areas of <em>surface</em> are painted
+with the source, transparent areas are not painted.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.move_to">
+<tt class="descname">move_to</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#cairo.Context.move_to" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; the X coordinate of the new position</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; the Y coordinate of the new position</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Begin a new sub-path. After this call the current point will be <em>(x,
+y)</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.new_path">
+<tt class="descname">new_path</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.new_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears the current path. After this call there will be no path and no
+current point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.new_sub_path">
+<tt class="descname">new_sub_path</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.new_sub_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin a new sub-path. Note that the existing path is not affected. After
+this call there will be no current point.</p>
+<p>In many cases, this call is not needed since new sub-paths are
+frequently started with <a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.move_to()</span></tt></a>.</p>
+<p>A call to <a class="reference internal" href="#cairo.Context.new_sub_path" title="cairo.Context.new_sub_path"><tt class="xref py py-meth docutils literal"><span class="pre">new_sub_path()</span></tt></a> is particularly useful when beginning a
+new sub-path with one of the <a class="reference internal" href="#cairo.Context.arc" title="cairo.Context.arc"><tt class="xref py py-meth docutils literal"><span class="pre">Context.arc()</span></tt></a> calls. This makes
+things easier as it is no longer necessary to manually compute the arc&#8217;s
+initial coordinates for a call to <a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.move_to()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.paint">
+<tt class="descname">paint</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.paint" title="Permalink to this definition">¶</a></dt>
+<dd><p>A drawing operator that paints the current source everywhere within the
+current clip region.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.paint_with_alpha">
+<tt class="descname">paint_with_alpha</tt><big>(</big><em>alpha</em><big>)</big><a class="headerlink" href="#cairo.Context.paint_with_alpha" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>alpha</strong> (<em>float</em>) &#8211; alpha value, between 0 (transparent) and 1 (opaque)</td>
+</tr>
+</tbody>
+</table>
+<p>A drawing operator that paints the current source everywhere within the
+current clip region using a mask of constant alpha value <em>alpha</em>. The
+effect is similar to <a class="reference internal" href="#cairo.Context.paint" title="cairo.Context.paint"><tt class="xref py py-meth docutils literal"><span class="pre">Context.paint()</span></tt></a>, but the drawing is faded out
+using the alpha value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.path_extents">
+<tt class="descname">path_extents</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.path_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x1, y1, x2, y2)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">(float, float, float, float)</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>x1</em>: left of the resulting extents</li>
+<li><em>y1</em>: top of the resulting extents</li>
+<li><em>x2</em>: right of the resulting extents</li>
+<li><em>y2</em>: bottom of the resulting extents</li>
+</ul>
+<p>Computes a bounding box in user-space coordinates covering the points on
+the current path. If the current path is empty, returns an empty
+rectangle (0, 0, 0, 0). Stroke parameters, fill rule, surface
+dimensions and clipping are not taken into account.</p>
+<p>Contrast with <a class="reference internal" href="#cairo.Context.fill_extents" title="cairo.Context.fill_extents"><tt class="xref py py-meth docutils literal"><span class="pre">Context.fill_extents()</span></tt></a> and
+<a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke_extents()</span></tt></a> which return the extents of only the area
+that would be &#8220;inked&#8221; by the corresponding drawing operations.</p>
+<p>The result of <a class="reference internal" href="#cairo.Context.path_extents" title="cairo.Context.path_extents"><tt class="xref py py-meth docutils literal"><span class="pre">path_extents()</span></tt></a> is defined as equivalent to the
+limit of <a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke_extents()</span></tt></a> with cairo.LINE_CAP_ROUND as the
+line width approaches 0.0, (but never reaching the empty-rectangle
+returned by <a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">Context.stroke_extents()</span></tt></a> for a line width of 0.0).</p>
+<p>Specifically, this means that zero-area sub-paths such as
+<a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.move_to()</span></tt></a>; <a class="reference internal" href="#cairo.Context.line_to" title="cairo.Context.line_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.line_to()</span></tt></a> segments, (even
+degenerate cases where the coordinates to both calls are identical),
+will be considered as contributing to the extents. However, a lone
+<a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.move_to()</span></tt></a> will not contribute to the results of
+<a class="reference internal" href="#cairo.Context.path_extents" title="cairo.Context.path_extents"><tt class="xref py py-meth docutils literal"><span class="pre">Context.path_extents()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.pop_group">
+<tt class="descname">pop_group</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.pop_group" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">a newly created <a class="reference internal" href="patterns.html#cairo.SurfacePattern" title="cairo.SurfacePattern"><tt class="xref py py-class docutils literal"><span class="pre">SurfacePattern</span></tt></a> containing the results
+of all drawing operations performed to the group.</td>
+</tr>
+</tbody>
+</table>
+<p>Terminates the redirection begun by a call to <a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group()</span></tt></a>
+or <a class="reference internal" href="#cairo.Context.push_group_with_content" title="cairo.Context.push_group_with_content"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group_with_content()</span></tt></a> and returns a new pattern
+containing the results of all drawing operations performed to the group.</p>
+<p>The <a class="reference internal" href="#cairo.Context.pop_group" title="cairo.Context.pop_group"><tt class="xref py py-meth docutils literal"><span class="pre">pop_group()</span></tt></a> function calls <a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">Context.restore()</span></tt></a>,
+(balancing a call to <a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">Context.save()</span></tt></a> by the
+<a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group()</span></tt></a> function), so that any changes to the graphics
+state will not be visible outside the group.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.pop_group_to_source">
+<tt class="descname">pop_group_to_source</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.pop_group_to_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminates the redirection begun by a call to <a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group()</span></tt></a>
+or <a class="reference internal" href="#cairo.Context.push_group_with_content" title="cairo.Context.push_group_with_content"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group_with_content()</span></tt></a> and installs the resulting
+pattern as the source <a class="reference internal" href="patterns.html#cairo.Pattern" title="cairo.Pattern"><tt class="xref py py-class docutils literal"><span class="pre">Pattern</span></tt></a> in the given <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>The behavior of this function is equivalent to the sequence of
+operations:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">group</span> <span class="o">=</span> <span class="n">cairo_pop_group</span><span class="p">()</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>but is more convenient as their is no need for a variable to store
+the short-lived pointer to the pattern.</p>
+<p>The <a class="reference internal" href="#cairo.Context.pop_group" title="cairo.Context.pop_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.pop_group()</span></tt></a> function calls <a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">Context.restore()</span></tt></a>,
+(balancing a call to <a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">Context.save()</span></tt></a> by the
+<a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group()</span></tt></a> function), so that any changes to the graphics
+state will not be visible outside the group.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.push_group">
+<tt class="descname">push_group</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.push_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporarily redirects drawing to an intermediate surface known as a
+group. The redirection lasts until the group is completed by a call to
+<a class="reference internal" href="#cairo.Context.pop_group" title="cairo.Context.pop_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.pop_group()</span></tt></a> or <a class="reference internal" href="#cairo.Context.pop_group_to_source" title="cairo.Context.pop_group_to_source"><tt class="xref py py-meth docutils literal"><span class="pre">Context.pop_group_to_source()</span></tt></a>. These
+calls provide the result of any drawing to the group as a pattern,
+(either as an explicit object, or set as the source pattern).</p>
+<p>This group functionality can be convenient for performing intermediate
+compositing. One common use of a group is to render objects as opaque
+within the group, (so that they occlude each other), and then blend the
+result with translucence onto the destination.</p>
+<p>Groups can be nested arbitrarily deep by making balanced calls to
+<a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group()</span></tt></a>/<a class="reference internal" href="#cairo.Context.pop_group" title="cairo.Context.pop_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.pop_group()</span></tt></a>. Each call
+pushes/pops the new target group onto/from a stack.</p>
+<p>The <a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">push_group()</span></tt></a> function calls <a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">Context.save()</span></tt></a> so that any
+changes to the graphics state will not be visible outside the group,
+(the pop_group functions call <a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">Context.restore()</span></tt></a>).</p>
+<p>By default the intermediate group will have a <a class="reference internal" href="constants.html#constants-content"><em>CONTENT</em></a> type of cairo.CONTENT_COLOR_ALPHA. Other content
+types can be chosen for the group by using
+<a class="reference internal" href="#cairo.Context.push_group_with_content" title="cairo.Context.push_group_with_content"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group_with_content()</span></tt></a> instead.</p>
+<p>As an example, here is how one might fill and stroke a path with
+translucence, but without any portion of the fill being visible
+under the stroke:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ctx</span><span class="o">.</span><span class="n">push_group</span><span class="p">()</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="n">fill_pattern</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">fill_preserve</span><span class="p">()</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">set_source</span><span class="p">(</span><span class="n">stroke_pattern</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">stroke</span><span class="p">()</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">pop_group_to_source</span><span class="p">()</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">paint_with_alpha</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.push_group_with_content">
+<tt class="descname">push_group_with_content</tt><big>(</big><em>content</em><big>)</big><a class="headerlink" href="#cairo.Context.push_group_with_content" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>content</strong> &#8211; a <a class="reference internal" href="constants.html#constants-content"><em>CONTENT</em></a> indicating the
+type of group that will be created</td>
+</tr>
+</tbody>
+</table>
+<p>Temporarily redirects drawing to an intermediate surface known as a
+group. The redirection lasts until the group is completed by a call to
+<a class="reference internal" href="#cairo.Context.pop_group" title="cairo.Context.pop_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.pop_group()</span></tt></a> or <a class="reference internal" href="#cairo.Context.pop_group_to_source" title="cairo.Context.pop_group_to_source"><tt class="xref py py-meth docutils literal"><span class="pre">Context.pop_group_to_source()</span></tt></a>. These
+calls provide the result of any drawing to the group as a pattern,
+(either as an explicit object, or set as the source pattern).</p>
+<p>The group will have a content type of <em>content</em>. The ability to control
+this content type is the only distinction between this function and
+<a class="reference internal" href="#cairo.Context.push_group" title="cairo.Context.push_group"><tt class="xref py py-meth docutils literal"><span class="pre">Context.push_group()</span></tt></a> which you should see for a more detailed
+description of group rendering.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.rectangle">
+<tt class="descname">rectangle</tt><big>(</big><em>x</em>, <em>y</em>, <em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#cairo.Context.rectangle" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; the X coordinate of the top left corner of the rectangle</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; the Y coordinate to the top left corner of the rectangle</li>
+<li><strong>width</strong> (<em>float</em>) &#8211; the width of the rectangle</li>
+<li><strong>height</strong> (<em>float</em>) &#8211; the height of the rectangle</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Adds a closed sub-path rectangle of the given size to the current path
+at position <em>(x, y)</em> in user-space coordinates.</p>
+<p>This function is logically equivalent to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ctx</span><span class="o">.</span><span class="n">move_to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">rel_line_to</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">rel_line_to</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">rel_line_to</span><span class="p">(</span><span class="o">-</span><span class="n">width</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
+<span class="n">ctx</span><span class="o">.</span><span class="n">close_path</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.rel_curve_to">
+<tt class="descname">rel_curve_to</tt><big>(</big><em>dx1</em>, <em>dy1</em>, <em>dx2</em>, <em>dy2</em>, <em>dx3</em>, <em>dy4</em><big>)</big><a class="headerlink" href="#cairo.Context.rel_curve_to" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dx1</strong> (<em>float</em>) &#8211; the X offset to the first control point</li>
+<li><strong>dy1</strong> (<em>float</em>) &#8211; the Y offset to the first control point</li>
+<li><strong>dx2</strong> (<em>float</em>) &#8211; the X offset to the second control point</li>
+<li><strong>dy2</strong> (<em>float</em>) &#8211; the Y offset to the second control point</li>
+<li><strong>dx3</strong> (<em>float</em>) &#8211; the X offset to the end of the curve</li>
+<li><strong>dy3</strong> (<em>float</em>) &#8211; the Y offset to the end of the curve</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="exceptions.html#cairo.cairo.Error" title="cairo.cairo.Error"><tt class="xref py py-exc docutils literal"><span class="pre">cairo.Error</span></tt></a> if called with no current point.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Relative-coordinate version of <a class="reference internal" href="#cairo.Context.curve_to" title="cairo.Context.curve_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.curve_to()</span></tt></a>. All
+offsets are relative to the current point. Adds a cubic Bézier spline to
+the path from the current point to a point offset from the current point
+by <em>(dx3, dy3)</em>, using points offset by <em>(dx1, dy1)</em> and <em>(dx2, dy2)</em> as
+the control points. After this call the current point will be offset by
+<em>(dx3, dy3)</em>.</p>
+<p>Given a current point of (x, y), <tt class="docutils literal"><span class="pre">ctx.rel_curve_to(dx1,</span> <span class="pre">dy1,</span> <span class="pre">dx2,</span> <span class="pre">dy2,</span>
+<span class="pre">dx3,</span> <span class="pre">dy3)</span></tt> is logically equivalent to <tt class="docutils literal"><span class="pre">ctx.curve_to(x+dx1,</span> <span class="pre">y+dy1,</span>
+<span class="pre">x+dx2,</span> <span class="pre">y+dy2,</span> <span class="pre">x+dx3,</span> <span class="pre">y+dy3)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.rel_line_to">
+<tt class="descname">rel_line_to</tt><big>(</big><em>dx</em>, <em>dy</em><big>)</big><a class="headerlink" href="#cairo.Context.rel_line_to" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dx</strong> (<em>float</em>) &#8211; the X offset to the end of the new line</li>
+<li><strong>dy</strong> (<em>float</em>) &#8211; the Y offset to the end of the new line</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="exceptions.html#cairo.cairo.Error" title="cairo.cairo.Error"><tt class="xref py py-exc docutils literal"><span class="pre">cairo.Error</span></tt></a> if called with no current point.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Relative-coordinate version of <a class="reference internal" href="#cairo.Context.line_to" title="cairo.Context.line_to"><tt class="xref py py-meth docutils literal"><span class="pre">Context.line_to()</span></tt></a>. Adds a line to
+the path from the current point to a point that is offset from the
+current point by <em>(dx, dy)</em> in user space. After this call the current
+point will be offset by <em>(dx, dy)</em>.</p>
+<p>Given a current point of (x, y), <tt class="docutils literal"><span class="pre">ctx.rel_line_to(dx,</span> <span class="pre">dy)</span></tt> is logically
+equivalent to <tt class="docutils literal"><span class="pre">ctx.line_to(x</span> <span class="pre">+</span> <span class="pre">dx,</span> <span class="pre">y</span> <span class="pre">+</span> <span class="pre">dy)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.rel_move_to">
+<tt class="descname">rel_move_to</tt><big>(</big><em>dx</em>, <em>dy</em><big>)</big><a class="headerlink" href="#cairo.Context.rel_move_to" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dx</strong> (<em>float</em>) &#8211; the X offset</li>
+<li><strong>dy</strong> (<em>float</em>) &#8211; the Y offset</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="exceptions.html#cairo.cairo.Error" title="cairo.cairo.Error"><tt class="xref py py-exc docutils literal"><span class="pre">cairo.Error</span></tt></a> if called with no current point.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Begin a new sub-path. After this call the current point will offset by
+<em>(dx, dy)</em>.</p>
+<p>Given a current point of (x, y), <tt class="docutils literal"><span class="pre">ctx.rel_move_to(dx,</span> <span class="pre">dy)</span></tt> is logically
+equivalent to <tt class="docutils literal"><span class="pre">ctx.(x</span> <span class="pre">+</span> <span class="pre">dx,</span> <span class="pre">y</span> <span class="pre">+</span> <span class="pre">dy)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.reset_clip">
+<tt class="descname">reset_clip</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.reset_clip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the current clip region to its original, unrestricted state. That
+is, set the clip region to an infinitely large shape containing the
+target surface. Equivalently, if infinity is too hard to grasp, one can
+imagine the clip region being reset to the exact bounds of the target
+surface.</p>
+<p>Note that code meant to be reusable should not call <a class="reference internal" href="#cairo.Context.reset_clip" title="cairo.Context.reset_clip"><tt class="xref py py-meth docutils literal"><span class="pre">reset_clip()</span></tt></a>
+as it will cause results unexpected by higher-level code which calls
+<a class="reference internal" href="#cairo.Context.clip" title="cairo.Context.clip"><tt class="xref py py-meth docutils literal"><span class="pre">clip()</span></tt></a>. Consider using <a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a> and <a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">restore()</span></tt></a> around
+<a class="reference internal" href="#cairo.Context.clip" title="cairo.Context.clip"><tt class="xref py py-meth docutils literal"><span class="pre">clip()</span></tt></a> as a more robust means of temporarily restricting the clip
+region.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.restore">
+<tt class="descname">restore</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restores <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> to the state saved by a preceding call to
+<a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a> and removes that state from the stack of saved states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.rotate">
+<tt class="descname">rotate</tt><big>(</big><em>angle</em><big>)</big><a class="headerlink" href="#cairo.Context.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>angle</strong> (<em>float</em>) &#8211; angle (in radians) by which the user-space axes will be
+rotated</td>
+</tr>
+</tbody>
+</table>
+<p>Modifies the current transformation matrix (CTM) by rotating the
+user-space axes by <em>angle</em> radians. The rotation of the axes takes places
+after any existing transformation of user space. The rotation direction
+for positive angles is from the positive X axis toward the positive Y
+axis.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.save">
+<tt class="descname">save</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a copy of the current state of <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> and saves it on an
+internal stack of saved states. When <a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">restore()</span></tt></a> is called,
+<a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> will be restored to the saved state. Multiple calls to
+<a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a> and <a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">restore()</span></tt></a> can be nested; each call to
+<a class="reference internal" href="#cairo.Context.restore" title="cairo.Context.restore"><tt class="xref py py-meth docutils literal"><span class="pre">restore()</span></tt></a> restores the state from the matching paired
+<a class="reference internal" href="#cairo.Context.save" title="cairo.Context.save"><tt class="xref py py-meth docutils literal"><span class="pre">save()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.scale">
+<tt class="descname">scale</tt><big>(</big><em>sx</em>, <em>sy</em><big>)</big><a class="headerlink" href="#cairo.Context.scale" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sx</strong> (<em>float</em>) &#8211; scale factor for the X dimension</li>
+<li><strong>sy</strong> (<em>float</em>) &#8211; scale factor for the Y dimension</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Modifies the current transformation matrix (CTM) by scaling the X and Y
+user-space axes by <em>sx</em> and <em>sy</em> respectively. The scaling of the axes
+takes place after any existing transformation of user space.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.select_font_face">
+<tt class="descname">select_font_face</tt><big>(</big><em>family</em><span class="optional">[</span>, <em>slant</em><span class="optional">[</span>, <em>weight</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.Context.select_font_face" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>family</strong> (<em>str</em>) &#8211; a font family name</li>
+<li><strong>slant</strong> &#8211; the <a class="reference internal" href="constants.html#constants-font-slant"><em>FONT_SLANT</em></a> of the font,
+defaults to <a class="reference internal" href="constants.html#cairo.FONT_SLANT_NORMAL" title="cairo.FONT_SLANT_NORMAL"><tt class="xref py py-data docutils literal"><span class="pre">cairo.FONT_SLANT_NORMAL</span></tt></a>.</li>
+<li><strong>weight</strong> &#8211; the <a class="reference internal" href="constants.html#constants-font-weight"><em>FONT_WEIGHT</em></a> of the
+font, defaults to <a class="reference internal" href="constants.html#cairo.FONT_WEIGHT_NORMAL" title="cairo.FONT_WEIGHT_NORMAL"><tt class="xref py py-data docutils literal"><span class="pre">cairo.FONT_WEIGHT_NORMAL</span></tt></a>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note: The <a class="reference internal" href="#cairo.Context.select_font_face" title="cairo.Context.select_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">select_font_face()</span></tt></a> function call is part of what the
+cairo designers call the &#8220;toy&#8221; text API. It is convenient for short
+demos and simple programs, but it is not expected to be adequate for
+serious text-using applications.</p>
+<p>Selects a family and style of font from a simplified description as a
+family name, slant and weight. Cairo provides no operation to list
+available family names on the system (this is a &#8220;toy&#8221;, remember), but
+the standard CSS2 generic family names, (&#8220;serif&#8221;, &#8220;sans-serif&#8221;,
+&#8220;cursive&#8221;, &#8220;fantasy&#8221;, &#8220;monospace&#8221;), are likely to work as expected.</p>
+<p>For &#8220;real&#8221; font selection, see the font-backend-specific
+font_face_create functions for the font backend you are using. (For
+example, if you are using the freetype-based cairo-ft font backend, see
+cairo_ft_font_face_create_for_ft_face() or
+cairo_ft_font_face_create_for_pattern().) The resulting font face could
+then be used with cairo_scaled_font_create() and
+cairo_set_scaled_font().</p>
+<p>Similarly, when using the &#8220;real&#8221; font support, you can call directly
+into the underlying font system, (such as fontconfig or freetype), for
+operations such as listing available fonts, etc.</p>
+<p>It is expected that most applications will need to use a more
+comprehensive font handling and text layout library, (for example,
+pango), in conjunction with cairo.</p>
+<p>If text is drawn without a call to <a class="reference internal" href="#cairo.Context.select_font_face" title="cairo.Context.select_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">select_font_face()</span></tt></a>, (nor
+<a class="reference internal" href="#cairo.Context.set_font_face" title="cairo.Context.set_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">set_font_face()</span></tt></a> nor <a class="reference internal" href="#cairo.Context.set_scaled_font" title="cairo.Context.set_scaled_font"><tt class="xref py py-meth docutils literal"><span class="pre">set_scaled_font()</span></tt></a>), the default family
+is platform-specific, but is essentially &#8220;sans-serif&#8221;.  Default slant is
+cairo.FONT_SLANT_NORMAL, and default weight is
+cairo.FONT_WEIGHT_NORMAL.</p>
+<p>This function is equivalent to a call to <a class="reference internal" href="text.html#cairo.ToyFontFace" title="cairo.ToyFontFace"><tt class="xref py py-class docutils literal"><span class="pre">ToyFontFace</span></tt></a>
+followed by <a class="reference internal" href="#cairo.Context.set_font_face" title="cairo.Context.set_font_face"><tt class="xref py py-meth docutils literal"><span class="pre">set_font_face()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_antialias">
+<tt class="descname">set_antialias</tt><big>(</big><em>antialias</em><big>)</big><a class="headerlink" href="#cairo.Context.set_antialias" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>antialias</strong> &#8211; the new <a class="reference internal" href="constants.html#constants-antialias"><em>ANTIALIAS</em></a> mode</td>
+</tr>
+</tbody>
+</table>
+<p>Set the antialiasing mode of the rasterizer used for drawing shapes.
+This value is a hint, and a particular backend may or may not support a
+particular value.  At the current time, no backend supports
+<a class="reference internal" href="constants.html#cairo.ANTIALIAS_SUBPIXEL" title="cairo.ANTIALIAS_SUBPIXEL"><tt class="xref py py-data docutils literal"><span class="pre">cairo.ANTIALIAS_SUBPIXEL</span></tt></a> when drawing shapes.</p>
+<p>Note that this option does not affect text rendering, instead see
+<a class="reference internal" href="text.html#cairo.FontOptions.set_antialias" title="cairo.FontOptions.set_antialias"><tt class="xref py py-meth docutils literal"><span class="pre">FontOptions.set_antialias()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_dash">
+<tt class="descname">set_dash</tt><big>(</big><em>dashes</em><span class="optional">[</span>, <em>offset=0</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.Context.set_dash" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dashes</strong> (<em>sequence of float</em>) &#8211; a sequence specifying alternate lengths of on and off
+stroke portions.</li>
+<li><strong>offset</strong> (<em>int</em>) &#8211; an offset into the dash pattern at which the stroke
+should start, defaults to 0.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="exceptions.html#cairo.cairo.Error" title="cairo.cairo.Error"><tt class="xref py py-exc docutils literal"><span class="pre">cairo.Error</span></tt></a> if any value in <em>dashes</em> is negative, or if
+all values are 0.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the dash pattern to be used by <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>. A dash pattern is
+specified by <em>dashes</em> - a sequence of positive values. Each value
+provides the length of alternate &#8220;on&#8221; and &#8220;off&#8221; portions of the
+stroke. The <em>offset</em> specifies an offset into the pattern at which the
+stroke begins.</p>
+<p>Each &#8220;on&#8221; segment will have caps applied as if the segment were a
+separate sub-path. In particular, it is valid to use an &#8220;on&#8221; length of
+0.0 with <a class="reference internal" href="constants.html#cairo.LINE_CAP_ROUND" title="cairo.LINE_CAP_ROUND"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_ROUND</span></tt></a> or <a class="reference internal" href="constants.html#cairo.LINE_CAP_SQUARE" title="cairo.LINE_CAP_SQUARE"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_SQUARE</span></tt></a>
+in order to distributed dots or squares along a path.</p>
+<p>Note: The length values are in user-space units as evaluated at the time
+of stroking. This is not necessarily the same as the user space at the
+time of <a class="reference internal" href="#cairo.Context.set_dash" title="cairo.Context.set_dash"><tt class="xref py py-meth docutils literal"><span class="pre">set_dash()</span></tt></a>.</p>
+<p>If the number of dashes is 0 dashing is disabled.</p>
+<p>If the number of dashes is 1 a symmetric pattern is assumed with
+alternating on and off portions of the size specified by the single
+value in <em>dashes</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_fill_rule">
+<tt class="descname">set_fill_rule</tt><big>(</big><em>fill_rule</em><big>)</big><a class="headerlink" href="#cairo.Context.set_fill_rule" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fill_rule</strong> &#8211; a <a class="reference internal" href="constants.html#constants-fill-rule"><em>FILL RULE</em></a> to set the
+within the cairo context. The fill rule is used to determine which
+regions are inside or outside a complex (potentially
+self-intersecting) path. The current fill rule affects both
+<a class="reference internal" href="#cairo.Context.fill" title="cairo.Context.fill"><tt class="xref py py-meth docutils literal"><span class="pre">fill()</span></tt></a> and <a class="reference internal" href="#cairo.Context.clip" title="cairo.Context.clip"><tt class="xref py py-meth docutils literal"><span class="pre">clip()</span></tt></a>.</td>
+</tr>
+</tbody>
+</table>
+<p>The default fill rule is <a class="reference internal" href="constants.html#cairo.FILL_RULE_WINDING" title="cairo.FILL_RULE_WINDING"><tt class="xref py py-data docutils literal"><span class="pre">cairo.FILL_RULE_WINDING</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_font_face">
+<tt class="descname">set_font_face</tt><big>(</big><em>font_face</em><big>)</big><a class="headerlink" href="#cairo.Context.set_font_face" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>font_face</strong> &#8211; a <a class="reference internal" href="text.html#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a>, or None to restore to the
+default <a class="reference internal" href="text.html#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>Replaces the current <a class="reference internal" href="text.html#cairo.FontFace" title="cairo.FontFace"><tt class="xref py py-class docutils literal"><span class="pre">FontFace</span></tt></a> object in the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>
+with <em>font_face</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_font_matrix">
+<tt class="descname">set_font_matrix</tt><big>(</big><em>matrix</em><big>)</big><a class="headerlink" href="#cairo.Context.set_font_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>matrix</strong> &#8211; a <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> describing a transform to be applied to
+the current font.</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the current font matrix to <em>matrix</em>. The font matrix gives a
+transformation from the design space of the font (in this space, the
+em-square is 1 unit by 1 unit) to user space. Normally, a simple scale
+is used (see <a class="reference internal" href="#cairo.Context.set_font_size" title="cairo.Context.set_font_size"><tt class="xref py py-meth docutils literal"><span class="pre">set_font_size()</span></tt></a>), but a more complex font matrix can
+be used to shear the font or stretch it unequally along the two axes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_font_options">
+<tt class="descname">set_font_options</tt><big>(</big><em>options</em><big>)</big><a class="headerlink" href="#cairo.Context.set_font_options" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>options</strong> &#8211; <a class="reference internal" href="text.html#cairo.FontOptions" title="cairo.FontOptions"><tt class="xref py py-class docutils literal"><span class="pre">FontOptions</span></tt></a> to use</td>
+</tr>
+</tbody>
+</table>
+<p>Sets a set of custom font rendering options for the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.
+Rendering options are derived by merging these options with the options
+derived from underlying surface; if the value in <em>options</em> has a default
+value (like <a class="reference internal" href="constants.html#cairo.ANTIALIAS_DEFAULT" title="cairo.ANTIALIAS_DEFAULT"><tt class="xref py py-data docutils literal"><span class="pre">cairo.ANTIALIAS_DEFAULT</span></tt></a>), then the value from the
+surface is used.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_font_size">
+<tt class="descname">set_font_size</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#cairo.Context.set_font_size" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>size</strong> (<em>float</em>) &#8211; the new font size, in user space units</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the current font matrix to a scale by a factor of <em>size</em>, replacing
+any font matrix previously set with <a class="reference internal" href="#cairo.Context.set_font_size" title="cairo.Context.set_font_size"><tt class="xref py py-meth docutils literal"><span class="pre">set_font_size()</span></tt></a> or
+<a class="reference internal" href="#cairo.Context.set_font_matrix" title="cairo.Context.set_font_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">set_font_matrix()</span></tt></a>. This results in a font size of <em>size</em> user
+space units. (More precisely, this matrix will result in the font&#8217;s
+em-square being a <em>size</em> by <em>size</em> square in user space.)</p>
+<p>If text is drawn without a call to <a class="reference internal" href="#cairo.Context.set_font_size" title="cairo.Context.set_font_size"><tt class="xref py py-meth docutils literal"><span class="pre">set_font_size()</span></tt></a>, (nor
+<a class="reference internal" href="#cairo.Context.set_font_matrix" title="cairo.Context.set_font_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">set_font_matrix()</span></tt></a> nor <a class="reference internal" href="#cairo.Context.set_scaled_font" title="cairo.Context.set_scaled_font"><tt class="xref py py-meth docutils literal"><span class="pre">set_scaled_font()</span></tt></a>), the default font
+size is 10.0.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_line_cap">
+<tt class="descname">set_line_cap</tt><big>(</big><em>line_cap</em><big>)</big><a class="headerlink" href="#cairo.Context.set_line_cap" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line_cap</strong> &#8211; a <a class="reference internal" href="constants.html#constants-line-cap"><em>LINE_CAP</em></a> style</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the current line cap style within the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>As with the other stroke parameters, the current line cap style is
+examined by <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>, <a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_extents()</span></tt></a>, and
+<tt class="xref py py-meth docutils literal"><span class="pre">stroke_to_path()</span></tt>, but does not have any effect during path
+construction.</p>
+<p>The default line cap style is <a class="reference internal" href="constants.html#cairo.LINE_CAP_BUTT" title="cairo.LINE_CAP_BUTT"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_BUTT</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_line_join">
+<tt class="descname">set_line_join</tt><big>(</big><em>line_join</em><big>)</big><a class="headerlink" href="#cairo.Context.set_line_join" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line_join</strong> &#8211; a <a class="reference internal" href="constants.html#constants-line-join"><em>LINE_JOIN</em></a> style</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the current line join style within the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>As with the other stroke parameters, the current line join style is
+examined by <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>, <a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_extents()</span></tt></a>, and
+<tt class="xref py py-meth docutils literal"><span class="pre">stroke_to_path()</span></tt>, but does not have any effect during path
+construction.</p>
+<p>The default line join style is <a class="reference internal" href="constants.html#cairo.LINE_JOIN_MITER" title="cairo.LINE_JOIN_MITER"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_JOIN_MITER</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_line_width">
+<tt class="descname">set_line_width</tt><big>(</big><em>width</em><big>)</big><a class="headerlink" href="#cairo.Context.set_line_width" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>width</strong> (<em>float</em>) &#8211; a line width</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the current line width within the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>. The line width
+value specifies the diameter of a pen that is circular in user space,
+(though device-space pen may be an ellipse in general due to
+scaling/shear/rotation of the CTM).</p>
+<p>Note: When the description above refers to user space and CTM it refers
+to the user space and CTM in effect at the time of the stroking
+operation, not the user space and CTM in effect at the time of the call
+to <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_width()</span></tt></a>. The simplest usage makes both of these
+spaces identical. That is, if there is no change to the CTM between a
+call to <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_width()</span></tt></a> and the stroking operation, then one can
+just pass user-space values to <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_width()</span></tt></a> and ignore this
+note.</p>
+<p>As with the other stroke parameters, the current line width is examined
+by <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>, <a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_extents()</span></tt></a>, and
+<tt class="xref py py-meth docutils literal"><span class="pre">stroke_to_path()</span></tt>, but does not have any effect during path
+construction.</p>
+<p>The default line width value is 2.0.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_matrix">
+<tt class="descname">set_matrix</tt><big>(</big><em>matrix</em><big>)</big><a class="headerlink" href="#cairo.Context.set_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>matrix</strong> &#8211; a transformation <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> from user space to
+device space.</td>
+</tr>
+</tbody>
+</table>
+<p>Modifies the current transformation matrix (CTM) by setting it equal to
+<em>matrix</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_miter_limit">
+<tt class="descname">set_miter_limit</tt><big>(</big><em>limit</em><big>)</big><a class="headerlink" href="#cairo.Context.set_miter_limit" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>limit</strong> &#8211; miter limit to set</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the current miter limit within the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<p>If the current line join style is set to <a class="reference internal" href="constants.html#cairo.LINE_JOIN_MITER" title="cairo.LINE_JOIN_MITER"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_JOIN_MITER</span></tt></a>
+(see <a class="reference internal" href="#cairo.Context.set_line_join" title="cairo.Context.set_line_join"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_join()</span></tt></a>), the miter limit is used to determine
+whether the lines should be joined with a bevel instead of a miter.
+Cairo divides the length of the miter by the line width. If the result
+is greater than the miter limit, the style is converted to a bevel.</p>
+<p>As with the other stroke parameters, the current line miter limit is
+examined by <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>, <a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_extents()</span></tt></a>, and
+<tt class="xref py py-meth docutils literal"><span class="pre">stroke_to_path()</span></tt>, but does not have any effect during path
+construction.</p>
+<p>The default miter limit value is 10.0, which will convert joins with
+interior angles less than 11 degrees to bevels instead of miters. For
+reference, a miter limit of 2.0 makes the miter cutoff at 60 degrees,
+and a miter limit of 1.414 makes the cutoff at 90 degrees.</p>
+<p>A miter limit for a desired angle can be computed as:</p>
+<div class="highlight-python"><pre>miter limit = 1/math.sin(angle/2)</pre>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_operator">
+<tt class="descname">set_operator</tt><big>(</big><em>op</em><big>)</big><a class="headerlink" href="#cairo.Context.set_operator" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>op</strong> &#8211; the compositing <a class="reference internal" href="constants.html#constants-operator"><em>OPERATOR</em></a> to set
+for use in all drawing operations.</td>
+</tr>
+</tbody>
+</table>
+<p>The default operator is <a class="reference internal" href="constants.html#cairo.OPERATOR_OVER" title="cairo.OPERATOR_OVER"><tt class="xref py py-data docutils literal"><span class="pre">cairo.OPERATOR_OVER</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_scaled_font">
+<tt class="descname">set_scaled_font</tt><big>(</big><em>scaled_font</em><big>)</big><a class="headerlink" href="#cairo.Context.set_scaled_font" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scaled_font</strong> &#8211; a <a class="reference internal" href="text.html#cairo.ScaledFont" title="cairo.ScaledFont"><tt class="xref py py-class docutils literal"><span class="pre">ScaledFont</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>Replaces the current font face, font matrix, and font options in the
+<a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> with those of the <a class="reference internal" href="text.html#cairo.ScaledFont" title="cairo.ScaledFont"><tt class="xref py py-class docutils literal"><span class="pre">ScaledFont</span></tt></a>. Except for some
+translation, the current CTM of the <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> should be the same
+as that of the <a class="reference internal" href="text.html#cairo.ScaledFont" title="cairo.ScaledFont"><tt class="xref py py-class docutils literal"><span class="pre">ScaledFont</span></tt></a>, which can be accessed using
+<a class="reference internal" href="text.html#cairo.ScaledFont.get_ctm" title="cairo.ScaledFont.get_ctm"><tt class="xref py py-meth docutils literal"><span class="pre">ScaledFont.get_ctm()</span></tt></a>.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.2.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_source">
+<tt class="descname">set_source</tt><big>(</big><em>source</em><big>)</big><a class="headerlink" href="#cairo.Context.set_source" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>source</strong> &#8211; a <a class="reference internal" href="patterns.html#cairo.Pattern" title="cairo.Pattern"><tt class="xref py py-class docutils literal"><span class="pre">Pattern</span></tt></a> to be used as the source for
+subsequent drawing operations.</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the source pattern within <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> to <em>source</em>. This
+pattern will then be used for any subsequent drawing operation until a
+new source pattern is set.</p>
+<p>Note: The pattern&#8217;s transformation matrix will be locked to the user
+space in effect at the time of <a class="reference internal" href="#cairo.Context.set_source" title="cairo.Context.set_source"><tt class="xref py py-meth docutils literal"><span class="pre">set_source()</span></tt></a>. This means that
+further modifications of the current transformation matrix will not
+affect the source pattern. See <a class="reference internal" href="patterns.html#cairo.Pattern.set_matrix" title="cairo.Pattern.set_matrix"><tt class="xref py py-meth docutils literal"><span class="pre">Pattern.set_matrix()</span></tt></a>.</p>
+<p>The default source pattern is a solid pattern that is opaque black,
+(that is, it is equivalent to <tt class="docutils literal"><span class="pre">set_source_rgb(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_source_rgb">
+<tt class="descname">set_source_rgb</tt><big>(</big><em>red</em>, <em>green</em>, <em>blue</em><big>)</big><a class="headerlink" href="#cairo.Context.set_source_rgb" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>red</strong> (<em>float</em>) &#8211; red component of color</li>
+<li><strong>green</strong> (<em>float</em>) &#8211; green component of color</li>
+<li><strong>blue</strong> (<em>float</em>) &#8211; blue component of color</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the source pattern within <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> to an opaque color. This
+opaque color will then be used for any subsequent drawing operation
+until a new source pattern is set.</p>
+<p>The color components are floating point numbers in the range 0 to
+1. If the values passed in are outside that range, they will be
+clamped.</p>
+<p>The default source pattern is opaque black, (that is, it is
+equivalent to <tt class="docutils literal"><span class="pre">set_source_rgb(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_source_rgba">
+<tt class="descname">set_source_rgba</tt><big>(</big><em>red</em>, <em>green</em>, <em>blue</em><span class="optional">[</span>, <em>alpha=1.0</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.Context.set_source_rgba" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>red</strong> (<em>float</em>) &#8211; red component of color</li>
+<li><strong>green</strong> (<em>float</em>) &#8211; green component of color</li>
+<li><strong>blue</strong> (<em>float</em>) &#8211; blue component of color</li>
+<li><strong>alpha</strong> (<em>float</em>) &#8211; alpha component of color</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the source pattern within <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> to a translucent
+color. This color will then be used for any subsequent drawing operation
+until a new source pattern is set.</p>
+<p>The color and alpha components are floating point numbers in the range 0
+to 1. If the values passed in are outside that range, they will be
+clamped.</p>
+<p>The default source pattern is opaque black, (that is, it is
+equivalent to <tt class="docutils literal"><span class="pre">set_source_rgba(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0,</span> <span class="pre">1.0)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_source_surface">
+<tt class="descname">set_source_surface</tt><big>(</big><em>surface</em><span class="optional">[</span>, <em>x=0.0</em><span class="optional">[</span>, <em>y=0.0</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.Context.set_source_surface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>surface</strong> &#8211; a <a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a> to be used to set the source pattern</li>
+<li><strong>x</strong> (<em>float</em>) &#8211; User-space X coordinate for surface origin</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; User-space Y coordinate for surface origin</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This is a convenience function for creating a pattern from a
+<a class="reference internal" href="surfaces.html#cairo.Surface" title="cairo.Surface"><tt class="xref py py-class docutils literal"><span class="pre">Surface</span></tt></a> and setting it as the source in <a class="reference internal" href="#cairo.Context" title="cairo.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> with
+<a class="reference internal" href="#cairo.Context.set_source" title="cairo.Context.set_source"><tt class="xref py py-meth docutils literal"><span class="pre">set_source()</span></tt></a>.</p>
+<p>The <em>x</em> and <em>y</em> parameters give the user-space coordinate at which the
+surface origin should appear. (The surface origin is its upper-left
+corner before any transformation has been applied.) The <em>x</em> and <em>y</em>
+patterns are negated and then set as translation values in the pattern
+matrix.</p>
+<p>Other than the initial translation pattern matrix, as described above,
+all other pattern attributes, (such as its extend mode), are set to the
+default values as in <a class="reference internal" href="patterns.html#cairo.SurfacePattern" title="cairo.SurfacePattern"><tt class="xref py py-class docutils literal"><span class="pre">SurfacePattern</span></tt></a>.  The resulting pattern can
+be queried with <a class="reference internal" href="#cairo.Context.get_source" title="cairo.Context.get_source"><tt class="xref py py-meth docutils literal"><span class="pre">get_source()</span></tt></a> so that these attributes can be
+modified if desired, (eg. to create a repeating pattern with
+<a class="reference internal" href="patterns.html#cairo.Pattern.set_extend" title="cairo.Pattern.set_extend"><tt class="xref py py-meth docutils literal"><span class="pre">Pattern.set_extend()</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.set_tolerance">
+<tt class="descname">set_tolerance</tt><big>(</big><em>tolerance</em><big>)</big><a class="headerlink" href="#cairo.Context.set_tolerance" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tolerance</strong> (<em>float</em>) &#8211; the tolerance, in device units (typically pixels)</td>
+</tr>
+</tbody>
+</table>
+<p>Sets the tolerance used when converting paths into trapezoids.  Curved
+segments of the path will be subdivided until the maximum deviation
+between the original path and the polygonal approximation is less than
+<em>tolerance</em>. The default value is 0.1. A larger value will give better
+performance, a smaller value, better appearance. (Reducing the value
+from the default value of 0.1 is unlikely to improve appearance
+significantly.)  The accuracy of paths within Cairo is limited by the
+precision of its internal arithmetic, and the prescribed <em>tolerance</em> is
+restricted to the smallest representable internal value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.show_glyphs">
+<tt class="descname">show_glyphs</tt><big>(</big><em>glyphs</em><span class="optional">[</span>, <em>num_glyphs</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cairo.Context.show_glyphs" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>glyphs</strong> (<em>a sequence of (int, float, float)</em>) &#8211; glyphs to show</li>
+<li><strong>num_glyphs</strong> (<em>int</em>) &#8211; number of glyphs to show, defaults to showing all
+glyphs</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>A drawing operator that generates the shape from an array of glyphs,
+rendered according to the current font face, font size (font matrix),
+and font options.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.show_page">
+<tt class="descname">show_page</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.show_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emits and clears the current page for backends that support multiple
+pages. Use <a class="reference internal" href="#cairo.Context.copy_page" title="cairo.Context.copy_page"><tt class="xref py py-meth docutils literal"><span class="pre">copy_page()</span></tt></a> if you don&#8217;t want to clear the page.</p>
+<p>This is a convenience function that simply calls
+<tt class="docutils literal"><span class="pre">ctx.get_target()</span> <span class="pre">.</span> <span class="pre">show_page()</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.show_text">
+<tt class="descname">show_text</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#cairo.Context.show_text" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>str</em>) &#8211; text</td>
+</tr>
+</tbody>
+</table>
+<p>A drawing operator that generates the shape from a string of text,
+rendered according to the current font_face, font_size (font_matrix),
+and font_options.</p>
+<p>This function first computes a set of glyphs for the string of text. The
+first glyph is placed so that its origin is at the current point. The
+origin of each subsequent glyph is offset from that of the previous
+glyph by the advance values of the previous glyph.</p>
+<p>After this call the current point is moved to the origin of where the
+next glyph would be placed in this same progression. That is, the
+current point will be at the origin of the final glyph offset by its
+advance values. This allows for easy display of a single logical string
+with multiple calls to <a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">show_text()</span></tt></a>.</p>
+<p>Note: The <a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">show_text()</span></tt></a> function call is part of what the cairo
+designers call the &#8220;toy&#8221; text API. It is convenient for short demos
+and simple programs, but it is not expected to be adequate for
+serious text-using applications. See <a class="reference internal" href="#cairo.Context.show_glyphs" title="cairo.Context.show_glyphs"><tt class="xref py py-meth docutils literal"><span class="pre">show_glyphs()</span></tt></a> for the
+&#8220;real&#8221; text display API in cairo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.stroke">
+<tt class="descname">stroke</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.stroke" title="Permalink to this definition">¶</a></dt>
+<dd><p>A drawing operator that strokes the current path according to the
+current line width, line join, line cap, and dash settings. After
+<a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>, the current path will be cleared from the cairo
+context. See <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_width()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_line_join" title="cairo.Context.set_line_join"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_join()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.set_line_cap" title="cairo.Context.set_line_cap"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_cap()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_dash" title="cairo.Context.set_dash"><tt class="xref py py-meth docutils literal"><span class="pre">set_dash()</span></tt></a>, and <a class="reference internal" href="#cairo.Context.stroke_preserve" title="cairo.Context.stroke_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_preserve()</span></tt></a>.</p>
+<p>Note: Degenerate segments and sub-paths are treated specially and
+provide a useful result. These can result in two different situations:</p>
+<p>1. Zero-length &#8220;on&#8221; segments set in <a class="reference internal" href="#cairo.Context.set_dash" title="cairo.Context.set_dash"><tt class="xref py py-meth docutils literal"><span class="pre">set_dash()</span></tt></a>. If the cap
+style is <a class="reference internal" href="constants.html#cairo.LINE_CAP_ROUND" title="cairo.LINE_CAP_ROUND"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_ROUND</span></tt></a> or <a class="reference internal" href="constants.html#cairo.LINE_CAP_SQUARE" title="cairo.LINE_CAP_SQUARE"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_SQUARE</span></tt></a>
+then these segments will be drawn as circular dots or squares
+respectively. In the case of <a class="reference internal" href="constants.html#cairo.LINE_CAP_SQUARE" title="cairo.LINE_CAP_SQUARE"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_SQUARE</span></tt></a>, the
+orientation of the squares is determined by the direction of the
+underlying path.</p>
+<p>2. A sub-path created by <a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">move_to()</span></tt></a> followed by either a
+<a class="reference internal" href="#cairo.Context.close_path" title="cairo.Context.close_path"><tt class="xref py py-meth docutils literal"><span class="pre">close_path()</span></tt></a> or one or more calls to <a class="reference internal" href="#cairo.Context.line_to" title="cairo.Context.line_to"><tt class="xref py py-meth docutils literal"><span class="pre">line_to()</span></tt></a> to the same
+coordinate as the <a class="reference internal" href="#cairo.Context.move_to" title="cairo.Context.move_to"><tt class="xref py py-meth docutils literal"><span class="pre">move_to()</span></tt></a>. If the cap style is
+<a class="reference internal" href="constants.html#cairo.LINE_CAP_ROUND" title="cairo.LINE_CAP_ROUND"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_ROUND</span></tt></a> then these sub-paths will be drawn as
+circular dots. Note that in the case of <a class="reference internal" href="constants.html#cairo.LINE_CAP_SQUARE" title="cairo.LINE_CAP_SQUARE"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_SQUARE</span></tt></a> a
+degenerate sub-path will not be drawn at all, (since the correct
+orientation is indeterminate).</p>
+<p>In no case will a cap style of <a class="reference internal" href="constants.html#cairo.LINE_CAP_BUTT" title="cairo.LINE_CAP_BUTT"><tt class="xref py py-data docutils literal"><span class="pre">cairo.LINE_CAP_BUTT</span></tt></a> cause anything
+to be drawn in the case of either degenerate segments or sub-paths.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.stroke_extents">
+<tt class="descname">stroke_extents</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.stroke_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">(x1, y1, x2, y2)</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">(float, float, float, float)</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>x1</em>: left of the resulting extents</li>
+<li><em>y1</em>: top of the resulting extents</li>
+<li><em>x2</em>: right of the resulting extents</li>
+<li><em>y2</em>: bottom of the resulting extents</li>
+</ul>
+<p>Computes a bounding box in user coordinates covering the area that would
+be affected, (the &#8220;inked&#8221; area), by a <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a> operation given
+the current path and stroke parameters. If the current path is empty,
+returns an empty rectangle (0, 0, 0, 0). Surface dimensions and
+clipping are not taken into account.</p>
+<p>Note that if the line width is set to exactly zero, then
+<a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_extents()</span></tt></a> will return an empty rectangle. Contrast with
+<a class="reference internal" href="#cairo.Context.path_extents" title="cairo.Context.path_extents"><tt class="xref py py-meth docutils literal"><span class="pre">path_extents()</span></tt></a> which can be used to compute the non-empty bounds
+as the line width approaches zero.</p>
+<p>Note that <a class="reference internal" href="#cairo.Context.stroke_extents" title="cairo.Context.stroke_extents"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_extents()</span></tt></a> must necessarily do more work to
+compute the precise inked areas in light of the stroke parameters, so
+<a class="reference internal" href="#cairo.Context.path_extents" title="cairo.Context.path_extents"><tt class="xref py py-meth docutils literal"><span class="pre">path_extents()</span></tt></a> may be more desirable for sake of performance if
+non-inked path extents are desired.</p>
+<p>See <a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_width()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_line_join" title="cairo.Context.set_line_join"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_join()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.set_line_cap" title="cairo.Context.set_line_cap"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_cap()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_dash" title="cairo.Context.set_dash"><tt class="xref py py-meth docutils literal"><span class="pre">set_dash()</span></tt></a>, and <a class="reference internal" href="#cairo.Context.stroke_preserve" title="cairo.Context.stroke_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_preserve()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.stroke_preserve">
+<tt class="descname">stroke_preserve</tt><big>(</big><big>)</big><a class="headerlink" href="#cairo.Context.stroke_preserve" title="Permalink to this definition">¶</a></dt>
+<dd><p>A drawing operator that strokes the current path according to the
+current line width, line join, line cap, and dash settings. Unlike
+<a class="reference internal" href="#cairo.Context.stroke" title="cairo.Context.stroke"><tt class="xref py py-meth docutils literal"><span class="pre">stroke()</span></tt></a>, <a class="reference internal" href="#cairo.Context.stroke_preserve" title="cairo.Context.stroke_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_preserve()</span></tt></a> preserves the path within the
+cairo context.</p>
+<p>See <a class="reference internal" href="#cairo.Context.set_line_width" title="cairo.Context.set_line_width"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_width()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_line_join" title="cairo.Context.set_line_join"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_join()</span></tt></a>,
+<a class="reference internal" href="#cairo.Context.set_line_cap" title="cairo.Context.set_line_cap"><tt class="xref py py-meth docutils literal"><span class="pre">set_line_cap()</span></tt></a>, <a class="reference internal" href="#cairo.Context.set_dash" title="cairo.Context.set_dash"><tt class="xref py py-meth docutils literal"><span class="pre">set_dash()</span></tt></a>, and <a class="reference internal" href="#cairo.Context.stroke_preserve" title="cairo.Context.stroke_preserve"><tt class="xref py py-meth docutils literal"><span class="pre">stroke_preserve()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.text_extents">
+<tt class="descname">text_extents</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#cairo.Context.text_extents" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>str</em>) &#8211; text to get extents for</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">x_bearing, y_bearing, width, height, x_advance, y_advance</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">6-tuple of float</td>
+</tr>
+</tbody>
+</table>
+<p>Gets the extents for a string of text. The extents describe a user-space
+rectangle that encloses the &#8220;inked&#8221; portion of the text, (as it would be
+drawn by <a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a>). Additionally, the x_advance and
+y_advance values indicate the amount by which the current point would be
+advanced by <a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a>.</p>
+<p>Note that whitespace characters do not directly contribute to the size
+of the rectangle (extents.width and extents.height). They do contribute
+indirectly by changing the position of non-whitespace characters. In
+particular, trailing whitespace characters are likely to not affect the
+size of the rectangle, though they will affect the x_advance and
+y_advance values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.text_path">
+<tt class="descname">text_path</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#cairo.Context.text_path" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>str</em>) &#8211; text</td>
+</tr>
+</tbody>
+</table>
+<p>Adds closed paths for text to the current path. The generated path if
+filled, achieves an effect similar to that of <a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a>.</p>
+<p>Text conversion and positioning is done similar to
+<a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a>.</p>
+<p>Like <a class="reference internal" href="#cairo.Context.show_text" title="cairo.Context.show_text"><tt class="xref py py-meth docutils literal"><span class="pre">Context.show_text()</span></tt></a>, After this call the current point is
+moved to the origin of where the next glyph would be placed in this same
+progression. That is, the current point will be at the origin of the
+final glyph offset by its advance values.  This allows for chaining
+multiple calls to to <a class="reference internal" href="#cairo.Context.text_path" title="cairo.Context.text_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.text_path()</span></tt></a> without having to set
+current point in between.</p>
+<p>Note: The <a class="reference internal" href="#cairo.Context.text_path" title="cairo.Context.text_path"><tt class="xref py py-meth docutils literal"><span class="pre">text_path()</span></tt></a> function call is part of what the cairo
+designers call the &#8220;toy&#8221; text API. It is convenient for short demos and
+simple programs, but it is not expected to be adequate for serious
+text-using applications. See <a class="reference internal" href="#cairo.Context.glyph_path" title="cairo.Context.glyph_path"><tt class="xref py py-meth docutils literal"><span class="pre">Context.glyph_path()</span></tt></a> for the &#8220;real&#8221;
+text path API in cairo.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.transform">
+<tt class="descname">transform</tt><big>(</big><em>matrix</em><big>)</big><a class="headerlink" href="#cairo.Context.transform" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>matrix</strong> &#8211; a transformation <a class="reference internal" href="matrix.html#cairo.Matrix" title="cairo.Matrix"><tt class="xref py py-class docutils literal"><span class="pre">Matrix</span></tt></a> to be applied to the
+user-space axes</td>
+</tr>
+</tbody>
+</table>
+<p>Modifies the current transformation matrix (CTM) by applying <em>matrix</em> as
+an additional transformation. The new transformation of user space takes
+place after any existing transformation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.translate">
+<tt class="descname">translate</tt><big>(</big><em>tx</em>, <em>ty</em><big>)</big><a class="headerlink" href="#cairo.Context.translate" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tx</strong> (<em>float</em>) &#8211; amount to translate in the X direction</li>
+<li><strong>ty</strong> (<em>float</em>) &#8211; amount to translate in the Y direction</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Modifies the current transformation matrix (CTM) by translating the
+user-space origin by <em>(tx, ty)</em>. This offset is interpreted as a
+user-space coordinate according to the CTM in place before the new call
+to <a class="reference internal" href="#cairo.Context.translate" title="cairo.Context.translate"><tt class="xref py py-meth docutils literal"><span class="pre">translate()</span></tt></a>. In other words, the translation of the user-space
+origin takes place after any existing transformation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.user_to_device">
+<tt class="descname">user_to_device</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#cairo.Context.user_to_device" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; X value of coordinate</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; Y value of coordinate</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(x, y)</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(float, float)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>x</em>: X value of coordinate</li>
+<li><em>y</em>: Y value of coordinate</li>
+</ul>
+<p>Transform a coordinate from user space to device space by multiplying
+the given point by the current transformation matrix (CTM).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cairo.Context.user_to_device_distance">
+<tt class="descname">user_to_device_distance</tt><big>(</big><em>dx</em>, <em>dy</em><big>)</big><a class="headerlink" href="#cairo.Context.user_to_device_distance" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dx</strong> (<em>float</em>) &#8211; X value of a distance vector</li>
+<li><strong>dy</strong> (<em>float</em>) &#8211; Y value of a distance vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(dx, dy)</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(float, float)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><em>dx</em>: X value of a distance vector</li>
+<li><em>dy</em>: Y value of a distance vector</li>
+</ul>
+<p>Transform a distance vector from user space to device space. This
+function is similar to <a class="reference internal" href="#cairo.Context.user_to_device" title="cairo.Context.user_to_device"><tt class="xref py py-meth docutils literal"><span class="pre">Context.user_to_device()</span></tt></a> except that the
+translation components of the CTM will be ignored when transforming
+<em>(dx,dy)</em>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Cairo Context</a><ul>
+<li><a class="reference internal" href="#class-context">class Context()</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="constants.html"
+                        title="previous chapter">Module Functions and Constants</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="exceptions.html"
+                        title="next chapter">Exceptions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/context.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="exceptions.html" title="Exceptions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="constants.html" title="Module Functions and Constants"
+             >previous</a> |</li>
+        <li><a href="../index.html">Pycairo v1.10.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2008, Steve Chaplin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
