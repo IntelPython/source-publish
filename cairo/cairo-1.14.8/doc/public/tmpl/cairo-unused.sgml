@@ -1,0 +1,147 @@
+<!-- ##### SECTION ./tmpl/cairo-tag.sgml:Image ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/cairo-tag.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/cairo-tag.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/cairo-tag.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/cairo-tag.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/cairo-tag.sgml:Title ##### -->
+cairo-tag
+
+
+<!-- ##### MACRO CAIRO_PDF_OUTLINE_ROOT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO CAIRO_TAG_DEST ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO CAIRO_TAG_LINK ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM cairo_pdf_metadata_t ##### -->
+<para>
+
+</para>
+
+@CAIRO_PDF_METADATA_TITLE: 
+@CAIRO_PDF_METADATA_AUTHOR: 
+@CAIRO_PDF_METADATA_SUBJECT: 
+@CAIRO_PDF_METADATA_KEYWORDS: 
+@CAIRO_PDF_METADATA_CREATOR: 
+@CAIRO_PDF_METADATA_CREATE_DATE: 
+@CAIRO_PDF_METADATA_MOD_DATE: 
+
+<!-- ##### ENUM cairo_pdf_outline_flags_t ##### -->
+<para>
+
+</para>
+
+@CAIRO_BOOKMARK_FLAG_OPEN: 
+@CAIRO_BOOKMARK_FLAG_BOLD: 
+@CAIRO_BOOKMARK_FLAG_ITALIC: 
+
+<!-- ##### FUNCTION cairo_pdf_surface_add_outline ##### -->
+<para>
+
+</para>
+
+@surface: 
+@parent_id: 
+@utf8: 
+@dest: 
+@flags: 
+@Returns: 
+
+<!-- ##### FUNCTION cairo_pdf_surface_set_metadata ##### -->
+<para>
+
+</para>
+
+@surface: 
+@metadata: 
+@utf8: 
+
+<!-- ##### FUNCTION cairo_pdf_surface_set_page_label ##### -->
+<para>
+
+</para>
+
+@surface: 
+@utf8: 
+
+<!-- ##### FUNCTION cairo_pdf_surface_set_thumbnail_size ##### -->
+<para>
+
+</para>
+
+@surface: 
+@width: 
+@height: 
+
+<!-- ##### STRUCT cairo_skia_context ##### -->
+<para>
+
+</para>
+
+@base: 
+@original: 
+@target: 
+@matrix: 
+@canvas: 
+@paint: 
+@path: 
+@source: 
+@source_image: 
+@source_extra: 
+
+<!-- ##### STRUCT cairo_skia_surface ##### -->
+<para>
+
+</para>
+
+@image: 
+@bitmap: 
+
+<!-- ##### FUNCTION cairo_tag_begin ##### -->
+<para>
+
+</para>
+
+@cr: 
+@tag_name: 
+@attributes: 
+
+<!-- ##### FUNCTION cairo_tag_end ##### -->
+<para>
+
+</para>
+
+@cr: 
+@tag_name: 
+
