@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,13 +27,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include "ip.hpp"
 #include "err.hpp"
-#include "platform.hpp"
+#include "macros.hpp"
 
-#if defined ZMQ_HAVE_WINDOWS
-#include "windows.hpp"
-#else
+#if !defined ZMQ_HAVE_WINDOWS
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -48,6 +47,8 @@
 
 zmq::fd_t zmq::open_socket (int domain_, int type_, int protocol_)
 {
+    int rc;
+
     //  Setting this option result in sane behaviour when exec() functions
     //  are used. Old sockets are closed and don't block TCP ports etc.
 #if defined ZMQ_HAVE_SOCK_CLOEXEC
@@ -67,7 +68,7 @@ zmq::fd_t zmq::open_socket (int domain_, int type_, int protocol_)
     //  race condition can cause socket not to be closed (if fork happens
     //  between socket creation and this point).
 #if !defined ZMQ_HAVE_SOCK_CLOEXEC && defined FD_CLOEXEC
-    int rc = fcntl (s, F_SETFD, FD_CLOEXEC);
+    rc = fcntl (s, F_SETFD, FD_CLOEXEC);
     errno_assert (rc != -1);
 #endif
 
@@ -76,6 +77,10 @@ zmq::fd_t zmq::open_socket (int domain_, int type_, int protocol_)
     BOOL brc = SetHandleInformation ((HANDLE) s, HANDLE_FLAG_INHERIT, 0);
     win_assert (brc);
 #endif
+
+    //  Socket is not yet connected so EINVAL is not a valid networking error
+    rc = zmq::set_nosigpipe (s);
+    errno_assert (rc == 0);
 
     return s;
 }
@@ -132,10 +137,11 @@ int zmq::get_peer_ip_address (fd_t sockfd_, std::string &ip_addr_)
     rc = getpeername (sockfd_, (struct sockaddr*) &ss, &addrlen);
 #ifdef ZMQ_HAVE_WINDOWS
     if (rc == SOCKET_ERROR) {
-        wsa_assert (WSAGetLastError () != WSANOTINITIALISED &&
-                    WSAGetLastError () != WSAEFAULT &&
-                    WSAGetLastError () != WSAEINPROGRESS &&
-                    WSAGetLastError () != WSAENOTSOCK);
+        const int last_error = WSAGetLastError();
+        wsa_assert (last_error != WSANOTINITIALISED &&
+                    last_error != WSAEFAULT &&
+                    last_error != WSAEINPROGRESS &&
+                    last_error != WSAENOTSOCK);
         return 0;
     }
 #else
@@ -173,4 +179,41 @@ void zmq::set_ip_type_of_service (fd_t s_, int iptos)
 #else
     errno_assert (rc == 0);
 #endif
+
+    //  Windows and Hurd do not support IPV6_TCLASS
+#if !defined (ZMQ_HAVE_WINDOWS) && defined (IPV6_TCLASS)
+    rc = setsockopt(
+        s_,
+        IPPROTO_IPV6,
+        IPV6_TCLASS,
+        reinterpret_cast<const char*>(&iptos),
+        sizeof(iptos));
+
+    //  If IPv6 is not enabled ENOPROTOOPT will be returned on Linux and
+    //  EINVAL on OSX
+    if (rc == -1) {
+        errno_assert (errno == ENOPROTOOPT ||
+                      errno == EINVAL);
+    }
+#endif
+}
+
+int zmq::set_nosigpipe (fd_t s_)
+{
+#ifdef SO_NOSIGPIPE
+    //  Make sure that SIGPIPE signal is not generated when writing to a
+    //  connection that was already closed by the peer.
+    //  As per POSIX spec, EINVAL will be returned if the socket was valid but
+    //  the connection has been reset by the peer. Return an error so that the
+    //  socket can be closed and the connection retried if necessary.
+    int set = 1;
+    int rc = setsockopt (s_, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof (int));
+    if (rc != 0 && errno == EINVAL)
+        return -1;
+    errno_assert (rc == 0);
+#else
+    LIBZMQ_UNUSED (s_);
+#endif
+
+    return 0;
 }

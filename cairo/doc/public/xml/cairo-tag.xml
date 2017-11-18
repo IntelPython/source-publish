@@ -7,9 +7,7 @@
 <refmeta>
 <refentrytitle role="top_of_page" id="cairo-Tags-and-Links.top_of_page">Tags and Links</refentrytitle>
 <manvolnum>3</manvolnum>
-<refmiscinfo>
-  CAIRO Library
-</refmiscinfo>
+<refmiscinfo>CAIRO Library</refmiscinfo>
 </refmeta>
 <refnamediv>
 <refname>Tags and Links</refname>
@@ -45,11 +43,6 @@
 </tbody>
 </tgroup>
 </informaltable>
-</refsect1>
-<refsect1 id="cairo-Tags-and-Links.object-hierarchy" role="object_hierarchy">
-<title role="object_hierarchy.title">Object Hierarchy</title>
-<screen>
-</screen>
 </refsect1>
 
 
@@ -281,7 +274,7 @@ for the list of tags and attributes.</para>
  to
 shutdown with a status of <link linkend="CAIRO-STATUS-TAG-ERROR:CAPS"><literal>CAIRO_STATUS_TAG_ERROR</literal></link>.</para>
 <para>See <link linkend="cairo-tag-end"><function>cairo_tag_end()</function></link>.</para>
-<refsect3 role="parameters">
+<refsect3 id="cairo-tag-begin.parameters" role="parameters">
 <title>Parameters</title>
 <informaltable role="parameters_table" pgwide="1" frame="none">
 <tgroup cols="3">
@@ -299,7 +292,7 @@ shutdown with a status of <link linkend="CAIRO-STATUS-TAG-ERROR:CAPS"><literal>C
 <entry role="parameter_description"><para>tag attributes</para></entry>
 <entry role="parameter_annotations"></entry></row>
 </tbody></tgroup></informaltable>
-</refsect3><para role="since">Since 1.16</para></refsect2>
+</refsect3><para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 <refsect2 id="cairo-tag-end" role="function" condition="since:1.16">
 <title>cairo_tag_end&#160;()</title>
 <indexterm zone="cairo-tag-end" role="1.16"><primary sortas="tag_end">cairo_tag_end</primary></indexterm>
@@ -312,7 +305,7 @@ cairo_tag_end (<parameter><link linkend="cairo-t"><type>cairo_t</type></link> *c
  to shutdown with a status of
 <link linkend="CAIRO-STATUS-TAG-ERROR:CAPS"><literal>CAIRO_STATUS_TAG_ERROR</literal></link>.</para>
 <para>See <link linkend="cairo-tag-begin"><function>cairo_tag_begin()</function></link>.</para>
-<refsect3 role="parameters">
+<refsect3 id="cairo-tag-end.parameters" role="parameters">
 <title>Parameters</title>
 <informaltable role="parameters_table" pgwide="1" frame="none">
 <tgroup cols="3">
@@ -327,7 +320,7 @@ cairo_tag_end (<parameter><link linkend="cairo-t"><type>cairo_t</type></link> *c
 <entry role="parameter_description"><para>tag name</para></entry>
 <entry role="parameter_annotations"></entry></row>
 </tbody></tgroup></informaltable>
-</refsect3><para role="since">Since 1.16</para></refsect2>
+</refsect3><para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 
 </refsect1>
 <refsect1 id="cairo-Tags-and-Links.other_details" role="details">
@@ -339,7 +332,7 @@ cairo_tag_end (<parameter><link linkend="cairo-t"><type>cairo_t</type></link> *c
 </programlisting>
 <para>Create a destination for a hyperlink. Destination tag attributes
 are detailed at <link linkend="dests">Destinations</link>.</para>
-<para role="since">Since 1.16</para></refsect2>
+<para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 <refsect2 id="CAIRO-TAG-LINK:CAPS" role="macro" condition="since:1.16">
 <title>CAIRO_TAG_LINK</title>
 <indexterm zone="CAIRO-TAG-LINK:CAPS" role="1.16"><primary sortas="TAG_LINK">CAIRO_TAG_LINK</primary></indexterm>
@@ -347,7 +340,7 @@ are detailed at <link linkend="dests">Destinations</link>.</para>
 </programlisting>
 <para>Create hyperlink. Link tag attributes are detailed at
 <link linkend="links">Links</link>.</para>
-<para role="since">Since 1.16</para></refsect2>
+<para role="since">Since: <link linkend="api-index-1.16">1.16</link></para></refsect2>
 
 </refsect1>
 <refsect1 id="cairo-Tags-and-Links.see-also">

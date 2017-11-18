@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,6 +27,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include "epoll.hpp"
 #if defined ZMQ_USE_EPOLL
 
@@ -37,6 +38,7 @@
 #include <algorithm>
 #include <new>
 
+#include "macros.hpp"
 #include "epoll.hpp"
 #include "err.hpp"
 #include "config.hpp"
@@ -46,7 +48,14 @@ zmq::epoll_t::epoll_t (const zmq::ctx_t &ctx_) :
     ctx(ctx_),
     stopping (false)
 {
+#ifdef ZMQ_USE_EPOLL_CLOEXEC
+    //  Setting this option result in sane behaviour when exec() functions
+    //  are used. Old sockets are closed and don't block TCP ports, avoid
+    //  leaks, etc.
+    epoll_fd = epoll_create1 (EPOLL_CLOEXEC);
+#else
     epoll_fd = epoll_create (1);
+#endif
     errno_assert (epoll_fd != -1);
 }
 
@@ -56,8 +65,9 @@ zmq::epoll_t::~epoll_t ()
     worker.stop ();
 
     close (epoll_fd);
-    for (retired_t::iterator it = retired.begin (); it != retired.end (); ++it)
-        delete *it;
+    for (retired_t::iterator it = retired.begin (); it != retired.end (); ++it) {
+        LIBZMQ_DELETE(*it);
+    }
 }
 
 zmq::epoll_t::handle_t zmq::epoll_t::add_fd (fd_t fd_, i_poll_events *events_)
@@ -89,7 +99,9 @@ void zmq::epoll_t::rm_fd (handle_t handle_)
     int rc = epoll_ctl (epoll_fd, EPOLL_CTL_DEL, pe->fd, &pe->ev);
     errno_assert (rc != -1);
     pe->fd = retired_fd;
+    retired_sync.lock ();
     retired.push_back (pe);
+    retired_sync.unlock ();
 
     //  Decrease the load metric of the thread.
     adjust_load (-1);
@@ -177,10 +189,12 @@ void zmq::epoll_t::loop ()
         }
 
         //  Destroy retired event sources.
-        for (retired_t::iterator it = retired.begin (); it != retired.end ();
-              ++it)
-            delete *it;
+        retired_sync.lock ();
+        for (retired_t::iterator it = retired.begin (); it != retired.end (); ++it) {
+            LIBZMQ_DELETE(*it);
+        }
         retired.clear ();
+        retired_sync.unlock ();
     }
 }
 

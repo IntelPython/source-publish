@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,6 +27,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include <string.h>
 #include <stdarg.h>
 
@@ -115,6 +116,10 @@ void zmq::object_t::process_command (command_t &cmd_)
 
     case command_t::pipe_term_ack:
         process_pipe_term_ack ();
+        break;
+
+    case command_t::pipe_hwm:
+        process_pipe_hwm (cmd_.args.pipe_hwm.inhwm, cmd_.args.pipe_hwm.outhwm);
         break;
 
     case command_t::term_req:
@@ -290,6 +295,16 @@ void zmq::object_t::send_pipe_term_ack (pipe_t *destination_)
     send_command (cmd);
 }
 
+void zmq::object_t::send_pipe_hwm (pipe_t *destination_, int inhwm_, int outhwm_)
+{
+    command_t cmd;
+    cmd.destination = destination_;
+    cmd.type = command_t::pipe_hwm;
+    cmd.args.pipe_hwm.inhwm = inhwm_;
+    cmd.args.pipe_hwm.outhwm = outhwm_;
+    send_command (cmd);
+}
+
 void zmq::object_t::send_term_req (own_t *destination_,
     own_t *object_)
 {
@@ -396,6 +411,11 @@ void zmq::object_t::process_pipe_term ()
 }
 
 void zmq::object_t::process_pipe_term_ack ()
+{
+    zmq_assert (false);
+}
+
+void zmq::object_t::process_pipe_hwm (int, int)
 {
     zmq_assert (false);
 }

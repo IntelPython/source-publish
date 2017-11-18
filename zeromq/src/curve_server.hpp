@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -32,11 +32,8 @@
 
 #ifdef ZMQ_HAVE_CURVE
 
-#include "platform.hpp"
-
 #if defined (ZMQ_USE_TWEETNACL)
-#   include "tweetnacl_base.h"
-#   include "randombytes.h"
+#   include "tweetnacl.h"
 #elif defined (ZMQ_USE_LIBSODIUM)
 #   include "sodium.h"
 #endif
@@ -130,7 +127,6 @@ namespace zmq
 
         void send_zap_request (const uint8_t *key);
         int receive_and_process_zap_reply ();
-        mutex_t sync;
     };
 
 }

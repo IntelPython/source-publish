@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -30,7 +30,6 @@
 #ifndef __ZMQ_MUTEX_HPP_INCLUDED__
 #define __ZMQ_MUTEX_HPP_INCLUDED__
 
-#include "platform.hpp"
 #include "err.hpp"
 
 //  Mutex class encapsulates OS mutex in a platform-independent way.
@@ -70,6 +69,11 @@ namespace zmq
             LeaveCriticalSection (&cs);
         }
 
+        inline CRITICAL_SECTION* get_cs()
+        {
+            return &cs;
+        }
+
     private:
 
         CRITICAL_SECTION cs;
@@ -93,13 +97,22 @@ namespace zmq
     public:
         inline mutex_t ()
         {
-            int rc = pthread_mutex_init (&mutex, NULL);
+            int rc = pthread_mutexattr_init(&attr);
+            posix_assert (rc);
+
+            rc = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+            posix_assert (rc);
+
+            rc = pthread_mutex_init (&mutex, &attr);
             posix_assert (rc);
         }
 
         inline ~mutex_t ()
         {
             int rc = pthread_mutex_destroy (&mutex);
+            posix_assert (rc);
+
+            rc = pthread_mutexattr_destroy (&attr);
             posix_assert (rc);
         }
 
@@ -125,9 +138,15 @@ namespace zmq
             posix_assert (rc);
         }
 
+        inline pthread_mutex_t* get_mutex()
+        {
+            return &mutex;
+        }
+
     private:
 
         pthread_mutex_t mutex;
+        pthread_mutexattr_t attr;
 
         // Disable copy construction and assignment.
         mutex_t (const mutex_t&);
@@ -162,6 +181,33 @@ namespace zmq
         scoped_lock_t (const scoped_lock_t&);
         const scoped_lock_t &operator = (const scoped_lock_t&);
     };
+
+
+    struct scoped_optional_lock_t
+    {
+        scoped_optional_lock_t (mutex_t* mutex_)
+            : mutex (mutex_)
+        {
+            if(mutex != NULL)
+                mutex->lock ();
+        }
+
+        ~scoped_optional_lock_t ()
+        {
+            if(mutex != NULL)
+                mutex->unlock ();
+        }
+
+    private:
+
+        mutex_t* mutex;
+
+        // Disable copy construction and assignment.
+        scoped_optional_lock_t (const scoped_lock_t&);
+        const scoped_optional_lock_t &operator = (const scoped_lock_t&);
+    };
+
+
 }
 
 #endif

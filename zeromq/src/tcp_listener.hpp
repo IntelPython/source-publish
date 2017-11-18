@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -35,7 +35,6 @@
 #include "stdint.hpp"
 #include "io_object.hpp"
 #include "tcp_address.hpp"
-#include "../include/zmq.h"
 
 namespace zmq
 {
@@ -84,7 +83,7 @@ namespace zmq
         //  Handle corresponding to the listening socket.
         handle_t handle;
 
-        //  Socket the listerner belongs to.
+        //  Socket the listener belongs to.
         zmq::socket_base_t *socket;
 
        // String representation of endpoint to bind to

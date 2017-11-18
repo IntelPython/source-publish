@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -32,12 +32,8 @@
 
 #ifdef ZMQ_HAVE_CURVE
 
-#include "platform.hpp"
-#include "mutex.hpp"
-
 #if defined (ZMQ_USE_TWEETNACL)
-#   include "tweetnacl_base.h"
-#   include "randombytes.h"
+#   include "tweetnacl.h"
 #elif defined (ZMQ_USE_LIBSODIUM)
 #   include "sodium.h"
 #endif
@@ -108,7 +104,7 @@ namespace zmq
         //  Cookie received from server
         uint8_t cn_cookie [16 + 80];
 
-        //  Intermediary buffer used to seepd up boxing and unboxing.
+        //  Intermediary buffer used to speed up boxing and unboxing.
         uint8_t cn_precom [crypto_box_BEFORENMBYTES];
 
         //  Nonce
@@ -120,8 +116,8 @@ namespace zmq
         int produce_initiate (msg_t *msg_);
         int process_ready (const uint8_t *cmd_data, size_t data_size);
         int process_error (const uint8_t *cmd_data, size_t data_size);
-        mutex_t sync;
     };
+
 }
 
 #endif

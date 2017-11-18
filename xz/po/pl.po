@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xz 5.1.4\n"
 "Report-Msgid-Bugs-To: lasse.collin@tukaani.org\n"
-"POT-Creation-Date: 2015-09-29 14:03+0300\n"
+"POT-Creation-Date: 2016-12-30 13:27+0200\n"
 "PO-Revision-Date: 2014-10-15 20:53+0200\n"
 "Last-Translator: Jakub Bogusz <qboosh@pld-linux.org>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
@@ -49,6 +49,14 @@ msgstr "Wraz z opcją `--files' lub `--files0' można podać tylko jeden plik."
 msgid "The environment variable %s contains too many arguments"
 msgstr "Zmienna środowiskowa %s zawiera zbyt dużo argumentów"
 
+#: src/xz/args.c:643
+msgid "Compression support was disabled at build time"
+msgstr ""
+
+#: src/xz/args.c:650
+msgid "Decompression support was disabled at build time"
+msgstr ""
+
 #: src/xz/coder.c:110
 msgid "Maximum number of filters is four"
 msgstr "Maksymalna liczba filtrów to cztery"
@@ -81,36 +89,48 @@ msgstr "Łańcuch filtrów jest niezgodny z --flush-timeout"
 msgid "Switching to single-threaded mode due to --flush-timeout"
 msgstr "Przełączanie w tryb jednowątkowy z powodu --flush-timeout"
 
-#: src/xz/coder.c:234
+#: src/xz/coder.c:235
 #, c-format
 msgid "Using up to %<PRIu32> threads."
 msgstr "Maksymalna liczba używanych wątków: %<PRIu32>."
 
-#: src/xz/coder.c:247
+#: src/xz/coder.c:251
 msgid "Unsupported filter chain or filter options"
 msgstr "Nieobsługiwany łańcuch filtrów lub opcje filtra"
 
-#: src/xz/coder.c:255
+#: src/xz/coder.c:263
 #, c-format
 msgid "Decompression will need %s MiB of memory."
 msgstr "Dekompresja będzie wymagała %s MiB pamięci."
 
-#: src/xz/coder.c:290
+#: src/xz/coder.c:300
 #, c-format
 msgid "Adjusted the number of threads from %s to %s to not exceed the memory usage limit of %s MiB"
 msgstr "Skorygowano liczbę wątków z %s do %s, aby nie przekroczyć limitu użycia pamięci %s MiB"
 
-#: src/xz/coder.c:344
+#: src/xz/coder.c:354
 #, c-format
 msgid "Adjusted LZMA%c dictionary size from %s MiB to %s MiB to not exceed the memory usage limit of %s MiB"
 msgstr "Skorygowano rozmiar słownika LZMA%c z %s MiB do %s MiB aby nie przekroczyć limitu użycia pamięci %s MiB"
 
-#: src/xz/file_io.c:87 src/xz/file_io.c:95
+#: src/xz/file_io.c:110 src/xz/file_io.c:118
 #, c-format
 msgid "Error creating a pipe: %s"
 msgstr "Błąd tworzenia potoku: %s"
 
-#: src/xz/file_io.c:172
+#: src/xz/file_io.c:173
+msgid "Sandbox is disabled due to incompatible command line arguments"
+msgstr ""
+
+#: src/xz/file_io.c:216
+msgid "Sandbox was successfully enabled"
+msgstr ""
+
+#: src/xz/file_io.c:220
+msgid "Failed to enable the sandbox"
+msgstr ""
+
+#: src/xz/file_io.c:262
 #, c-format
 msgid "%s: poll() failed: %s"
 msgstr "%s: poll() nie powiodło się: %s"
@@ -125,107 +145,107 @@ msgstr "%s: poll() nie powiodło się: %s"
 #. it is possible that the user has put a new file in place
 #. of the original file, and in that case it obviously
 #. shouldn't be removed.
-#: src/xz/file_io.c:242
+#: src/xz/file_io.c:332
 #, c-format
 msgid "%s: File seems to have been moved, not removing"
 msgstr "%s: Plik wygląda na przeniesiony, nie zostanie usunięty"
 
-#: src/xz/file_io.c:249 src/xz/file_io.c:762
+#: src/xz/file_io.c:339 src/xz/file_io.c:872
 #, c-format
 msgid "%s: Cannot remove: %s"
 msgstr "%s: Nie można usunąć: %s"
 
-#: src/xz/file_io.c:274
+#: src/xz/file_io.c:364
 #, c-format
 msgid "%s: Cannot set the file owner: %s"
 msgstr "%s: Nie można ustawić właściciela pliku: %s"
 
-#: src/xz/file_io.c:280
+#: src/xz/file_io.c:370
 #, c-format
 msgid "%s: Cannot set the file group: %s"
 msgstr "%s: Nie można ustawić grupy pliku: %s"
 
-#: src/xz/file_io.c:299
+#: src/xz/file_io.c:389
 #, c-format
 msgid "%s: Cannot set the file permissions: %s"
 msgstr "%s: Nie można ustawić uprawnień pliku: %s"
 
-#: src/xz/file_io.c:409
+#: src/xz/file_io.c:515
 #, c-format
 msgid "Error getting the file status flags from standard input: %s"
 msgstr "Błąd podczas pobierania flag stanu pliku ze standardowego wejścia: %s"
 
-#: src/xz/file_io.c:463 src/xz/file_io.c:525
+#: src/xz/file_io.c:569 src/xz/file_io.c:631
 #, c-format
 msgid "%s: Is a symbolic link, skipping"
 msgstr "%s: Jest dowiązaniem symbolicznym, pominięto"
 
-#: src/xz/file_io.c:554
+#: src/xz/file_io.c:660
 #, c-format
 msgid "%s: Is a directory, skipping"
 msgstr "%s: Jest katalogiem, pominięto"
 
-#: src/xz/file_io.c:560
+#: src/xz/file_io.c:666
 #, c-format
 msgid "%s: Not a regular file, skipping"
 msgstr "%s: Nie jest zwykłym plikiem, pominięto"
 
-#: src/xz/file_io.c:577
+#: src/xz/file_io.c:683
 #, c-format
 msgid "%s: File has setuid or setgid bit set, skipping"
 msgstr "%s: Plik ma ustawiony bit setuid lub setgid, pominięto"
 
-#: src/xz/file_io.c:584
+#: src/xz/file_io.c:690
 #, c-format
 msgid "%s: File has sticky bit set, skipping"
 msgstr "%s: Plik ma ustawiony bit sticky, pominięto"
 
-#: src/xz/file_io.c:591
+#: src/xz/file_io.c:697
 #, c-format
 msgid "%s: Input file has more than one hard link, skipping"
 msgstr "%s: Plik wejściowy ma więcej niż jedno dowiązanie zwykłe, pominięto"
 
-#: src/xz/file_io.c:671
+#: src/xz/file_io.c:782
 #, c-format
 msgid "Error restoring the status flags to standard input: %s"
 msgstr "Błąd podczas odtwarzania flag stanu dla standardowego wejścia: %s"
 
-#: src/xz/file_io.c:720
+#: src/xz/file_io.c:830
 #, c-format
 msgid "Error getting the file status flags from standard output: %s"
 msgstr "Błąd podczas pobierania flag stanu pliku ze standardowego wyjścia: %s"
 
-#: src/xz/file_io.c:898
+#: src/xz/file_io.c:1008
 #, c-format
 msgid "Error restoring the O_APPEND flag to standard output: %s"
 msgstr "Błąd podczas odtwarzania flagi O_APPEND dla standardowego wyjścia: %s"
 
-#: src/xz/file_io.c:910
+#: src/xz/file_io.c:1020
 #, c-format
 msgid "%s: Closing the file failed: %s"
 msgstr "%s: Zamknięcie pliku nie powiodło się: %s"
 
-#: src/xz/file_io.c:946 src/xz/file_io.c:1172
+#: src/xz/file_io.c:1056 src/xz/file_io.c:1282
 #, c-format
 msgid "%s: Seeking failed when trying to create a sparse file: %s"
 msgstr "%s: Zmiana pozycji nie powiodła się podczas próby utworzenia pliku rzadkiego: %s"
 
-#: src/xz/file_io.c:1041
+#: src/xz/file_io.c:1151
 #, c-format
 msgid "%s: Read error: %s"
 msgstr "%s: Błąd odczytu: %s"
 
-#: src/xz/file_io.c:1061
+#: src/xz/file_io.c:1171
 #, c-format
 msgid "%s: Error seeking the file: %s"
 msgstr "%s: Błąd podczas zmiany pozycji w pliku: %s"
 
-#: src/xz/file_io.c:1071
+#: src/xz/file_io.c:1181
 #, c-format
 msgid "%s: Unexpected end of file"
 msgstr "%s: Nieoczekiwany koniec pliku"
 
-#: src/xz/file_io.c:1130
+#: src/xz/file_io.c:1240
 #, c-format
 msgid "%s: Write error: %s"
 msgstr "%s: Błąd zapisu: %s"
@@ -464,7 +484,7 @@ msgstr "%s: Napotkano znak NUL podczas odczytu nazw plików; może miało być `
 msgid "Compression and decompression with --robot are not supported yet."
 msgstr "Kompresja i dekompresja z opcją --robot nie jest jeszcze obsługiwana."
 
-#: src/xz/main.c:231
+#: src/xz/main.c:252
 msgid "Cannot read data from standard input when reading filenames from standard input"
 msgstr "Nie można odczytać danych ze standardowego wejścia przy czytaniu nazw plików ze standardowego wejścia"
 

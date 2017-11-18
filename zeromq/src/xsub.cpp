@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,8 +27,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include <string.h>
 
+#include "macros.hpp"
 #include "xsub.hpp"
 #include "err.hpp"
 
@@ -55,8 +57,7 @@ zmq::xsub_t::~xsub_t ()
 
 void zmq::xsub_t::xattach_pipe (pipe_t *pipe_, bool subscribe_to_all_)
 {
-    // subscribe_to_all_ is unused
-    (void) subscribe_to_all_;
+    LIBZMQ_UNUSED (subscribe_to_all_);
 
     zmq_assert (pipe_);
     fq.attach (pipe_);
@@ -216,7 +217,9 @@ zmq::blob_t zmq::xsub_t::get_credential () const
 
 bool zmq::xsub_t::match (msg_t *msg_)
 {
-    return subscriptions.check ((unsigned char*) msg_->data (), msg_->size ());
+    bool matching = subscriptions.check ((unsigned char*) msg_->data (), msg_->size ());
+
+    return matching ^ options.invert_matching;
 }
 
 void zmq::xsub_t::send_subscription (unsigned char *data_, size_t size_,
@@ -224,13 +227,18 @@ void zmq::xsub_t::send_subscription (unsigned char *data_, size_t size_,
 {
     pipe_t *pipe = (pipe_t*) arg_;
 
-    //  Create the subsctription message.
+    //  Create the subscription message.
     msg_t msg;
     int rc = msg.init_size (size_ + 1);
     errno_assert (rc == 0);
     unsigned char *data = (unsigned char*) msg.data ();
     data [0] = 1;
-    memcpy (data + 1, data_, size_);
+
+    //  We explicitly allow a NULL subscription with size zero
+    if (size_) {
+        assert (data_);
+        memcpy (data + 1, data_, size_);
+    }
 
     //  Send it to the pipe.
     bool sent = pipe->write (&msg);

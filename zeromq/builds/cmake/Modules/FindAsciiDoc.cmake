@@ -6,8 +6,7 @@
 # A2X_EXECUTABLE - the full path to a2x
 # A2X_FOUND - If false, don't attempt to use a2x.
 
-# CMP0053: Unable to refer to $ENV{PROGRAMFILES(X86)}
-set(PROGRAMFILESX86 "PROGRAMFILES(X86)")
+set (PROGRAMFILESX86 "PROGRAMFILES(X86)")
 
 find_program(ASCIIDOC_EXECUTABLE asciidoc asciidoc.py
              PATHS "$ENV{ASCIIDOC_ROOT}"

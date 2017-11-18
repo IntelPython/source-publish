@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,6 +27,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include "ipc_connecter.hpp"
 
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS
@@ -36,7 +37,6 @@
 
 #include "stream_engine.hpp"
 #include "io_thread.hpp"
-#include "platform.hpp"
 #include "random.hpp"
 #include "err.hpp"
 #include "ip.hpp"
@@ -103,7 +103,7 @@ void zmq::ipc_connecter_t::process_term (int linger_)
 
 void zmq::ipc_connecter_t::in_event ()
 {
-    //  We are not polling for incomming data, so we are actually called
+    //  We are not polling for incoming data, so we are actually called
     //  because of error here. However, we can get error on out event as well
     //  on some platforms, so we'll simply handle both events in the same way.
     out_event ();
@@ -216,7 +216,7 @@ int zmq::ipc_connecter_t::open ()
         s, addr->resolved.ipc_addr->addr (),
         addr->resolved.ipc_addr->addrlen ());
 
-    //  Connect was successfull immediately.
+    //  Connect was successful immediately.
     if (rc == 0)
         return 0;
 
@@ -252,8 +252,11 @@ zmq::fd_t zmq::ipc_connecter_t::connect ()
     socklen_t len = sizeof (err);
 #endif
     int rc = getsockopt (s, SOL_SOCKET, SO_ERROR, (char*) &err, &len);
-    if (rc == -1)
+    if (rc == -1) {
+        if (errno == ENOPROTOOPT)
+            errno = 0;
         err = errno;
+    }
     if (err != 0) {
 
         //  Assert if the error was caused by 0MQ bug.

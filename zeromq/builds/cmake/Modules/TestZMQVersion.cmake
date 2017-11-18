@@ -6,4 +6,3 @@ string(REGEX REPLACE ".*#define ZMQ_VERSION_PATCH ([0-9]+).*" "\\1" ZMQ_VERSION_
 set(ZMQ_VERSION "${ZMQ_VERSION_MAJOR}.${ZMQ_VERSION_MINOR}.${ZMQ_VERSION_PATCH}")
 
 message(STATUS "Detected ZMQ Version - ${ZMQ_VERSION}")
-

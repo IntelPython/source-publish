@@ -20,11 +20,11 @@ argument.
 
 The 'endpoint' argument is as described in linkzmq:zmq_bind[3]
 
-Unbinding wild-card addres from a socket
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When wild-card `*` 'endpoint' (described in linkzmq:zmq_tcp[7] and 
-linkzmq:zmq_ipc[7]) was used in _zmq_bind()_, the caller should use 
-real 'endpoind' obtained from the ZMQ_LAST_ENDPOINT socket option 
+Unbinding wild-card address from a socket
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When wild-card `*` 'endpoint' (described in linkzmq:zmq_tcp[7],
+linkzmq:zmq_ipc[7] and linkzmq:zmq_vmci[7]) was used in _zmq_bind()_, the caller should use
+real 'endpoint' obtained from the ZMQ_LAST_ENDPOINT socket option
 to unbind this 'endpoint' from a socket.
 
 RETURN VALUE
@@ -40,6 +40,8 @@ The endpoint supplied is invalid.
 The 0MQ 'context' associated with the specified 'socket' was terminated.
 *ENOTSOCK*::
 The provided 'socket' was invalid.
+*ENOENT*::
+The endpoint supplied was not previously bound.
 
 
 EXAMPLES

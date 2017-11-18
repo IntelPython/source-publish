@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xz-utils\n"
 "Report-Msgid-Bugs-To: lasse.collin@tukaani.org\n"
-"POT-Creation-Date: 2015-09-29 14:03+0300\n"
+"POT-Creation-Date: 2016-12-30 13:27+0200\n"
 "PO-Revision-Date: 2010-09-24 21;12+0200\n"
 "Last-Translator: Adrien Nader <adrien@notk.org>\n"
 "Language-Team: None\n"
@@ -49,6 +49,14 @@ msgstr "Un seul fichier peut être spécifié avec `--files' ou `--files0'."
 msgid "The environment variable %s contains too many arguments"
 msgstr "La variable d'environnement %s contient trop d'arguments"
 
+#: src/xz/args.c:643
+msgid "Compression support was disabled at build time"
+msgstr ""
+
+#: src/xz/args.c:650
+msgid "Decompression support was disabled at build time"
+msgstr ""
+
 #: src/xz/coder.c:110
 msgid "Maximum number of filters is four"
 msgstr "Le nombre maximal de filtres est quatre"
@@ -81,36 +89,48 @@ msgstr ""
 msgid "Switching to single-threaded mode due to --flush-timeout"
 msgstr ""
 
-#: src/xz/coder.c:234
+#: src/xz/coder.c:235
 #, c-format
 msgid "Using up to %<PRIu32> threads."
 msgstr "Jusqu'à %<PRIu32> threads seront utilisés."
 
-#: src/xz/coder.c:247
+#: src/xz/coder.c:251
 msgid "Unsupported filter chain or filter options"
 msgstr "Enchaînement ou options de filtres non pris en charge"
 
-#: src/xz/coder.c:255
+#: src/xz/coder.c:263
 #, c-format
 msgid "Decompression will need %s MiB of memory."
 msgstr "La décompression nécessitera %s MiB de mémoire."
 
-#: src/xz/coder.c:290
+#: src/xz/coder.c:300
 #, c-format
 msgid "Adjusted the number of threads from %s to %s to not exceed the memory usage limit of %s MiB"
 msgstr "Nombre de threads réduit de %s à %s pour ne pas dépasser la limite d'utilisation mémoire de %s MiB"
 
-#: src/xz/coder.c:344
+#: src/xz/coder.c:354
 #, c-format
 msgid "Adjusted LZMA%c dictionary size from %s MiB to %s MiB to not exceed the memory usage limit of %s MiB"
 msgstr "Taille du dictionnaire LZMA%c réduite de %s MiB à %s MiB pour ne pas dépasser la limite d'utilisation mémoire de %s MiB"
 
-#: src/xz/file_io.c:87 src/xz/file_io.c:95
+#: src/xz/file_io.c:110 src/xz/file_io.c:118
 #, c-format
 msgid "Error creating a pipe: %s"
 msgstr "Impossible de créer un tube anonyme (pipe) : %s"
 
-#: src/xz/file_io.c:172
+#: src/xz/file_io.c:173
+msgid "Sandbox is disabled due to incompatible command line arguments"
+msgstr ""
+
+#: src/xz/file_io.c:216
+msgid "Sandbox was successfully enabled"
+msgstr ""
+
+#: src/xz/file_io.c:220
+msgid "Failed to enable the sandbox"
+msgstr ""
+
+#: src/xz/file_io.c:262
 #, c-format
 msgid "%s: poll() failed: %s"
 msgstr "%s : L'appel à la fonction poll() a échoué : %s"
@@ -125,27 +145,27 @@ msgstr "%s : L'appel à la fonction poll() a échoué : %s"
 #. it is possible that the user has put a new file in place
 #. of the original file, and in that case it obviously
 #. shouldn't be removed.
-#: src/xz/file_io.c:242
+#: src/xz/file_io.c:332
 #, c-format
 msgid "%s: File seems to have been moved, not removing"
 msgstr "%s : Le fichier a apparemment été déplacé, suppression annulée"
 
-#: src/xz/file_io.c:249 src/xz/file_io.c:762
+#: src/xz/file_io.c:339 src/xz/file_io.c:872
 #, c-format
 msgid "%s: Cannot remove: %s"
 msgstr "%s : Impossible de supprimer : %s"
 
-#: src/xz/file_io.c:274
+#: src/xz/file_io.c:364
 #, c-format
 msgid "%s: Cannot set the file owner: %s"
 msgstr "%s : Impossible de modifier le propriétaire du fichier : %s"
 
-#: src/xz/file_io.c:280
+#: src/xz/file_io.c:370
 #, c-format
 msgid "%s: Cannot set the file group: %s"
 msgstr "%s : Impossible de modifier le groupe propriétaire du fichier : %s"
 
-#: src/xz/file_io.c:299
+#: src/xz/file_io.c:389
 #, c-format
 msgid "%s: Cannot set the file permissions: %s"
 msgstr "%s : Impossible de modifier les permissions du fichier : %s"
@@ -158,84 +178,84 @@ msgstr "%s : Impossible de modifier les permissions du fichier : %s"
 # - make it more difficult to look up in search engines; it might happen one in
 # a million times, if we dilute the error message in 20 languages, it will be
 # almost impossible to find an explanation and support for the error.
-#: src/xz/file_io.c:409
+#: src/xz/file_io.c:515
 #, c-format
 msgid "Error getting the file status flags from standard input: %s"
 msgstr ""
 
-#: src/xz/file_io.c:463 src/xz/file_io.c:525
+#: src/xz/file_io.c:569 src/xz/file_io.c:631
 #, c-format
 msgid "%s: Is a symbolic link, skipping"
 msgstr "%s est un lien symbolique : ignoré"
 
-#: src/xz/file_io.c:554
+#: src/xz/file_io.c:660
 #, c-format
 msgid "%s: Is a directory, skipping"
 msgstr "%s est un répertoire : ignoré"
 
-#: src/xz/file_io.c:560
+#: src/xz/file_io.c:666
 #, c-format
 msgid "%s: Not a regular file, skipping"
 msgstr "%s n'est pas un fichier régulier : ignoré"
 
-#: src/xz/file_io.c:577
+#: src/xz/file_io.c:683
 #, c-format
 msgid "%s: File has setuid or setgid bit set, skipping"
 msgstr "%s : Le fichier possède les bits `setuid' ou `setgid' : ignoré"
 
-#: src/xz/file_io.c:584
+#: src/xz/file_io.c:690
 #, c-format
 msgid "%s: File has sticky bit set, skipping"
 msgstr "%s : Le fichier possède le bit `sticky' : ignoré"
 
-#: src/xz/file_io.c:591
+#: src/xz/file_io.c:697
 #, c-format
 msgid "%s: Input file has more than one hard link, skipping"
 msgstr "%s : Le fichier d'entrée a plus d'un lien matériel : ignoré"
 
 # See note from translator above titled "file status flags".
-#: src/xz/file_io.c:671
+#: src/xz/file_io.c:782
 #, c-format
 msgid "Error restoring the status flags to standard input: %s"
 msgstr ""
 
 # See note from translator above titled "file status flags".
-#: src/xz/file_io.c:720
+#: src/xz/file_io.c:830
 #, c-format
 msgid "Error getting the file status flags from standard output: %s"
 msgstr ""
 
-#: src/xz/file_io.c:898
+#: src/xz/file_io.c:1008
 #, c-format
 msgid "Error restoring the O_APPEND flag to standard output: %s"
 msgstr "Impossible de rétablir le drapeau O_APPEND sur la sortie standard : %s"
 
-#: src/xz/file_io.c:910
+#: src/xz/file_io.c:1020
 #, c-format
 msgid "%s: Closing the file failed: %s"
 msgstr "%s : Impossible de fermer le fichier : %s"
 
-#: src/xz/file_io.c:946 src/xz/file_io.c:1172
+#: src/xz/file_io.c:1056 src/xz/file_io.c:1282
 #, c-format
 msgid "%s: Seeking failed when trying to create a sparse file: %s"
 msgstr "%s : Impossible de se déplacer dans le fichier pour créer un 'sparse file' : %s"
 
-#: src/xz/file_io.c:1041
+#: src/xz/file_io.c:1151
 #, c-format
 msgid "%s: Read error: %s"
 msgstr "%s : Erreur d'écriture : %s"
 
-#: src/xz/file_io.c:1061
+#: src/xz/file_io.c:1171
 #, c-format
 msgid "%s: Error seeking the file: %s"
 msgstr "%s : Impossible de se déplacer dans le fichier : %s"
 
-#: src/xz/file_io.c:1071
+#: src/xz/file_io.c:1181
 #, c-format
 msgid "%s: Unexpected end of file"
 msgstr "%s : Fin de fichier inattendue"
 
-#: src/xz/file_io.c:1130
+#: src/xz/file_io.c:1240
 #, c-format
 msgid "%s: Write error: %s"
 msgstr "%s : Erreur d'écriture : %s"
@@ -473,7 +493,7 @@ msgstr "%s : Caractère NULL détecté lors de la lecture des noms de fichiers ;
 msgid "Compression and decompression with --robot are not supported yet."
 msgstr "La compression et la décompression ne marchent pas encore avec --robot."
 
-#: src/xz/main.c:231
+#: src/xz/main.c:252
 msgid "Cannot read data from standard input when reading filenames from standard input"
 msgstr "Impossible de lire à la fois les données et les noms de fichiers depuis l'entrée standard"
 

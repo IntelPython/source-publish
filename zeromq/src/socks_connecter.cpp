@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,12 +27,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include <new>
 #include <string>
 
+#include "macros.hpp"
 #include "socks_connecter.hpp"
 #include "stream_engine.hpp"
-#include "platform.hpp"
 #include "random.hpp"
 #include "err.hpp"
 #include "ip.hpp"
@@ -42,9 +43,7 @@
 #include "session_base.hpp"
 #include "socks.hpp"
 
-#ifdef ZMQ_HAVE_WINDOWS
-#include "windows.hpp"
-#else
+#ifndef ZMQ_HAVE_WINDOWS
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -59,7 +58,10 @@ zmq::socks_connecter_t::socks_connecter_t (class io_thread_t *io_thread_,
     proxy_addr (proxy_addr_),
     status (unplugged),
     s (retired_fd),
+    handle((handle_t)NULL),
+    handle_valid(false),
     delayed_start (delayed_start_),
+    timer_started(false),
     session (session_),
     current_reconnect_ivl (options.reconnect_ivl)
 {
@@ -72,7 +74,7 @@ zmq::socks_connecter_t::socks_connecter_t (class io_thread_t *io_thread_,
 zmq::socks_connecter_t::~socks_connecter_t ()
 {
     zmq_assert (s == retired_fd);
-    delete proxy_addr;
+    LIBZMQ_DELETE(proxy_addr);
 }
 
 void zmq::socks_connecter_t::process_plug ()
@@ -111,13 +113,13 @@ void zmq::socks_connecter_t::in_event ()
              && status != waiting_for_reconnect_time);
 
     if (status == waiting_for_choice) {
-        const int rc = choice_decoder.input (s);
+        int rc = choice_decoder.input (s);
         if (rc == 0 || rc == -1)
             error ();
         else
         if (choice_decoder.message_ready ()) {
              const socks_choice_t choice = choice_decoder.decode ();
-             const int rc = process_server_response (choice);
+             rc = process_server_response (choice);
              if (rc == -1)
                  error ();
              else {
@@ -137,19 +139,16 @@ void zmq::socks_connecter_t::in_event ()
     }
     else
     if (status == waiting_for_response) {
-        const int rc = response_decoder.input (s);
+        int rc = response_decoder.input (s);
         if (rc == 0 || rc == -1)
             error ();
         else
         if (response_decoder.message_ready ()) {
             const socks_response_t response = response_decoder.decode ();
-            const int rc = process_server_response (response);
+            rc = process_server_response (response);
             if (rc == -1)
                 error ();
             else {
-                //  Remember our fd for ZMQ_SRCFD in messages
-                socket->set_fd (s);
-
                 //  Create the engine object for this connection.
                 stream_engine_t *engine = new (std::nothrow)
                     stream_engine_t (s, options, endpoint);
@@ -158,7 +157,7 @@ void zmq::socks_connecter_t::in_event ()
                 //  Attach the engine to the corresponding session object.
                 send_attach (session, engine);
 
-                socket->event_connected (endpoint, s);
+                socket->event_connected (endpoint, (int) s);
 
                 rm_fd (handle);
                 s = -1;
@@ -180,7 +179,7 @@ void zmq::socks_connecter_t::out_event ()
              || status == sending_request);
 
     if (status == waiting_for_proxy_connection) {
-        const int rc = check_proxy_connection ();
+        const int rc = (int) check_proxy_connection ();
         if (rc == -1)
             error ();
         else {
@@ -303,15 +302,14 @@ int zmq::socks_connecter_t::connect_to_proxy ()
     zmq_assert (s == retired_fd);
 
     //  Resolve the address
-    delete proxy_addr->resolved.tcp_addr;
+    LIBZMQ_DELETE(proxy_addr->resolved.tcp_addr);
     proxy_addr->resolved.tcp_addr = new (std::nothrow) tcp_address_t ();
     alloc_assert (proxy_addr->resolved.tcp_addr);
 
     int rc = proxy_addr->resolved.tcp_addr->resolve (
         proxy_addr->address.c_str (), false, options.ipv6);
     if (rc != 0) {
-        delete proxy_addr->resolved.tcp_addr;
-        proxy_addr->resolved.tcp_addr = NULL;
+        LIBZMQ_DELETE(proxy_addr->resolved.tcp_addr);
         return -1;
     }
     zmq_assert (proxy_addr->resolved.tcp_addr != NULL);
@@ -340,9 +338,9 @@ int zmq::socks_connecter_t::connect_to_proxy ()
     unblock_socket (s);
 
     //  Set the socket buffer limits for the underlying socket.
-    if (options.sndbuf != 0)
+    if (options.sndbuf >= 0)
         set_tcp_send_buffer (s, options.sndbuf);
-    if (options.rcvbuf != 0)
+    if (options.rcvbuf >= 0)
         set_tcp_receive_buffer (s, options.rcvbuf);
 
     // Set the IP Type-Of-Service for the underlying socket
@@ -361,18 +359,18 @@ int zmq::socks_connecter_t::connect_to_proxy ()
     //  Connect to the remote peer.
     rc = ::connect (s, tcp_addr->addr (), tcp_addr->addrlen ());
 
-    //  Connect was successfull immediately.
+    //  Connect was successful immediately.
     if (rc == 0)
         return 0;
 
     //  Translate error codes indicating asynchronous connect has been
     //  launched to a uniform EINPROGRESS.
 #ifdef ZMQ_HAVE_WINDOWS
-    const int error_code = WSAGetLastError ();
-    if (error_code == WSAEINPROGRESS || error_code == WSAEWOULDBLOCK)
+    const int last_error = WSAGetLastError();
+    if (last_error == WSAEINPROGRESS || last_error == WSAEWOULDBLOCK)
         errno = EINPROGRESS;
     else {
-        errno = wsa_error_to_errno (error_code);
+        errno = wsa_error_to_errno (last_error);
         close ();
     }
 #else
@@ -446,7 +444,7 @@ void zmq::socks_connecter_t::close ()
     const int rc = ::close (s);
     errno_assert (rc == 0);
 #endif
-    socket->event_closed (endpoint, s);
+    socket->event_closed (endpoint, (int) s);
     s = retired_fd;
 }
 

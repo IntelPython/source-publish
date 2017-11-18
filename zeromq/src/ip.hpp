@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -51,6 +51,10 @@ namespace zmq
 
     // Sets the IP Type-Of-Service for the underlying socket
     void set_ip_type_of_service (fd_t s_, int iptos);
+
+    // Sets the SO_NOSIGPIPE option for the underlying socket.
+    // Return 0 on success, -1 if the connection has been closed by the peer
+    int set_nosigpipe (fd_t s_);
 
 }
 

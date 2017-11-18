@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,12 +27,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include <new>
 
 #include <string>
 #include <stdio.h>
 
-#include "platform.hpp"
 #include "tcp_listener.hpp"
 #include "stream_engine.hpp"
 #include "io_thread.hpp"
@@ -43,9 +43,7 @@
 #include "tcp.hpp"
 #include "socket_base.hpp"
 
-#ifdef ZMQ_HAVE_WINDOWS
-#include "windows.hpp"
-#else
+#ifndef ZMQ_HAVE_WINDOWS
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -64,6 +62,7 @@ zmq::tcp_listener_t::tcp_listener_t (io_thread_t *io_thread_,
     own_t (io_thread_, options_),
     io_object_t (io_thread_),
     s (retired_fd),
+    handle((handle_t)NULL),
     socket (socket_)
 {
 }
@@ -99,10 +98,9 @@ void zmq::tcp_listener_t::in_event ()
     }
 
     tune_tcp_socket (fd);
-    tune_tcp_keepalives (fd, options.tcp_keepalive, options.tcp_keepalive_cnt, options.tcp_keepalive_idle, options.tcp_keepalive_intvl);
-
-    // remember our fd for ZMQ_SRCFD in messages
-    socket->set_fd(fd);
+    tune_tcp_keepalives (fd, options.tcp_keepalive, options.tcp_keepalive_cnt,
+            options.tcp_keepalive_idle, options.tcp_keepalive_intvl);
+    tune_tcp_maxrt (fd, options.tcp_maxrt);
 
     //  Create the engine object for this connection.
     stream_engine_t *engine = new (std::nothrow)
@@ -121,7 +119,7 @@ void zmq::tcp_listener_t::in_event ()
     session->inc_seqnum ();
     launch_child (session);
     send_attach (session, engine, false);
-    socket->event_accepted (endpoint, fd);
+    socket->event_accepted (endpoint, (int) fd);
 }
 
 void zmq::tcp_listener_t::close ()
@@ -134,7 +132,7 @@ void zmq::tcp_listener_t::close ()
     int rc = ::close (s);
     errno_assert (rc == 0);
 #endif
-    socket->event_closed (endpoint, s);
+    socket->event_closed (endpoint, (int) s);
     s = retired_fd;
 }
 
@@ -164,6 +162,14 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
     int rc = address.resolve (addr_, true, options.ipv6);
     if (rc != 0)
         return -1;
+
+    address.to_string (endpoint);
+
+    if (options.use_fd != -1) {
+        s = options.use_fd;
+        socket->event_listening (endpoint, (int) s);
+        return 0;
+    }
 
     //  Create a listening socket.
     s = open_socket (address.family (), SOCK_STREAM, IPPROTO_TCP);
@@ -203,9 +209,9 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
         set_ip_type_of_service (s, options.tos);
 
     //  Set the socket buffer limits for the underlying socket.
-    if (options.sndbuf != 0)
+    if (options.sndbuf >= 0)
         set_tcp_send_buffer (s, options.sndbuf);
-    if (options.rcvbuf != 0)
+    if (options.rcvbuf >= 0)
         set_tcp_receive_buffer (s, options.rcvbuf);
 
     //  Allow reusing of the address.
@@ -218,8 +224,6 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
     rc = setsockopt (s, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof (int));
     errno_assert (rc == 0);
 #endif
-
-    address.to_string (endpoint);
 
     //  Bind the socket to the network interface and port.
     rc = bind (s, address.addr (), address.addrlen ());
@@ -245,7 +249,7 @@ int zmq::tcp_listener_t::set_address (const char *addr_)
         goto error;
 #endif
 
-    socket->event_listening (endpoint, s);
+    socket->event_listening (endpoint, (int) s);
     return 0;
 
 error:
@@ -269,14 +273,19 @@ zmq::fd_t zmq::tcp_listener_t::accept ()
 #else
     socklen_t ss_len = sizeof (ss);
 #endif
+#if defined ZMQ_HAVE_SOCK_CLOEXEC
+    fd_t sock = ::accept4 (s, (struct sockaddr *) &ss, &ss_len, SOCK_CLOEXEC);
+#else
     fd_t sock = ::accept (s, (struct sockaddr *) &ss, &ss_len);
+#endif
 
 #ifdef ZMQ_HAVE_WINDOWS
     if (sock == INVALID_SOCKET) {
-        wsa_assert (WSAGetLastError () == WSAEWOULDBLOCK ||
-            WSAGetLastError () == WSAECONNRESET ||
-            WSAGetLastError () == WSAEMFILE ||
-            WSAGetLastError () == WSAENOBUFS);
+        const int last_error = WSAGetLastError();
+        wsa_assert (last_error == WSAEWOULDBLOCK ||
+            last_error == WSAECONNRESET ||
+            last_error == WSAEMFILE ||
+            last_error == WSAENOBUFS);
         return retired_fd;
     }
 #if !defined _WIN32_WCE
@@ -294,9 +303,9 @@ zmq::fd_t zmq::tcp_listener_t::accept ()
     }
 #endif
 
+#if !defined ZMQ_HAVE_SOCK_CLOEXEC && defined FD_CLOEXEC
     //  Race condition can cause socket not to be closed (if fork happens
     //  between accept and this point).
-#ifdef FD_CLOEXEC
     int rc = fcntl (sock, F_SETFD, FD_CLOEXEC);
     errno_assert (rc != -1);
 #endif
@@ -319,6 +328,17 @@ zmq::fd_t zmq::tcp_listener_t::accept ()
 #endif
             return retired_fd;
         }
+    }
+
+    if (zmq::set_nosigpipe (sock)) {
+#ifdef ZMQ_HAVE_WINDOWS
+        int rc = closesocket (sock);
+        wsa_assert (rc != SOCKET_ERROR);
+#else
+        int rc = ::close (sock);
+        errno_assert (rc == 0);
+#endif
+        return retired_fd;
     }
 
     // Set the IP Type-Of-Service priority for this client socket

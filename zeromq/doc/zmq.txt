@@ -30,6 +30,9 @@ provided by the 0MQ library.
 
 Context
 ~~~~~~~
+The 0MQ 'context' keeps the list of sockets and manages the async I/O thread
+and internal queries.
+
 Before using any 0MQ library functions you must create a 0MQ 'context'. When
 you exit your application you must destroy the 'context'. These functions let
 you work with 'contexts':
@@ -55,7 +58,7 @@ Individual 0MQ 'sockets' are _not_ thread safe except in the case where full
 memory barriers are issued when migrating a socket from one thread to another.
 In practice this means applications can create a socket in one thread with
 _zmq_socket()_ and then pass it to a _newly created_ thread as part of thread
-initialization, for example via a structure passed as an argument to
+initialisation, for example via a structure passed as an argument to
 _pthread_create()_.
 
 
@@ -132,7 +135,7 @@ Sending and receiving messages::
     linkzmq:zmq_recv[3]
     linkzmq:zmq_send_const[3]
 
-Monitoring socket events:
+Monitoring socket events::
     linkzmq:zmq_socket_monitor[3]
 
 .Input/output multiplexing
@@ -162,6 +165,12 @@ Local inter-process communication transport::
 Local in-process (inter-thread) communication transport::
     linkzmq:zmq_inproc[7]
 
+Virtual Machine Communications Interface (VMC) transport::
+    linkzmq:zmq_vmci[7]
+
+Unreliable unicast and multicast using UDP::
+    linkzmq:zmq_udp[7]
+
 
 Proxies
 ~~~~~~~
@@ -187,13 +196,14 @@ Plain-text authentication using username and password::
 Elliptic curve authentication and encryption::
     linkzmq:zmq_curve[7]
 
-Generate a CURVE keypair in armored text format:
+Generate a CURVE keypair in armored text format::
     linkzmq:zmq_curve_keypair[3]
 
-Convert an armored key into a 32-byte binary key:
-    linkzmq:zmq_z85_decode[3]
+Derive a CURVE public key from a secret key:
+    linkzmq:zmq_curve_public[3]
 
-Convert a 32-byte binary CURVE key to an armored text string:
+Converting keys to/from armoured text strings::
+    linkzmq:zmq_z85_decode[3]
     linkzmq:zmq_z85_encode[3]
 
 
@@ -211,6 +221,19 @@ to assist in these cases; for details refer to linkzmq:zmq_errno[3].
 
 The _zmq_strerror()_ function is provided to translate 0MQ-specific error codes
 into error message strings; for details refer to linkzmq:zmq_strerror[3].
+
+
+UTILITY
+-------
+The following utility functions are provided:
+
+Working with atomic counters::
+    linkzmq:zmq_atomic_counter_new[3]
+    linkzmq:zmq_atomic_counter_set[3]
+    linkzmq:zmq_atomic_counter_inc[3]
+    linkzmq:zmq_atomic_counter_dec[3]
+    linkzmq:zmq_atomic_counter_value[3]
+    linkzmq:zmq_atomic_counter_destroy[3]
 
 
 MISCELLANEOUS

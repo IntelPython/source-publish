@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xz 5.1.4beta\n"
 "Report-Msgid-Bugs-To: lasse.collin@tukaani.org\n"
-"POT-Creation-Date: 2015-09-29 14:03+0300\n"
+"POT-Creation-Date: 2016-12-30 13:27+0200\n"
 "PO-Revision-Date: 2014-09-25 09:06+0700\n"
 "Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
 "Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
@@ -51,6 +51,14 @@ msgstr "Chỉ được đưa ra một tập tin cho “--files” hay “--files
 msgid "The environment variable %s contains too many arguments"
 msgstr "Biến môi trường %s chứa quá nhiều đối số"
 
+#: src/xz/args.c:643
+msgid "Compression support was disabled at build time"
+msgstr ""
+
+#: src/xz/args.c:650
+msgid "Decompression support was disabled at build time"
+msgstr ""
+
 #: src/xz/coder.c:110
 msgid "Maximum number of filters is four"
 msgstr "Số lượng bộ lọc tối đa là bốn"
@@ -83,36 +91,48 @@ msgstr "Móc xích lọc là không tương thích với --flush-timeout"
 msgid "Switching to single-threaded mode due to --flush-timeout"
 msgstr "Chuyển sang chế độ đơn tuyến trình bởi vì --flush-timeout"
 
-#: src/xz/coder.c:234
+#: src/xz/coder.c:235
 #, c-format
 msgid "Using up to %<PRIu32> threads."
 msgstr "Dùng đến %<PRIu32> tuyến trình."
 
-#: src/xz/coder.c:247
+#: src/xz/coder.c:251
 msgid "Unsupported filter chain or filter options"
 msgstr "Không hỗ trợ lọc móc xích hay tùy chọn lọc"
 
-#: src/xz/coder.c:255
+#: src/xz/coder.c:263
 #, c-format
 msgid "Decompression will need %s MiB of memory."
 msgstr "Giải nén sẽ cần %s MiB bộ nhớ."
 
-#: src/xz/coder.c:290
+#: src/xz/coder.c:300
 #, c-format
 msgid "Adjusted the number of threads from %s to %s to not exceed the memory usage limit of %s MiB"
 msgstr "Chỉnh số lượng tuyến trình từ %s thành %s để không vượt quá giới hạn tiêu dùng bộ nhớ là %s MiB"
 
-#: src/xz/coder.c:344
+#: src/xz/coder.c:354
 #, c-format
 msgid "Adjusted LZMA%c dictionary size from %s MiB to %s MiB to not exceed the memory usage limit of %s MiB"
 msgstr "Chỉnh cỡ từ điển LZMA%c từ %s MiB thành %s MiB để không vượt quá giới hạn tiêu dùng bộ nhớ là %s MiB"
 
-#: src/xz/file_io.c:87 src/xz/file_io.c:95
+#: src/xz/file_io.c:110 src/xz/file_io.c:118
 #, c-format
 msgid "Error creating a pipe: %s"
 msgstr "Gặp lỗi khi tạo một ống dẫn: %s"
 
-#: src/xz/file_io.c:172
+#: src/xz/file_io.c:173
+msgid "Sandbox is disabled due to incompatible command line arguments"
+msgstr ""
+
+#: src/xz/file_io.c:216
+msgid "Sandbox was successfully enabled"
+msgstr ""
+
+#: src/xz/file_io.c:220
+msgid "Failed to enable the sandbox"
+msgstr ""
+
+#: src/xz/file_io.c:262
 #, c-format
 msgid "%s: poll() failed: %s"
 msgstr "%s: hàm poll() bị lỗi: %s"
@@ -127,107 +147,107 @@ msgstr "%s: hàm poll() bị lỗi: %s"
 #. it is possible that the user has put a new file in place
 #. of the original file, and in that case it obviously
 #. shouldn't be removed.
-#: src/xz/file_io.c:242
+#: src/xz/file_io.c:332
 #, c-format
 msgid "%s: File seems to have been moved, not removing"
 msgstr "%s: Tập tin có lẽ đã bị di chuyển, không phải gỡ bỏ"
 
-#: src/xz/file_io.c:249 src/xz/file_io.c:762
+#: src/xz/file_io.c:339 src/xz/file_io.c:872
 #, c-format
 msgid "%s: Cannot remove: %s"
 msgstr "%s: Không thể gỡ bỏ: %s"
 
-#: src/xz/file_io.c:274
+#: src/xz/file_io.c:364
 #, c-format
 msgid "%s: Cannot set the file owner: %s"
 msgstr "%s: Không thể đặt chủ sở hữu tập tin: %s"
 
-#: src/xz/file_io.c:280
+#: src/xz/file_io.c:370
 #, c-format
 msgid "%s: Cannot set the file group: %s"
 msgstr "%s: Không thể đặt nhóm tập tin: %s"
 
-#: src/xz/file_io.c:299
+#: src/xz/file_io.c:389
 #, c-format
 msgid "%s: Cannot set the file permissions: %s"
 msgstr "%s: Không thể đặt chế độ đọc ghi cho tập tin: %s"
 
-#: src/xz/file_io.c:409
+#: src/xz/file_io.c:515
 #, c-format
 msgid "Error getting the file status flags from standard input: %s"
 msgstr "Gặp lỗi khi lấy các cờ trạng thái tập tin từ đầu vào tiêu chuẩn: %s"
 
-#: src/xz/file_io.c:463 src/xz/file_io.c:525
+#: src/xz/file_io.c:569 src/xz/file_io.c:631
 #, c-format
 msgid "%s: Is a symbolic link, skipping"
 msgstr "%s: Là một liên kết mềm nên bỏ qua"
 
-#: src/xz/file_io.c:554
+#: src/xz/file_io.c:660
 #, c-format
 msgid "%s: Is a directory, skipping"
 msgstr "%s: Không phải là một thư mục nên bỏ qua"
 
-#: src/xz/file_io.c:560
+#: src/xz/file_io.c:666
 #, c-format
 msgid "%s: Not a regular file, skipping"
 msgstr "%s: Không phải là tập tin thường nên bỏ qua"
 
-#: src/xz/file_io.c:577
+#: src/xz/file_io.c:683
 #, c-format
 msgid "%s: File has setuid or setgid bit set, skipping"
 msgstr "%s: Tập tin có đặt bít setuid hoặc setgid nên bỏ qua"
 
-#: src/xz/file_io.c:584
+#: src/xz/file_io.c:690
 #, c-format
 msgid "%s: File has sticky bit set, skipping"
 msgstr "%s: Tập tin có bít sticky nên bỏ qua"
 
-#: src/xz/file_io.c:591
+#: src/xz/file_io.c:697
 #, c-format
 msgid "%s: Input file has more than one hard link, skipping"
 msgstr "%s: Tập tin đầu vào có nhiều hơn một liên kết cứng nên bỏ qua"
 
-#: src/xz/file_io.c:671
+#: src/xz/file_io.c:782
 #, c-format
 msgid "Error restoring the status flags to standard input: %s"
 msgstr "Gặp lỗi khi phục hồi các cờ trạng thái tới đầu vào tiêu chuẩn: %s"
 
-#: src/xz/file_io.c:720
+#: src/xz/file_io.c:830
 #, c-format
 msgid "Error getting the file status flags from standard output: %s"
 msgstr "Gặp lỗi khi lấy các cờ trạng thái tập tin từ đầu vào tiêu chuẩn: %s"
 
-#: src/xz/file_io.c:898
+#: src/xz/file_io.c:1008
 #, c-format
 msgid "Error restoring the O_APPEND flag to standard output: %s"
 msgstr "Gặp lỗi khi phục hồi cờ O_APPEND trên đầu ra tiêu chuẩn: %s"
 
-#: src/xz/file_io.c:910
+#: src/xz/file_io.c:1020
 #, c-format
 msgid "%s: Closing the file failed: %s"
 msgstr "%s: Gặp lỗi khi đóng tập tin: %s"
 
-#: src/xz/file_io.c:946 src/xz/file_io.c:1172
+#: src/xz/file_io.c:1056 src/xz/file_io.c:1282
 #, c-format
 msgid "%s: Seeking failed when trying to create a sparse file: %s"
 msgstr "%s: Gặp lỗi khi di chuyển vị trí đọc khi cố tạo một tập tin rải rác: %s"
 
-#: src/xz/file_io.c:1041
+#: src/xz/file_io.c:1151
 #, c-format
 msgid "%s: Read error: %s"
 msgstr "%s: Lỗi đọc: %s"
 
-#: src/xz/file_io.c:1061
+#: src/xz/file_io.c:1171
 #, c-format
 msgid "%s: Error seeking the file: %s"
 msgstr "%s: Gặp lỗi khi di chuyển vị trí đọc tập tin: %s"
 
-#: src/xz/file_io.c:1071
+#: src/xz/file_io.c:1181
 #, c-format
 msgid "%s: Unexpected end of file"
 msgstr "%s: Kết thúc tập tin bất ngờ"
 
-#: src/xz/file_io.c:1130
+#: src/xz/file_io.c:1240
 #, c-format
 msgid "%s: Write error: %s"
 msgstr "%s: Lỗi ghi: %s"
@@ -464,7 +484,7 @@ msgstr "%s: Gặp ký hiệu Null khi đọc tên tập tin; có lẽ ý bạn m
 msgid "Compression and decompression with --robot are not supported yet."
 msgstr "Nén và giải nén với --robot vẫn chưa được hỗ trợ."
 
-#: src/xz/main.c:231
+#: src/xz/main.c:252
 msgid "Cannot read data from standard input when reading filenames from standard input"
 msgstr "Không thể đọc dữ liệu từ đầu vào tiêu chuẩn khi đọc tập tin từ đầu vào tiêu chuẩn"
 

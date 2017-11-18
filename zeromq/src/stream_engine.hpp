@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -39,7 +39,6 @@
 #include "i_decoder.hpp"
 #include "options.hpp"
 #include "socket_base.hpp"
-#include "../include/zmq.h"
 #include "metadata.hpp"
 
 namespace zmq
@@ -87,7 +86,6 @@ namespace zmq
         void timer_event (int id_);
 
     private:
-
         //  Unplug the engine from the session.
         void unplug ();
 
@@ -106,10 +104,10 @@ namespace zmq
         int next_handshake_command (msg_t *msg);
         int process_handshake_command (msg_t *msg);
 
-        int push_raw_msg_to_session (msg_t *msg);
-
         int pull_msg_from_session (msg_t *msg_);
         int push_msg_to_session (msg_t *msg);
+
+        int push_raw_msg_to_session (msg_t *msg);
 
         int write_credential (msg_t *msg_);
         int pull_and_encode (msg_t *msg_);
@@ -118,12 +116,17 @@ namespace zmq
 
         void mechanism_ready ();
 
-        int write_subscription_msg (msg_t *msg_);
-
         size_t add_property (unsigned char *ptr,
             const char *name, const void *value, size_t value_len);
 
         void set_handshake_timer();
+
+        typedef metadata_t::dict_t properties_t;
+        bool init_properties (properties_t & properties);
+
+        int produce_ping_message(msg_t * msg_);
+        int process_heartbeat_message(msg_t * msg_);
+        int produce_pong_message(msg_t * msg_);
 
         //  Underlying socket.
         fd_t s;
@@ -203,6 +206,17 @@ namespace zmq
 
         //  True is linger timer is running.
         bool has_handshake_timer;
+
+        //  Heartbeat stuff
+        enum {
+            heartbeat_ivl_timer_id = 0x80,
+            heartbeat_timeout_timer_id = 0x81,
+            heartbeat_ttl_timer_id = 0x82
+        };
+        bool has_ttl_timer;
+        bool has_timeout_timer;
+        bool has_heartbeat_timer;
+        int heartbeat_timeout;
 
         // Socket
         zmq::socket_base_t *socket;

@@ -3,7 +3,7 @@
                 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
 <!ENTITY version SYSTEM "version.xml">
 ]>
-<indexdiv>
+<indexdiv id="api-index-1.16">
 <indexdiv><title>P</title>
 <indexentry><primaryie linkends="cairo-pdf-metadata-t"><link linkend="cairo-pdf-metadata-t">cairo_pdf_metadata_t</link>, enum in <link linkend="cairo-PDF-Surfaces">PDF Surfaces</link></primaryie></indexentry>
 <indexentry><primaryie linkends="cairo-pdf-outline-flags-t"><link linkend="cairo-pdf-outline-flags-t">cairo_pdf_outline_flags_t</link>, enum in <link linkend="cairo-PDF-Surfaces">PDF Surfaces</link></primaryie></indexentry>

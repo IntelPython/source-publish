@@ -35,13 +35,13 @@ operating system namespace used by the 'ipc' implementation, and must fulfill
 any restrictions placed by the operating system on the format and length of a
 'pathname'.
 
-When the address is `*`, _zmq_bind()_ shall generate a unique temporary
+When the address is wild-card `*`, _zmq_bind()_ shall generate a unique temporary
 pathname. The caller should retrieve this pathname using the ZMQ_LAST_ENDPOINT
 socket option. See linkzmq:zmq_getsockopt[3] for details.
 
 NOTE: any existing binding to the same endpoint shall be overridden. That is,
 if a second process binds to an endpoint already bound by a process, this
-will succeed and the first process will lose its binding. In this behavior,
+will succeed and the first process will lose its binding. In this behaviour,
 the 'ipc' transport is not consistent with the 'tcp' or 'inproc' transports.
 
 NOTE: the endpoint pathname must be writable by the process. When the endpoint
@@ -60,7 +60,7 @@ characters for the real path name).
 Unbinding wild-card address from a socket
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When wild-card `*` 'endpoint' was used in _zmq_bind()_, the caller should use
-real 'endpoind' obtained from the ZMQ_LAST_ENDPOINT socket option to unbind
+real 'endpoint' obtained from the ZMQ_LAST_ENDPOINT socket option to unbind
 this 'endpoint' from a socket using _zmq_unbind()_.
 
 Connecting a socket
@@ -95,6 +95,7 @@ linkzmq:zmq_connect[3]
 linkzmq:zmq_inproc[7]
 linkzmq:zmq_tcp[7]
 linkzmq:zmq_pgm[7]
+linkzmq:zmq_vmci[7]
 linkzmq:zmq_getsockopt[3]
 linkzmq:zmq[7]
 

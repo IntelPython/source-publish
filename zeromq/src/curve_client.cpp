@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,13 +27,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "platform.hpp"
+#include "precompiled.hpp"
+#include "macros.hpp"
 
 #ifdef ZMQ_HAVE_CURVE
-
-#ifdef ZMQ_HAVE_WINDOWS
-#include "windows.hpp"
-#endif
 
 #include "msg.hpp"
 #include "session_base.hpp"
@@ -45,22 +42,12 @@ zmq::curve_client_t::curve_client_t (const options_t &options_) :
     mechanism_t (options_),
     state (send_hello),
     cn_nonce(1),
-    cn_peer_nonce(1),
-    sync()
+    cn_peer_nonce(1)
 {
     int rc;
     memcpy (public_key, options_.curve_public_key, crypto_box_PUBLICKEYBYTES);
     memcpy (secret_key, options_.curve_secret_key, crypto_box_SECRETKEYBYTES);
     memcpy (server_key, options_.curve_server_key, crypto_box_PUBLICKEYBYTES);
-    scoped_lock_t lock (sync);
-#if defined (ZMQ_USE_TWEETNACL)
-    // allow opening of /dev/urandom
-    unsigned char tmpbytes[4];
-    randombytes(tmpbytes, 4);
-#else
-    rc = sodium_init ();
-    zmq_assert (rc != -1);
-#endif
 
     //  Generate short-term key pair
     rc = crypto_box_keypair (cn_public, cn_secret);
@@ -130,6 +117,8 @@ int zmq::curve_client_t::encode (msg_t *msg_)
     uint8_t flags = 0;
     if (msg_->flags () & msg_t::more)
         flags |= 0x01;
+    if (msg_->flags () & msg_t::command)
+        flags |= 0x02;
 
     uint8_t message_nonce [crypto_box_NONCEBYTES];
     memcpy (message_nonce, "CurveZMQMESSAGEC", 16);
@@ -222,6 +211,8 @@ int zmq::curve_client_t::decode (msg_t *msg_)
         const uint8_t flags = message_plaintext [crypto_box_ZEROBYTES];
         if (flags & 0x01)
             msg_->set_flags (msg_t::more);
+        if (flags & 0x02)
+            msg_->set_flags (msg_t::command);
 
         memcpy (msg_->data (),
                 message_plaintext + crypto_box_ZEROBYTES + 1,

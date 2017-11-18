@@ -2,6 +2,7 @@
 #  msvc directory does its own stuff.
 
 EXTRA_DIST = \
+ 	cygwin/Makefile.cygwin \
 	zos/makelibzmq \
 	zos/cxxall \
 	zos/README.md \
@@ -11,6 +12,7 @@ EXTRA_DIST = \
 	zos/test_fork.cpp \
 	zos/maketests \
 	zos/runtests \
+	cygwin/Makefile.cygwin \
 	mingw32/Makefile.mingw32 \
 	mingw32/platform.hpp \
 	cmake/Modules \
@@ -23,4 +25,7 @@ EXTRA_DIST = \
 	valgrind/valgrind.supp \
 	valgrind/vg \
 	nuget/readme.nuget \
-	nuget/libzmq.autopkg
+	nuget/libzmq.autopkg \
+	android/android_build_helper.sh \
+	android/ci_build.sh \
+	android/build.sh

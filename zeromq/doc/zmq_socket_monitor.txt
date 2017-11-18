@@ -23,7 +23,10 @@ your own 'ZMQ_PAIR' socket, and connect that to the endpoint.
 
 The 'events' argument is a bitmask of the socket events you wish to
 monitor, see 'Supported events' below. To monitor all events, use the
-event value ZMQ_EVENT_ALL.
+event value ZMQ_EVENT_ALL. NOTE: as new events are added, the catch-all
+value will start returning them. An application that relies on a strict
+and fixed sequence of events must not use ZMQ_EVENT_ALL in order to
+guarantee compatibility with future versions.
 
 Each event is sent as two frames. The first frame contains an event
 number (16 bits), and an event value (32 bits) that provides additional
@@ -96,6 +99,18 @@ ZMQ_EVENT_MONITOR_STOPPED
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 Monitoring on this socket ended.
 
+ZMQ_EVENT_HANDSHAKE_FAILED
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ZMTP security mechanism handshake failed.
+The event value is unspecified.
+NOTE: in DRAFT state, not yet available in stable releases.
+
+ZMQ_EVENT_HANDSHAKE_SUCCEED
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ZMTP security mechanism handshake succeeded.
+The event value is unspecified.
+NOTE: in DRAFT state, not yet available in stable releases.
+
 
 RETURN VALUE
 ------------
@@ -131,7 +146,7 @@ get_monitor_event (void *monitor, int *value, char **address)
     zmq_msg_t msg;
     zmq_msg_init (&msg);
     if (zmq_msg_recv (&msg, monitor, 0) == -1)
-        return -1;              //  Interruped, presumably
+        return -1;              //  Interrupted, presumably
     assert (zmq_msg_more (&msg));
 
     uint8_t *data = (uint8_t *) zmq_msg_data (&msg);
@@ -142,7 +157,7 @@ get_monitor_event (void *monitor, int *value, char **address)
     //  Second frame in message contains event address
     zmq_msg_init (&msg);
     if (zmq_msg_recv (&msg, monitor, 0) == -1)
-        return -1;              //  Interruped, presumably
+        return -1;              //  Interrupted, presumably
     assert (!zmq_msg_more (&msg));
 
     if (address) {
@@ -150,7 +165,7 @@ get_monitor_event (void *monitor, int *value, char **address)
         size_t size = zmq_msg_size (&msg);
         *address = (char *) malloc (size + 1);
         memcpy (*address, data, size);
-        *address [size] = 0;
+        (*address)[size] = 0;
     }
     return event;
 }

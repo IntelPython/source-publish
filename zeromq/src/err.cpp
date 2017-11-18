@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2015 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -27,6 +27,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "precompiled.hpp"
 #include "err.hpp"
 
 const char *zmq::errno_to_string (int errno_)
@@ -58,6 +59,8 @@ const char *zmq::errno_to_string (int errno_)
         return "Context was terminated";
     case EMTHREAD:
         return "No thread available";
+    case EHOSTUNREACH:
+        return "Host unreachable";
     default:
 #if defined _MSC_VER
 #pragma warning (push)
@@ -80,6 +83,7 @@ void zmq::zmq_abort(const char *errmsg_)
     RaiseException (0x40000015, EXCEPTION_NONCONTINUABLE, 1, extra_info);
 #else
     (void)errmsg_;
+    print_backtrace();
     abort ();
 #endif
 }
@@ -88,15 +92,10 @@ void zmq::zmq_abort(const char *errmsg_)
 
 const char *zmq::wsa_error()
 {
-    int no = WSAGetLastError ();
-    //  TODO: This is not a generic way to handle this...
-    if (no == WSAEWOULDBLOCK)
-        return NULL;
-
-    return wsa_error_no (no);
+    return wsa_error_no (WSAGetLastError(), NULL);
 }
 
-const char *zmq::wsa_error_no (int no_)
+const char *zmq::wsa_error_no (int no_, const char * wsae_wouldblock_string)
 {
     //  TODO:  It seems that list of Windows socket errors is longer than this.
     //         Investigate whether there's a way to convert it into the string
@@ -117,7 +116,7 @@ const char *zmq::wsa_error_no (int no_)
         (no_ == WSAEMFILE) ?
             "Too many open files" :
         (no_ == WSAEWOULDBLOCK) ?
-            "Operation would block" :
+            wsae_wouldblock_string :
         (no_ == WSAEINPROGRESS) ?
             "Operation now in progress" :
         (no_ == WSAEALREADY) ?
@@ -211,13 +210,13 @@ void zmq::win_error (char *buffer_, size_t buffer_size_)
 {
     DWORD errcode = GetLastError ();
 #if defined _WIN32_WCE
-    DWORD rc = FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM |
+    DWORD rc = FormatMessageW (FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errcode, MAKELANGID(LANG_NEUTRAL,
-        SUBLANG_DEFAULT), (LPWSTR)buffer_, buffer_size_ / sizeof(wchar_t), NULL );
+        SUBLANG_DEFAULT), (LPWSTR)buffer_, buffer_size_ / sizeof(wchar_t), NULL);
 #else
     DWORD rc = FormatMessageA (FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errcode, MAKELANGID(LANG_NEUTRAL,
-        SUBLANG_DEFAULT), buffer_, (DWORD) buffer_size_, NULL );
+        SUBLANG_DEFAULT), buffer_, (DWORD) buffer_size_, NULL);
 #endif
     zmq_assert (rc);
 }
@@ -380,6 +379,64 @@ int zmq::wsa_error_to_errno (int errcode)
     }
     //  Not reachable
     return 0;
+}
+
+#endif
+
+#ifdef HAVE_LIBUNWIND
+
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
+#include <dlfcn.h>
+#include <cxxabi.h>
+
+void zmq::print_backtrace (void)
+{
+    Dl_info dl_info;
+    unw_cursor_t cursor;
+    unw_context_t ctx;
+    unsigned frame_n = 0;
+
+    unw_getcontext (&ctx);
+    unw_init_local (&cursor, &ctx);
+
+    while (unw_step (&cursor) > 0) {
+        unw_word_t offset;
+        unw_proc_info_t p_info;
+        const char *file_name;
+        char *demangled_name;
+        char func_name[256] = "";
+        void *addr;
+        int rc;
+
+        if (unw_get_proc_info (&cursor, &p_info))
+            break;
+
+        addr = (void *)(p_info.start_ip + offset);
+
+        if (dladdr (addr, &dl_info) && dl_info.dli_fname)
+            file_name = dl_info.dli_fname;
+        else
+            file_name = "?";
+
+        rc = unw_get_proc_name (&cursor, func_name, 256, &offset);
+        if (rc == -UNW_ENOINFO)
+            strcpy(func_name, "?");
+
+        demangled_name = abi::__cxa_demangle (func_name, NULL, NULL, &rc);
+
+        printf ("#%u  %p in %s (%s+0x%lx)\n", frame_n++, addr, file_name,
+                rc ? func_name : demangled_name, (unsigned long) offset);
+        free (demangled_name);
+    }
+
+    fflush (stdout);
+}
+
+#else
+
+void zmq::print_backtrace (void)
+{
 }
 
 #endif

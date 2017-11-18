@@ -62,9 +62,9 @@ cairo-tag
 
 </para>
 
-@CAIRO_BOOKMARK_FLAG_OPEN: 
-@CAIRO_BOOKMARK_FLAG_BOLD: 
-@CAIRO_BOOKMARK_FLAG_ITALIC: 
+@CAIRO_PDF_OUTLINE_FLAG_OPEN: 
+@CAIRO_PDF_OUTLINE_FLAG_BOLD: 
+@CAIRO_PDF_OUTLINE_FLAG_ITALIC: 
 
 <!-- ##### FUNCTION cairo_pdf_surface_add_outline ##### -->
 <para>
@@ -103,30 +103,6 @@ cairo-tag
 @surface: 
 @width: 
 @height: 
-
-<!-- ##### STRUCT cairo_skia_context ##### -->
-<para>
-
-</para>
-
-@base: 
-@original: 
-@target: 
-@matrix: 
-@canvas: 
-@paint: 
-@path: 
-@source: 
-@source_image: 
-@source_extra: 
-
-<!-- ##### STRUCT cairo_skia_surface ##### -->
-<para>
-
-</para>
-
-@image: 
-@bitmap: 
 
 <!-- ##### FUNCTION cairo_tag_begin ##### -->
 <para>
