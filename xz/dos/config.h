@@ -116,6 +116,14 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1
 
+/* Define to 1 if the GNU C extension __builtin_assume_aligned is supported.
+   */
+#define HAVE___BUILTIN_ASSUME_ALIGNED 1
+
+/* Define to 1 if the GNU C extensions __builtin_bswap16/32/64 are supported.
+   */
+#define HAVE___BUILTIN_BSWAPXX 1
+
 /* Define to 1 to disable debugging code. */
 #define NDEBUG 1
 
@@ -126,7 +134,7 @@
 #define PACKAGE_NAME "XZ Utils"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL "http://tukaani.org/xz/"
+#define PACKAGE_URL "https://tukaani.org/xz/"
 
 /* The size of `size_t', as computed by sizeof. */
 #define SIZEOF_SIZE_T 4

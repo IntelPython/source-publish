@@ -50,8 +50,7 @@ typedef struct {
 
 
 static lzma_ret
-alone_decode(void *coder_ptr,
-		const lzma_allocator *allocator lzma_attribute((__unused__)),
+alone_decode(void *coder_ptr, const lzma_allocator *allocator,
 		const uint8_t *restrict in, size_t *restrict in_pos,
 		size_t in_size, uint8_t *restrict out,
 		size_t *restrict out_pos, size_t out_size,
@@ -203,9 +202,6 @@ lzma_alone_decoder_init(lzma_next_coder *next, const lzma_allocator *allocator,
 {
 	lzma_next_coder_init(&lzma_alone_decoder_init, next, allocator);
 
-	if (memlimit == 0)
-		return LZMA_PROG_ERROR;
-
 	lzma_alone_coder *coder = next->coder;
 
 	if (coder == NULL) {
@@ -227,7 +223,7 @@ lzma_alone_decoder_init(lzma_next_coder *next, const lzma_allocator *allocator,
 	coder->options.preset_dict = NULL;
 	coder->options.preset_dict_size = 0;
 	coder->uncompressed_size = 0;
-	coder->memlimit = memlimit;
+	coder->memlimit = my_max(1, memlimit);
 	coder->memusage = LZMA_MEMUSAGE_BASE;
 
 	return LZMA_OK;
