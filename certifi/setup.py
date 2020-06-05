@@ -31,7 +31,6 @@ if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist bdist_wheel upload')
     sys.exit()
 
-required = []
 setup(
     name='certifi',
     version=VERSION,
@@ -39,7 +38,7 @@ setup(
     long_description=open('README.rst').read(),
     author='Kenneth Reitz',
     author_email='me@kennethreitz.com',
-    url='http://certifi.io/',
+    url='https://certifiio.readthedocs.io/en/latest/',
     packages=[
         'certifi',
     ],
@@ -49,7 +48,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     license='MPL-2.0',
-    classifiers=(
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
@@ -63,5 +62,11 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-    ),
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8'
+    ],
+    project_urls={
+        'Documentation': 'https://certifiio.readthedocs.io/en/latest/',
+        'Source': 'https://github.com/certifi/python-certifi',
+    },
 )
