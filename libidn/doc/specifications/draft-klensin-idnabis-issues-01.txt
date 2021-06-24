@@ -1,0 +1,1681 @@
+
+
+
+Network Working Group                                    J. Klensin, Ed.
+Internet-Draft                                         February 23, 2007
+Expires: August 27, 2007
+
+
+           Proposed Issues and Changes for IDNA - An Overview
+                  draft-klensin-idnabis-issues-01.txt
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on August 27, 2007.
+
+Copyright Notice
+
+   Copyright (C) The IETF Trust (2007).
+
+Abstract
+
+   A recent IAB report identified issues that have been raised with
+   Internationalized Domain Names (IDNs).  Some of these issues require
+   tuning of the existing protocols and the tables on which they depend.
+   Based on intensive discussion by an informal design team, this
+   document provides an overview some of the proposals that are being
+   made, provides explanatory material for them and then further
+   explains some of the issues that have been encountered.
+
+
+
+
+
+Klensin                  Expires August 27, 2007                [Page 1]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+     1.1.  Context and Overview . . . . . . . . . . . . . . . . . . .  3
+     1.2.  Discussion Forum . . . . . . . . . . . . . . . . . . . . .  3
+     1.3.  Terminology  . . . . . . . . . . . . . . . . . . . . . . .  3
+       1.3.1.  Documents and Standards  . . . . . . . . . . . . . . .  3
+       1.3.2.  DNS-related Terminology  . . . . . . . . . . . . . . .  4
+       1.3.3.  Conformance Terminology  . . . . . . . . . . . . . . .  4
+   2.  The Original (2003) IDNA Model . . . . . . . . . . . . . . . .  4
+     2.1.  Proposed label . . . . . . . . . . . . . . . . . . . . . .  5
+     2.2.  Permitted Character Identification . . . . . . . . . . . .  5
+     2.3.  Character Mappings . . . . . . . . . . . . . . . . . . . .  5
+     2.4.  Registry Restrictions  . . . . . . . . . . . . . . . . . .  6
+     2.5.  Punycode Conversion  . . . . . . . . . . . . . . . . . . .  6
+     2.6.  Lookup or Insertion in the Zone  . . . . . . . . . . . . .  6
+   3.  A Revised IDNA Model . . . . . . . . . . . . . . . . . . . . .  7
+     3.1.  Terminology Issues . . . . . . . . . . . . . . . . . . . .  7
+       3.1.1.  Terms for IDN Label Codings  . . . . . . . . . . . . .  7
+       3.1.2.  Punycode as a Name, not an Algorithm . . . . . . . . .  8
+     3.2.  IDN Processing in the IDNA200x Model . . . . . . . . . . .  8
+       3.2.1.  Flow Model for Registration  . . . . . . . . . . . . .  8
+       3.2.2.  Flow Model for Domain Name Resolution (Lookup) . . . . 11
+   4.  IDNA200x Document List . . . . . . . . . . . . . . . . . . . . 13
+   5.  Permitted Characters: An Inclusion List  . . . . . . . . . . . 14
+   6.  Issues that Any Solution Must Address  . . . . . . . . . . . . 15
+     6.1.  Display and Network Order  . . . . . . . . . . . . . . . . 15
+     6.2.  The Ligature and Digraph Problem . . . . . . . . . . . . . 16
+     6.3.  Right-to-left Text . . . . . . . . . . . . . . . . . . . . 18
+   7.  IDNs and the Robustness Principle  . . . . . . . . . . . . . . 18
+   8.  Migration and Version Synchronization  . . . . . . . . . . . . 19
+     8.1.  Design Criteria  . . . . . . . . . . . . . . . . . . . . . 19
+     8.2.  More Flexibility in User Agents  . . . . . . . . . . . . . 22
+     8.3.  The Question of Prefix Changes . . . . . . . . . . . . . . 23
+       8.3.1.  Conditions requiring a prefix change . . . . . . . . . 24
+       8.3.2.  Conditions not requiring a prefix change . . . . . . . 24
+     8.4.  Stringprep Changes and Compatibility . . . . . . . . . . . 25
+   9.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 25
+   10. Contributors . . . . . . . . . . . . . . . . . . . . . . . . . 26
+   11. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 26
+   12. Security Considerations  . . . . . . . . . . . . . . . . . . . 26
+   13. Change Log . . . . . . . . . . . . . . . . . . . . . . . . . . 27
+   14. References . . . . . . . . . . . . . . . . . . . . . . . . . . 27
+     14.1. Normative References . . . . . . . . . . . . . . . . . . . 27
+     14.2. Informative Refe0rences  . . . . . . . . . . . . . . . . . 29
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 29
+   Intellectual Property and Copyright Statements . . . . . . . . . . 30
+
+
+
+
+Klensin                  Expires August 27, 2007                [Page 2]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+1.  Introduction
+
+1.1.  Context and Overview
+
+   A recent IAB report [RFC4690] identified issues that have been raised
+   with Internationalized Domain Names (IDNs) and the associated
+   standards.  Those standards are known as Internationalized Domain
+   Names in Applications (IDNA), taken from the name of the highest
+   level standard within that group (see Section 1.3).  Based on
+   discussion of those issues and their impact, some of these standards
+   now require tuning the existing protocols and the tables on which
+   they depend.  This document further explains, based on the results of
+   some intensive discussions by an informal design team, some of the
+   issues that have been encountered.  It also provides an overview of
+   the proposals that are being made and explanatory material for them.
+   Explanatory material for other proposals will appear with the
+   associated documents.
+
+   This document begins with a discussion of the original and new IDNA
+   models and the general differences in strategy between the original
+   version of IDNA and the proposed new version.  It continues with a
+   description of specific changes that are needed and issues that the
+   design must address, including some that were not explicitly
+   addressed in RFC 4690.
+
+1.2.  Discussion Forum
+
+   This work is being discussed on the mailing list
+   idna-update@alvestrand.no
+
+1.3.  Terminology
+
+1.3.1.  Documents and Standards
+
+   This document uses the term "IDNA2003" to refer to the set of
+   standards that make up and support the version of IDNA published in
+   2003, i.e., those commonly known as the IDNA base specification
+   [RFC3490], Nameprep [RFC3491], Punycode [RFC3492], and Stringprep
+   [RFC3454].  In this document, those names are used to refer,
+   conceptually, to the individual documents, with the base IDNA
+   specification called just "IDNA".
+
+   The term "IDNA200x" is used to refer to a possible new version of
+   IDNA without specifying which particular documents would be affected.
+   While more common IETF usage might refer to the successor document(s)
+   as "IDNAbis", this document uses that term, and similar ones, to
+   refer to successors to the individual documents, e.g., "IDNAbis" is a
+   synonym for the specific successor to RFC3490, or "RFC3490bis".  See
+
+
+
+Klensin                  Expires August 27, 2007                [Page 3]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   also Section 4.
+
+   The term "Unicode" in this document refers to Unicode 3.2 [Unicode32]
+   when it is used in the context of IDNA2003 and to Unicode 5.0
+   [Unicode50] in the context of IDNA200x.  For most of the purposes of
+   this document -- i.e., general explanation and issues that do not
+   address specific code points, blocks, scripts, or properties --
+   Unicode 3.2, Unicode 4.0 [Unicode40], and Unicode 5.0 are essentially
+   equivalent.
+
+1.3.2.  DNS-related Terminology
+
+   When discussing the DNS, this document generally assumes the
+   terminology used in the DNS specifications [RFC1034] [RFC1035].  The
+   terms "lookup" and "resolution" are used interchangeably and the
+   process or application that performs DNS resolution is called a
+   "resolver".  The process of placing an entry into the DNS is referred
+   to as "registration", paralleling common contemporary usage
+   elsewhere.
+
+1.3.3.  Conformance Terminology
+
+   This document is an intermediate working form of what will eventually
+   be split up into a protocol specification that replaces IDNA2003 and
+   some explanatory material.  The use of conformance-related terms in
+   discussions of the protocol conform to the provisions of [RFC2119].
+
+
+2.  The Original (2003) IDNA Model
+
+   IDNA is a client-side protocol, i.e., almost all of the processing is
+   performed by the client.  The strings that appear in and are resolved
+   by the DNS conform to the traditional rules for the naming of hosts,
+   and consist of ASCII letters, digits, and hyphens.  This approach
+   permits IDNA to be deployed without modifications to the DNS itself.
+   That, in turn, avoids both having to upgrade the entire Internet to
+   support IDNs and needing to incur the unknown risks to deployed
+   systems of DNS structural or design changes especially if those
+   changes need to be deployed all at the same time.
+
+   This section contains a summary of the model underlying IDNA2003.  It
+   is approximate and is not a substitute for reading and understanding
+   the actual specification document [RFC3490] and the documents on
+   which it depends.
+
+   [[anchor7: Editor's Note In Draft: The paragraphs that follow include
+   a critique of IDNA2003 as well as just a description of the model.
+   However, the model itself, as described here, is arguably a critique
+
+
+
+Klensin                  Expires August 27, 2007                [Page 4]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   of IDNA2003, which does not contain this material.  It seemed better
+   to retain it here than to have no model description of the 2003
+   version at all, but other suggestions would be welcome.]]
+
+   The original IDNA specifications have the logical flow in domain name
+   registration and resolution outlined in the balance of this section.
+   They are not defined this way; instead, the steps are presented here
+   for convenience in comparison to what is being proposed in this
+   document and the associated ones.  In particular, IDNA2003 does not
+   make as strong a distinction between procedures for registration and
+   those for resolution as the ones suggested in Section 3.
+
+   The IDNA2003 specification explicitly includes the equivalents of the
+   steps in Section 2.2, Section 2.3, and Section 2.5 below.  While the
+   other steps are present --either inside the protocol or presumed to
+   be performed before or after it-- they are not discussed explicitly.
+   That omission has been a source of confusion.  Another source has
+   been definition of IDNA2003 as an algorithm, expressed partially in
+   prose and partially in pseudo code and tables.  The steps below
+   follow the more traditional IETF practice: the functions are
+   specified, rather than the algorithms.  The breakdown into steps is
+   for clarity of explanation; any implementation that produces the same
+   result with the same inputs is conforming.
+
+2.1.  Proposed label
+
+   The registrant submits a request for an IDN or the user attempts to
+   look an IDN up.  The registrant or user typically produces the
+   request string by keyboard entry of a character sequence.  That
+   sequence is validated only on the basis of its displayed appearance,
+   without knowledge of the character coding used for its internal
+   representation or other local details of the way the operating system
+   processes it.  This string is converted to Unicode if necessary.
+   IDNA2003 assumes that the conversion is straightforward enough to not
+   be considered by the protocol.
+
+2.2.  Permitted Character Identification
+
+   The Unicode string is examined to prohibit characters that IDNA does
+   not permit in input.  The list of excluded characters is quite
+   limited because IDNA2003 permits almost all Unicode characters to be
+   used as input, with many of them mapped into others.
+
+2.3.  Character Mappings
+
+   The label string is processed through the Nameprep [RFC3491] profile
+   of the Stringprep [RFC3454] tables and procedure.  Among other
+   things, these procedures apply the Unicode normalization procedure
+
+
+
+Klensin                  Expires August 27, 2007                [Page 5]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   NFKC [Unicode-UAX15] which converts compatibility characters to their
+   base forms, resolves the different ways in which some characters can
+   be represented in Unicode into a canonical form, and performs one-way
+   case mapping (partially simulating the query-time folding operation
+   that the DNS provides for ASCII strings).
+
+2.4.  Registry Restrictions
+
+   Registries at all levels of the DNS, not just the top level, are
+   expected to establish policies about the labels that may be
+   registered and for the processes associated with that action (see the
+   discussion of guidelines and statements in [RFC4690]).  Such
+   restrictions have always existed in the DNS and have always been
+   applied at registration time, with the most notable example being
+   enforcement of the hostname (LDH) convention itself.  For IDNs, the
+   restrictions to be applied are not an IETF matter except insofar as
+   they derive from restrictions imposed by application protocols (e.g.,
+   email has always required a more restricted syntax for domain names
+   than the restrictions of the DNS itself).  Because these are
+   restrictions on what can be registered, it is not generally necessary
+   that they be global.  If a name is not found on resolution, it is not
+   relevant whether it could have been registered; only that it was not
+   registered.  Registry restrictions might include prohibition of
+   mixed-script labels or restrictions on labels permitted in a zone if
+   certain other labels are already present.  The "variant" systems
+   discussed in [RFC3743] and [RFC4290] are examples of fairly
+   sophisticated registry restriction models.  The various sets of ICANN
+   IDN Guidelines [ICANN-Guidelines] also suggest restrictions that
+   might sensibly be imposed.
+
+   The string produced by the above steps is checked and processed as
+   appropriate to local registry restrictions.  Application of those
+   registry restrictions may result in the rejection of some labels or
+   the application of special restrictions to others.
+
+2.5.  Punycode Conversion
+
+   The resulting label (in Unicode code point character form) is
+   processed with the Punycode algorithm [RFC3492] and converted to a
+   form suitable for storage in the DNS (the "xn--..." form).
+
+2.6.  Lookup or Insertion in the Zone
+
+   For registration, the Punycode-encoded label is then placed in the
+   DNS by insertion into a zone.  For lookup, that label is processed
+   according to normal DNS query procedures [RFC1035].
+
+
+
+
+
+Klensin                  Expires August 27, 2007                [Page 6]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+3.  A Revised IDNA Model
+
+   One of the major goals of this work is to improve the general
+   understanding of how IDNA works and what characters are permitted and
+   what happens to them.  Comprehensibility and predictability to users
+   and registrants are themselves important motivations and design goals
+   for this effort.  The effort includes some new terminology and a
+   revised and extended model, both covered in this section, and some
+   more specific protocol, processing, and table modifications.  Details
+   of the latter appear in other documents (see Section 4).
+
+3.1.  Terminology Issues
+
+   Some of the terminology used in describing IDNs in the IDNA2003
+   context has been a source of confusion.  This section defines some
+   new terminology to reduce dependence on the problematic terms.
+
+3.1.1.  Terms for IDN Label Codings
+
+3.1.1.1.  IDNA-valid strings, A-label, and U-label
+
+   To improve clarity, this document introduces three new terms.  A
+   string is "IDNA-valid" if it meets all of the requirements of this
+   specification for an IDNA label.  It may be either an "A-label" or a
+   "U-label", and it is expected that specific reference will be made to
+   the form appropriate to any context in which the distinction is
+   important.  An "A-label" is the ASCII-Compatible (ACE) form of an
+   IDNA-valid string.  It must be valid as output of ToASCII, regardless
+   of how it is actually produced.  This means, by definition, that
+   every A-label will begin with the IDNA ACE prefix, "xn--", followed
+   by a string that is a valid output of the Punycode algorithm and
+   hence a maximum of 59 ASCII characters in length.  The prefix and
+   string together must conform to all requirements for an IDN that can
+   be stored in the DNS including conformance to the LDH rule.  A
+   "U-label" is an IDNA-valid string of Unicode-coded characters that is
+   a valid output of performing ToUnicode on an A-label, again
+   regardless of how the label is actually produced.  A Unicode string
+   that cannot be generated by decoding a valid A-label is not a valid
+   U-label.
+
+   Any rules or conventions that apply to DNS labels in general, such as
+   rules about lengths of strings, apply to whichever of the U-label or
+   A-label would be most restrictive.  The exception to this, of course,
+   is that the restriction to ASCII characters does not apply to the
+   U-label.
+
+
+
+
+
+
+Klensin                  Expires August 27, 2007                [Page 7]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+3.1.1.2.  LDH-label
+
+   In the hope of further clarifying discussions about IDNs, this
+   document uses the term "LDH-label" strictly to refer to an all-ASCII
+   label that obeys the "hostname" (LDH) conventions and that is not an
+   IDN.  In other words, the categories "U-label", "A-label", and "LDH-
+   label" are disjoint, with only the first two referring to IDNs.
+   There are some standardized DNS label formats, such as those for
+   service location (SRV) records [RFC2782] that do not fall into any of
+   these categories.
+
+3.1.2.  Punycode as a Name, not an Algorithm
+
+   There has been some confusion about whether a "Punycode string" does
+   or does not include the prefix and about whether it is required that
+   such strings could have been the output of ToASCII (see RFC 3490,
+   Section 4 [RFC3490]).  This specification discourages the use of the
+   term "Punycode" to describe anything but the encoding method and
+   algorithm of [RFC3492].  The terms defined above are preferred as
+   much more clear than terms such as "Punycode string".
+
+3.2.  IDN Processing in the IDNA200x Model
+
+3.2.1.  Flow Model for Registration
+
+3.2.1.1.  Proposed label
+
+   The registrant submits a request for an IDN.  The user typically
+   produces the request string by the keyboard entry of a character
+   sequence, as above (Section 2.1).
+
+3.2.1.2.  Conversion to Unicode
+
+   Some system routine, or a localized front-end to the IDNA process,
+   ensures that the proposed label is a Unicode string.  This is
+   obviously trivial in a Unicode-native system where no conversion is
+   required.  It may, however, involve some complexity in one that is
+   not, especially if the elements of the local character set do not map
+   exactly and unambiguously into Unicode characters.  Depending on the
+   system involved, the major difficulty may not lie in the mapping but
+   in accurately identifying the incoming character set and then
+   applying the correct conversion routine.  It may be especially
+   difficult when the character coding system in local use has
+   conceptually different assumptions than those used by Unicode about,
+   e.g., how different presentation or combining forms are handled.
+   Those differences may not easily yield unambiguous conversions or
+   interpretations even if each coding system is internally consistent
+   and adequate to represent the local language and script.
+
+
+
+Klensin                  Expires August 27, 2007                [Page 8]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+3.2.1.3.  Permitted Character Identification
+
+   The Unicode string is examined to prohibit characters that IDNA does
+   not permit in input.  IDNA200x uses an inclusion-based approach,
+   i.e., a list of characters that are permitted, rather than the
+   exclusion-based approach of IDNA2003.  IDNA200x, by contrast, uses a
+   system that lists only those characters that are permitted and that
+   does much less mapping.
+
+   Under the proposed IDNA200x, the string in Unicode form will be
+   rejected if it contains characters that are not on the list of
+   characters acceptable as IDNA input for registration.  While there
+   are certain groups of characters that will never be accepted, the
+   ones that are will gradually expand from a list of "IDNA-possible"
+   characters.  Characters or sequences that are unassigned in Unicode
+   MUST NOT be part of labels registered in the DNS.  See Section 5 for
+   an extended discussion of the IDNA200x character table and its
+   applicability and Section 8 for a discussion of Unicode versioning
+   and related issues.
+
+   For example, Unicode contains several blocks of "Mathematical"
+   characters that are visually identical to ASCII ones except for font
+   and style distinctions.  IDNA2003 permits these characters as input,
+   then maps them (using NFKC) into their ASCII equivalents.  They
+   cannot be recovered from the A-label once the mappings are performed.
+   These mappings, and similar ones, are prohibited as input into
+   IDNA200x: they may be accepted by a user interface, but must be
+   converted (as the user interface designer considers appropriate)
+   before being passed into IDNA itself.
+
+3.2.1.4.  Nameprep Mappings
+
+   In the model of IDNA200x, IDN-specific operations, corresponding to
+   Nameprep2003 and the corresponding version of Stringprep, will be
+   specified as needed to depend on Unicode properties, rather than on
+   explicit character lists that are in turn dependent on a specific
+   version of Unicode.  This change in definition does not change the
+   functional model of IDNA processing but conceptually turns it into
+   the clear set of steps described here and localizes dependencies on
+   Unicode definitions and properties.  The key operation is Unicode
+   normalization, as described below.
+
+   Because IDNA (specifically Nameprep) profiles Stringprep differently
+   than other protocols, any changes that are required in the Nameprep-
+   Stringprep relationship will be specified in a way that will not have
+   any effect on those other protocols (see Section 8.4 and Section 12).
+
+   Filtering is specified prior to Nameprep in case IDNA-specific
+
+
+
+Klensin                  Expires August 27, 2007                [Page 9]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   processing rules are required for specific characters or code points
+   for which normalization would lose information.  This early filtering
+   step also rejects proposed labels containing compatibility characters
+   other than those for which special exceptions are made.  NFKC mapping
+   would otherwise quietly transform those characters into other ones.
+
+   The filtered string is then normalized to make string comparison
+   possible, compensating for the possibility of representing some
+   strings in several different ways in Unicode.  Because many of the
+   characters permitted and then mapped to others in IDNA2003 are not
+   permitted by IDNA200x (since most characters that would be mapped to
+   others by compatibility equivalences are prohibited), the
+   normalization operation is less extensive.  Unlike IDNA2003, IDNA200x
+   does no case mapping in either registration or lookup (see
+   Section 8.2).
+
+3.2.1.5.  Post-Nameprep Character String Checking and Processing
+
+   All characters produced as output of the preceding step are then
+   verified for permissibility by IDNA.  Conceptually, these tests are,
+   in order
+
+   1.  Each code point is verified to be assigned in the version of
+       Unicode in use (See Section 8).
+
+   2.  Each code point is checked for its presence in the table of
+       included characters for registration (see Section 5).
+
+   3.  Code points that require a specific context, such as occurring
+       only adjacent to certain other characters or only in labels with
+       specific types of other characters, are tested to be sure that
+       context is present and correct.
+
+   4.  Additional special tests for right-to-left strings are applied.
+
+   Strings that have been produced by the steps above, and whose
+   contents pass the above tests, are U-labels.
+
+   To summarize, tests are made here for invalid combinations of
+   characters, and for labels that are invalid even if the individual
+   characters they contain are all valid.  For example, labels
+   containing invisible ("zero-width") characters may be permitted in
+   context with characters whose presentation forms are significantly
+   changed by the presence or absence of the zero-width characters,
+   while other labels in which zero-width characters appear may be
+   rejected.  Additional transformations that do not occur as the result
+   of the steps above may be specified at this point by IDNA200x.  As
+   the list of characters permitted to be registered expands, new rules,
+
+
+
+Klensin                  Expires August 27, 2007               [Page 10]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   similar to those suggested for zero-width characters, may accompany
+   them.
+
+3.2.1.6.  Registry Restrictions
+
+   Registries at all levels of the DNS, not just the top level, are
+   expected to establish policies about the labels that may be
+   registered, and for the processes associated with that action.  As
+   discussed above (Section 2.4), such restrictions have always existed
+   in the DNS.
+
+   The string produced by the above steps is checked and processed as
+   appropriate to local registry restrictions.  Application of those
+   registry restrictions may result in the rejection of some labels or
+   the application of special restrictions to others.
+
+3.2.1.7.  Punycode Conversion
+
+   The resulting U-label is converted to an A-label (i.e., the Punycode
+   encoding of that label, the "xn--..." form).  The definition of the
+   Punycode method itself is not affected by IDNA200x.
+
+3.2.1.8.  Insertion in the Zone
+
+   The A-label is then registered in the DNS by insertion into a zone.
+
+
+3.2.2.  Flow Model for Domain Name Resolution (Lookup)
+
+   Resolution is conceptually different from registration and different
+   tests are applied on the client.  The resolution-side tests are more
+   permissive and rely heavily on the assumption that names that are
+   present in the DNS are valid.  Among other things, this distinction
+   facilitates expansion of the permitted character lists to include new
+   scripts and accommodate new version of Unicode.  As with other parts
+   of the IDN effort, there are some trade offs in these decisions.
+   Banning characters that are generally problematic so that they can be
+   rejected in the parsing process prior to actual lookup may improve
+   the overall health and safety of the Internet and improve
+   interoperability by, for example, avoiding parsing ambiguities when
+   IDNs appear in context rather than as isolated domain names.
+
+3.2.2.1.  User input
+
+   The user supplies a string in the local character set, typically by
+   typing it or clicking on, or cutting and pasting, a URI or IRI.
+   Processing in this step and the next two are local matters, to be
+   accomplished prior to actual invocation of IDNAbis, but at least this
+
+
+
+Klensin                  Expires August 27, 2007               [Page 11]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   one and the next one must be accomplished in some way.
+
+3.2.2.2.  Conversion to Unicode
+
+   The local character set, character coding conventions, and, as
+   necessary, display and presentation conventions, are converted to
+   Unicode, paralleling the process above (Section 3.2.1.2).
+
+3.2.2.3.  User Interface Character Changes
+
+   The Unicode string MAY then be processed, in a way specific to the
+   local environment, to make the result of the IDNA processing match
+   user expectations.  For instance, at this step, it would be
+   reasonable to case-fold all upper case characters to lower case, if
+   this makes sense in the user's environment.  The principles
+   underlying this step are discussed in Section 8.2.
+
+   Other examples of processing for localization that might be applied,
+   if appropriate, at this point include interpreting the KANA MIDDLE
+   DOT to separate domain name components from each other or giving
+   special treatment to characters whose presentation forms are
+   dependent on placement in the label.
+
+   Because these transformations are local, it is important that domain
+   names being passed between systems (e.g., in IRIs) be U-labels and
+   not forms that might be accepted as a consequence of this step.  This
+   step is not standardized, and not specified further here.
+
+3.2.2.4.  Pre-Nameprep Validation and Character List Testing
+
+   Again in parallel to the above, the Unicode string is checked to
+   verify that all characters that appear in it are valid for IDNA
+   resolution input.  As discussed in Section 5, the resolution check is
+   more liberal than that of Section 3.2.1.4: characters that fall into
+   "pending" ("possibly later") categories in the inclusion tables do
+   not lead to label rejection on resolution although unassigned and
+   prohibited code points MUST BE rejected.  Instead, the resolver MUST
+   rely on the presence or absence of labels containing such characters
+   in the DNS to determine their validity: if they are registered, they
+   are presumed to be valid; if they are not, their possibly validity is
+   not relevant.
+
+3.2.2.5.  Nameprep Processing
+
+   As above, the validated Unicode string is normalized (using NFKC) and
+   no case-mapping is performed.  If the code point is actually assigned
+   in some later version of Unicode, the resolver and the application
+   containing it and calling it should be upgraded when possible; the
+
+
+
+Klensin                  Expires August 27, 2007               [Page 12]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   protocol cannot automatically provide that upgrade.  See Section 8
+   for more discussion on this issue.
+
+3.2.2.6.  Post-Nameprep Processing
+
+   Any necessary processing or filtering is applied to the normalized
+   output string from the above.  In the cases we can anticipate, this
+   step will be null.  It is included in the model in case, e.g., full-
+   label checks are needed on lookup.
+
+3.2.2.7.  Punycode Conversion
+
+   The validated string, a U-label, is converted to an A-label.
+
+3.2.2.8.  DNS Name Resolution
+
+   The A-label is looked up in the DNS, using normal DNS procedures.
+
+   Separating Domain Name Registration and Resolution in the protocol
+   specification has one substantive impact.  With IDNA2003, the tests
+   and steps made in these two parts of the protocol are essentially
+   identical.  Separating them reflects current practice in which per-
+   registry restrictions and special processing are applied at
+   registration time but not on resolution.  Even more important in the
+   longer term, it allows incremental addition of permitted character
+   groups to avoid freezing on one particular version of Unicode.
+
+
+
+4.  IDNA200x Document List
+
+   [[anchor17: This section will need to be extensively revised or
+   removed before publication.]]
+
+   The following documents are expected to be produced as part of the
+   IDNA200x effort.
+
+   o  This document, containing an overview, rationale, and conformance
+      conditions.
+
+   o  A document describing the "BIDI problem" with Stringprep and
+      proposing a solution [IDNA200X-BIDI].
+
+   o  A list of code points allowed in a U-label, based on Unicode 5.0
+      code blocks.  See Section 5.
+
+   o  [[anchor18: ...More ??? ...]]
+
+
+
+
+Klensin                  Expires August 27, 2007               [Page 13]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+5.  Permitted Characters: An Inclusion List
+
+   [[anchor19: *** Still needs work.  In particular, version -03 should
+   divide this section into "Principles", "History", and "Update
+   Procedure" ***]]
+
+   Moving to an inclusion model requires a new list of characters that
+   are permitted in IDNs.  A preliminary version of such a list has been
+   developed by the contributors to this document [IDNA200X-Permitted].
+   The initial version was developed by going through Unicode 5.0 one
+   block and one character class at a time and determining which
+   characters, classes, and blocks were clearly acceptable for IDNs,
+   which one were clearly unacceptable (e.g., all blocks consisting
+   entirely of compatibility characters and non-language symbols were
+   excluded as were a number of character classes), and which blocks and
+   classes were in need of further study or input from the relevant
+   language communities.  That effort was successful, but not at the
+   level of producing a directly-useful character table.  Additional
+   iterations on the mailing list and with UTC participation largely
+   dropped the use of Unicode blocks and focused on character classes,
+   scripts, and properties together with understandings gained from
+   other Unicode Consortium efforts.  Those iterations have been more
+   successful, but, as of the time this draft was posted, appear to be
+   leading to the conclusion that an entirely new property specifically
+   associated with appropriateness for IDN use is likely to be
+   necessary.
+
+   The discussion in [IDNA200X-BIDI] illustrates some areas in which
+   more work and input is needed.  Other issues are raised by the
+   Unicode "presentation form" model and, in particular, by the need for
+   zero-width characters in some limited cases to correctly designate
+   those forms and by some other issues with combining characters in
+   different contexts.  It is expected that, once expert and materially-
+   concerned parties are identified to supply contextual rules, such
+   problems will be resolved quickly and the questioned collections of
+   characters either added to the list of permitted characters or
+   permanently excluded.
+
+   The IDN-permitted character property is expected to be associated
+   with any character than can plausibly be used in an IDN.  Non-
+   language characters and other character codes that can be identified
+   as globally inappropriate for IDNs, such as conventional spaces and
+   punctuation, will not have this property assigned (i.e., will never
+   be permitted in IDNs).  For each character associated with the
+   property, the property value will either be "pending" or the
+   identifier of a rule set.  Rule sets provide information about the
+   context of permitted uses of a character and will have values such as
+   "permitted only when all characters in the label are in a particular
+
+
+
+Klensin                  Expires August 27, 2007               [Page 14]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   script", "permitted only following particular characters", "permitted
+   globally", and so on.  This general approach could, obviously, be
+   implemented in several ways, not just by the exact arrangements
+   suggested above.
+
+   The property and rule sets are used as follows:
+
+   o  Systems supporting domain name resolution SHOULD attempt to
+      resolve any label consisting entirely of characters that have the
+      IDN-permitted property, including those that have not been
+      permanently excluded but that have not been classified with regard
+      to whether additional restrictions are needed, i.e., are
+      "pending".  They MUST NOT attempt to resolve label strings that
+      contain unassigned character positions.
+
+   o  Systems providing domain name registration functions MUST NOT
+      register any label that contains characters that do not have the
+      IDN-permitted property, any label that contains a character with
+      the value "pending" for that property, or any label that fails the
+      processing or test rules associated with the property for any of
+      its characters.
+
+   A procedure for assigning rules to characters with the "pending"
+   property, and for assigning (or not) the property to characters
+   assigned in future version of Unicode, will be developed as part of
+   this work.  A key part of that procedure will be specifications that
+   make it possible to add new characters and blocks without long delays
+   in implementation.
+
+   [[anchor20: That procedure is an important issue and this is a
+   placeholder.]]
+
+
+6.  Issues that Any Solution Must Address
+
+6.1.  Display and Network Order
+
+   The correct treatment of domain names requires a clear distinction
+   between Network Order (the order in which the code points are sent in
+   protocols) and Display Order (the order in which the code points are
+   displayed on a screen or paper).  The order of labels in a domain
+   name is discussed in [IDNA200X-BIDI].  There are, however, also
+   questions about the order in which labels are displayed if left-to-
+   right and right-to-left labels are adjacent to each other, especially
+   if there are also multiple consecutive appearances of one of the
+   types.  The decision about the display order is ultimately under the
+   control of user agents --including web browsers, mail clients, and
+   the like-- which may be highly localized.  Even when formats are
+
+
+
+Klensin                  Expires August 27, 2007               [Page 15]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   specified by protocols, the full composition of an Internationalized
+   Resource Identifier (IRI) [RFC3987] or Internationalized Email
+   address contains elements other than the domain name.  For example,
+   IRIs contain protocol identifiers and field delimiter syntax such as
+   "http://" or "mailto:" while email addresses contain the "@" to
+   separate local parts from domain names.  User agents are not required
+   to use those protocol-based forms directly but often do so.
+
+   Questions remain about protocol constraints implying that the overall
+   direction of these strings will always be left-to-right (or right-to-
+   left) for an IRI or email address, or if they even should conform to
+   such rules.  These questions also have several possible answers.
+   Should a domain name abc.def, in which both labels are represented in
+   scripts that are written right-to-left, be displayed as fed.cba or
+   cba.fed?  An IRI for clear text web access would, in network order,
+   begin with "http://" and the characters will appear as
+   "http://abc.def" -- but what does this suggest about the display
+   order?  When entering a URI to many browsers, it may be possible to
+   provide only the domain name and leave the "http://" to be filled in
+   by default, assuming no tail (an approach that does not work for
+   other protocols).  The natural display order for the typed domain
+   name on a right-to-left system is fed.cba.  Does this change if a
+   protocol identifier, tail, and the corresponding delimiters are
+   specified?
+
+   While logic, precedent, and reality suggest that these are questions
+   for user interface design, not IETF protocol specifications,
+   experience in the 1980s and 1990s with mixing systems in which domain
+   name labels were read in network order (left-to-right) and those in
+   which those labels were read right-to-left would predict a great deal
+   of confusion, and heuristics that sometimes fail, if each
+   implementation of each application makes its own decisions on these
+   issues.
+
+   It should be obvious that any revision of IDNA must be more clear
+   about the distinction between network and display order for complete
+   (fully-qualified) domain names, as well as simply for individual
+   labels, than the original specification was.  It is likely that some
+   strong suggestions should be made about display order as well.
+
+6.2.  The Ligature and Digraph Problem
+
+   There are a number of languages written with alphabetic scripts in
+   which single phonemes are written using two characters, termed a
+   "digraph", for example, the "ph" in "pharmacy" and "telephone".
+   (Note that characters paired in this manner can also appear
+   consecutively without forming a digraph, as in "tophat".)  Certain
+   digraphs are normally indicated typographically by setting the two
+
+
+
+Klensin                  Expires August 27, 2007               [Page 16]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   characters closer together than they would be if used consecutively
+   to represent different phonemes.  Some digraphs are fully joined as
+   ligatures (strictly designating setting totally without intervening
+   white space, although the term is sometimes applied to close set
+   pairs).  An example of this may be seen when the word "encyclopaedia"
+   is set with a U+00E6 LATIN SMALL LIGATURE AE (and some would not
+   consider that word correctly spelled unless the ligature form was
+   used or the "a" was dropped entirely).
+
+   Difficulties arise from the fact that a given ligature may be a
+   completely optional typographic convenience for representing a
+   digraph in one language (as in the above example with some spelling
+   conventions), while in another language it is a single character that
+   may not always be correctly representable by a two-letter sequence
+   (as in the above example with different spelling conventions).  This
+   can be illustrated by many words in the Norwegian language, where the
+   "ae" ligature is the 27th letter of a 29-letter extended Latin
+   alphabet.  It is equivalent to the 28th letter of the Swedish
+   alphabet (also containing 29 letters), U+00E4 LATIN SMALL LETTER A
+   WITH DIAERESIS, for which an "ae" cannot be substituted according to
+   current orthographic standards.
+
+   This character (U+00E4) is also part of the German alphabet where,
+   unlike in the Nordic languages, the two-character sequence "ae" is
+   usually treated as a fully acceptable alternate orthography.  The
+   inverse is however not true, and those two characters cannot
+   necessarily be combined into an "umlauted a".  This also applies to
+   another German character, the "umlauted o" (U+00F6 LATIN SMALL LETTER
+   O WITH DIAERESIS) which, for example, cannot be used for writing the
+   name of the author "Goethe".  It is also a letter in the Swedish
+   alphabet where, in parallel to the "umlauted a", it cannot be
+   correctly represented as "oe" and in the Norwegian alphabet, where it
+   is represented, not as "umlauted o", but as "slashed o", U+00F8.
+
+   Additional cases with alphabets written right-to-left are described
+   in [IDNA200X-BIDI] and Section 6.3.  This constitutes a problem that
+   cannot be resolved solely by operating on scripts.  It is, however, a
+   key concern in the IDN context.  Its satisfactory resolution will
+   require support in policies set by registries, which therefore need
+   to be particularly mindful not just of this specific issue, but of
+   all other related matters that cannot be dealt with on an exclusively
+   algorithmic basis.
+
+   Just as with the examples of different-looking characters that may be
+   assumed to be the same, as discussed in Section 2.2.6 of [RFC4690],
+   it is in general impossible to deal with these situations in a system
+   such as IDNA -- or Unicode normalization generally -- since
+   determining what to do requires information about the language being
+
+
+
+Klensin                  Expires August 27, 2007               [Page 17]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   used, context, or both.  Consequently, IDNAbis makes no attempt to
+   treat these combined characters in any special way.  However, their
+   existence provides a prime example of a situation in which a registry
+   that is aware of the language context in which labels are to be
+   registered, and where that language sometimes (or always) treats the
+   two-character sequences as equivalent to the combined form, should
+   give serious consideration to applying a "variant" model [RFC3743]
+   [RFC4290] to reduce the opportunities for user confusion and fraud
+   that would result from the related strings being registered to
+   different parties.
+
+6.3.  Right-to-left Text
+
+   In order to be sure that the directionality of right-to-left text is
+   unambiguous, Stringprep requires that any label in which right-to-
+   left characters appear both starts and ends with them, may not
+   include any characters with strong left-to-right properties (which
+   excludes other alphabetic characters but permits European digits),
+   and rejects any other string that contains a right-to-left character.
+   This is one of the few places where the IDNA algorithms essentially
+   look at an entire label, not just at individual characters.
+   Unfortunately, the algorithmic model, as defined in Stringprep, fails
+   when the final character in a right-to-left string requires a
+   combining mark in order to be correctly represented.  The mark will
+   be the final code point in the string but is not identified with the
+   right-to-left character attribute and Stringprep therefore rejects
+   the string.
+
+   This problem manifests itself in languages written with consonantal
+   alphabets to which diacritical vocalic systems are applied, and in
+   languages with orthographies derived from them where the combining
+   marks may have different functionality.  In both cases the combining
+   marks can be essential components of the orthography.  Examples of
+   this are Yiddish, written with an extended Hebrew script, and Dhivehi
+   (the official language of Maldives) which is written in the Thaana
+   script (which is, in turn, derived from the Arabic script).  Other
+   languages are still being investigated, but the 200x equivalent to
+   Nameprep processing must be adjusted accordingly .
+
+
+7.  IDNs and the Robustness Principle
+
+   The model of IDNs described in this document can be seen as a
+   particular instance of the "Robustness Principle" that has been so
+   important to other aspects of Internet protocol design.  This
+   principle is often stated as "Be conservative about what you send and
+   liberal in what you accept" (See, e.g., RFC 1123, Section 1.2.2
+   [RFC1123]).  For IDNs to work well, registries must have or require
+
+
+
+Klensin                  Expires August 27, 2007               [Page 18]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   sensible policies about what is registered -- conservative policies
+   -- and implement and enforce them.  Registries, registrars, or other
+   actors who do not do so, or who get too liberal, too greedy, or too
+   weird may deserve punishment that will primarily be meted out in the
+   marketplace or by consumer protection rules and legislation.  One can
+   debate whether or not "punishment by browser vendor" is an effective
+   marketplace tool, but it falls into the general category of
+   approaches being discussed here.  In any event, the Protocol Police
+   (an important, although mythical, Internet mechanism for enforcing
+   protocol conformance) are going to be worth about as much here as
+   they usually are -- i.e., very little -- simply because, unlike the
+   marketplace and legal and regulatory mechanisms, they have no
+   enforcement power.
+
+   Conversely, resolvers can (and SHOULD or maybe MUST) reject labels
+   that clearly violate global (protocol) rules (no one has ever
+   seriously claimed that being liberal in what is accepted requires
+   being stupid).  However, once one gets past such global rules and
+   deals with anything sensitive to script or locale, it is necessary to
+   assume that garbage has not been placed into the DNS, i.e., one must
+   be liberal about what one is willing to look up in the DNS rather
+   than guessing about whether it should have been permitted to be
+   registered.
+
+   As with other things, if something doesn't resolve, it makes no
+   difference whether it simply wasn't registered or was prohibited by
+   some rule.
+
+   If resolvers, as a user interface (UI) matter, decide to warn about
+   some strings that are valid under the global rules but that they
+   perceive as dangerous, that is their prerogative and we can only hope
+   that the market (and maybe regulators) will reward the good choices
+   and punish the bad ones.  In this context, a resolver that decides a
+   string that is valid under the protocol is dangerous and refuses to
+   look it up is in violation of the protocols (if they are properly
+   defined); one that is willing to look something up, but warns against
+   it, is exercising a UI choice.
+
+
+8.  Migration and Version Synchronization
+
+8.1.  Design Criteria
+
+   As mentioned above and in RFC 4690, two key goals of this work are to
+   enable applications to be agnostic about whether they are being run
+   in environments supporting any Unicode version from 3.2 onward and to
+   permit incrementally adding permitted scripts and other character
+   collections without disruption.  The mechanisms that support this are
+
+
+
+Klensin                  Expires August 27, 2007               [Page 19]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   outlined above, but this section reviews them in a context that may
+   be more helpful to those who need to understand the approach and make
+   plans for it.
+
+   1.  The general criteria for a putative label, and the collection of
+       characters that make it up, to be considered IDNA-valid are:
+
+       *  The characters are "letters", numerals, or otherwise used to
+          write words in some language.  Symbols, drawing characters,
+          and various notational characters are permanently excluded --
+          some because they are actively dangerous in URI, IRI, or
+          similar contexts and others because there is no evidence that
+          they are important enough to Internet operations or
+          internationalization to justify large numbers of special cases
+          and character-specific handling.  Other than in very
+          exceptional cases, e.g., where they are needed to write
+          substantially any word of a given language, punctuation
+          characters are excluded as well: the fact that a word exists
+          is not proof that it should be usable in a DNS label and DNS
+          labels are not expected to be usable for multiple-word phrases
+          (although they are not prohibited if the conventions and
+          orthography of a particular language cause that to be
+          possible).
+
+       *  Characters that are unassigned in the version of Unicode being
+          used by the registry or application are not permitted, even on
+          resolution (lookup).  This is because, unlike the conditions
+          contemplated in IDNA2003 (except for right-to-left text), we
+          now understand that tests involving the context of characters
+          (e.g., some characters being permitted only adjacent to other
+          ones of specific types) and integrity tests on complete labels
+          will be needed.  Unassigned code points cannot be permitted
+          because one cannot determine the contextual rules that
+          particular code points will require before characters are
+          assigned to them and the properties of those characters fully
+          understood.
+
+       *  Any character that is mapped to another character by
+          Nameprep2003 or by a current version of NFKC is prohibited as
+          input to IDNA (for either registration or resolution).
+          Implementers of user interfaces to applications are free to
+          make those conversions when they consider them suitable for
+          their operating system environments, context, or users.
+
+       Tables used to identify the characters that are IDNA-valid are
+       expected to be driven by the principles above.  The principles
+       are not just an interpretation of the tables.
+
+
+
+
+Klensin                  Expires August 27, 2007               [Page 20]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   2.  For registration purposes, the collection of IDNA-valid
+       characters will be a growing list.  The conditions for entry to
+       the list for a set of characters are (i) that they meet the
+       conditions for IDNA-valid characters discussed immediately above
+       and (ii) that consensus can be reached about usage and contextual
+       rules.  Because it is likely that such consensus cannot be
+       reached immediately about the correct contextual rules for some
+       characters -- e.g., the use of invisible ("zero-width")
+       characters to modify presentation forms -- some sets of
+       characters may be deferred from the IDNA-valid set even if they
+       appear in a current version of Unicode.  Of course, characters
+       first assigned code points in later versions of Unicode would
+       need to be introduced into IDNA only after those code points are
+       assigned.
+
+   3.  Anyone entering a label into a DNS zone must properly validate
+       that label -- i.e., be sure that the criteria for an A-label are
+       met -- in order for Unicode version-independence to be possible.
+       In particular:
+
+       *  Any label that contains hyphens as its third and fourth
+          characters MUST be IDNA-valid.  This implies in particular
+          that, (i) if the third and fourth characters are hyphens, the
+          first and second ones MUST be "xn" until and unless this
+          specification is updated to permit other prefixes and (ii)
+          labels starting in "xn--" MUST be valid A-labels, as discussed
+          in Section 3 above.
+
+       *  The Unicode tables (i.e., tables of code points, character
+          classes, and properties) and IDNA tables (i.e., tables of
+          contextual rules such as those described above or as might be
+          provided by Nameprep or Stringprep), MUST be consistent on the
+          systems performing or validating labels to be registered.
+          Note that this does not require that tables reflect the latest
+          version of Unicode, only that all tables used on the system
+          are consistent with each other.
+
+       Systems looking up or resolving DNS labels MUST be able to assume
+       that those rules were followed.
+
+   4.  Anyone looking up a label in a DNS zone MUST
+
+       *  Maintain a consistent set of tables, as discussed above.  As
+          with registration, the tables need not reflect the latest
+          version of Unicode but they MUST be consistent.
+
+       *  Validate labels to be looked up only to the extent of
+          determining that the U-label does not contain either code
+
+
+
+Klensin                  Expires August 27, 2007               [Page 21]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+          points prohibited by IDNA or code points that are unassigned
+          in its version of Unicode.  No attempt should be made to
+          validate contextual rules about characters, including mixed-
+          script label prohibitions, although such rules MAY be used to
+          influence presentation decisions in the user interface.
+
+       By avoiding applying its own interpretation of which labels are
+       valid as a means of rejecting lookup attempts, the resolver
+       application becomes less sensitive to version incompatibilities
+       with the particular zone registry associated with the domain
+       name.
+
+   Under this model, a registry (or entity communicating with a registry
+   to accomplish name registrations) will need to update its tables --
+   both the Unicode-associated tables and the tables of permitted IDN
+   characters -- to enable a new script or other set of new characters.
+   It will not be affected by newer versions of Unicode, or newly-
+   authorized characters, until and unless it wishes to make those
+   registrations.  The registration side is also responsible --under the
+   protocol and to registrants and users-- for much more careful
+   checking than is expected of applications systems that look names up,
+   both checking as required by the protocol and checking required by
+   whatever policies it develops for avoiding confusable characters and
+   sequences and preserving language or script integrity.
+
+   An application or client that looks names up in the DNS will be able
+   to resolve any name that is registered, as long as its version of the
+   Unicode-associated tables is sufficiently up-to-date to interpret all
+   of the characters in the label.  It SHOULD distinguish, in its
+   messages to users, between "label contains an unallocated code point"
+   and other types of lookup failures: a failure on the basis of an old
+   version of Unicode may lead the user to a desire to upgrade to a
+   newer version, but will have no other ill effects (this is consistent
+   with behavior in the transition to the DNS when some hosts could not
+   yet handle some forms of names or record types).
+
+8.2.  More Flexibility in User Agents
+
+   One key philosophical difference between IDNA2003 and this proposal
+   is that the former provided mappings for many characters into others.
+   These mappings were not reversible: the original string could not be
+   recovered from the form stored in the DNS and, probably as a
+   consequence, users became confused about what characters were valid
+   for IDNs and which ones were not.  Too many times, the answer to the
+   question "can this character be used in an IDN" was "it depends on
+   exactly what you mean by 'used'".
+
+   IDNA200x does not perform these mappings but, instead, prohibits the
+
+
+
+Klensin                  Expires August 27, 2007               [Page 22]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   characters that would be mapped to others.  As examples, while
+   mathematical characters based on Latin ones are accepted as input to
+   IDNA2003, they are prohibited in IDNA200x.  Similarly, double-width
+   characters and other variations are prohibited as IDNA input.
+
+   In many cases these prohibitions should have no effect on what the
+   user can type at resolution time: it is perfectly reasonable for
+   systems that support user interfaces at lookup time, to perform some
+   character mapping that is appropriate to the local environment prior
+   to actual invocation of IDNA as part of the Unicode conversions of
+   Section 3.2.1.2 and Section 3.2.2.2 above.  However, those changes
+   will be local ones only -- local to environments in which users will
+   clearly understand that the character forms are equivalent.  For use
+   in interchange among systems, it appears to be much more important
+   that U-labels and A-labels can be mapped back and forth without loss
+   of information.
+
+   One specific, and very important instance of this change in strategy
+   arises with case-folding.  In the ASCII-only DNS, names are looked up
+   and matched in a case-independent way, but no actual case-folding
+   occurs: Names can be placed in the DNS in either upper or lower case
+   form (or any mixture of them) and that form is preserved, returned in
+   queries, and so on.  IDNA2003 attempted to simulate that behavior by
+   performing case-mapping at registration time (resulting in only
+   lower-case IDNs in the DNS) and when names were looked up.
+
+   As suggested earlier in this section, it appears to be desirable to
+   do as little character mapping as possible consistent with having
+   Unicode work correctly (e.g., NFC mapping to resolve different
+   codings for the same character is still necessary) and to make the
+   mapping between A-labels and U-labels idempotent.  Case-mapping is
+   not an exception to this principle: if only lower case characters can
+   be registered in the DNS (i.e., present in a U-label), then IDNA200x
+   should prohibit upper-case characters as input.  Some other
+   considerations reinforce this conclusion.  For example, an essential
+   element of the ASCII case-mapping functions, that
+   uppercase(character) = uppercase(lowercase(character)), may not be
+   satisfied with IDNs: the relationship may even be language-dependent.
+   Of course, the expectations of users who are accustomed to a case-
+   insensitive DNS environment will probably be well-served if user
+   agents perform case mapping prior to IDNA processing, but the IDNA
+   procedures themselves should neither require such mapping nor expect
+   it when it isn't natural to the localized environment.
+
+8.3.  The Question of Prefix Changes
+
+   The conditions that would require a change in the IDNA "prefix"
+   ("xn--" for the version of IDNA specified in [RFC3490]) have been a
+
+
+
+Klensin                  Expires August 27, 2007               [Page 23]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   great concern to the community.  A prefix change would clearly be
+   necessary if the algorithms were modified in a manner that would
+   create serious ambiguities during subsequent transition in
+   registrations.  This section summarizes our conclusions about the
+   conditions under which changes in prefix would be necessary.
+
+8.3.1.  Conditions requiring a prefix change
+
+   An IDN prefix change is needed if a given string would resolve or
+   otherwise be interpreted differently depending on the version of the
+   protocol or tables being used.  Consequently, work to update IDNs
+   would require a prefix change if, and only if, one of the following
+   four conditions were met:
+
+   1.  The conversion of a Punycode string to Unicode yields one string
+       under IDNA2003 (RFC3490) and a different string under IDNA200x.
+
+   2.  An input string that is valid under IDNA2003 and also valid under
+       IDNA200x yields two different Punycode strings with the different
+       versions of IDNA.  This condition is believed to be essentially
+       equivalent to the one above.
+
+       Note, however, that if the input string is valid under one
+       version and not valid under the other, this condition does not
+       apply.  See the first item in Section 8.3.2, below.
+
+   3.  A fundamental change is made to the semantics of the string that
+       is inserted in the DNS, e.g., if a decision were made to try to
+       include language or specific script information in that string,
+       rather than having it be just a string of characters.
+
+   4.  A sufficiently large number of characters is added to Unicode so
+       that the Punycode mechanism for block offsets no longer has
+       enough capacity to reference the higher-numbered planes and
+       blocks.  This condition is unlikely even in the long term and
+       certain not to arise in the next few years.
+
+8.3.2.  Conditions not requiring a prefix change
+
+   In particular, as a result of the principles described above, none of
+   the following changes require a new prefix:
+
+   1.  Prohibition of some characters as input to IDNA.  This may make
+       names that are now registered inaccessible, but does not require
+       a prefix change.
+
+   2.  Adjustments in Stringprep tables or IDNA actions, including
+       normalization definitions, that do not affect characters that
+
+
+
+Klensin                  Expires August 27, 2007               [Page 24]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+       have already been invalid under IDNA2003.
+
+   3.  Changes in the style of definitions of Stringprep or Nameprep
+       that do not alter the actions performed by them.
+
+8.4.  Stringprep Changes and Compatibility
+
+   Concerns have been expressed about problems for other uses of
+   Stringprep being caused by changes to the specification intended to
+   improve the handling of IDNs, most notably as this might affect
+   identification and authentication protocols.  Section 8.3, above,
+   essentially also applies in this context.  The proposed new inclusion
+   tables [IDNA200X-Permitted], the reduction in the number of
+   characters permitted as input to Nameprep on registration or
+   resolution (Section 5), and even the proposed changes in handling of
+   right-to-left strings [IDNA200X-BIDI] either give interpretations to
+   strings prohibited under IDNA2003 or prohibit strings that IDNA2003
+   permitted.  Strings that are valid under both IDNA2003 and IDNA200x,
+   and the corresponding versions of Stringprep, are not changed in
+   interpretation.  If Nameprep changes are needed by these revised
+   protocols, the changes will be made either by creating a new
+   specification that will not modify Stringprep2003 or a new version of
+   Stringprep that contains additional tables without any effect on the
+   older ones.
+
+   It is particularly important to keep IDNA processing separate from
+   processing for various security protocols because some of the
+   constraints that are necessary for smooth and comprehensible use of
+   IDNs may be unwanted or undesirable in other contexts.  For example,
+   the criteria for good passwords or passphrases are very different
+   from those for desirable IDNs.  Similarly, internationalized SCSI
+   identifiers and other protocol components are likely to have
+   different requirements than IDNs.
+
+   Perhaps even more important in practice, since most other known uses
+   of Stringprep encode or process characters that are already in
+   normalized form and expect the use of only those characters that can
+   be used in writing words of languages, the changes proposed here and
+   in [IDNA200X-Permitted] are unlikely to have any effect at all,
+   especially not on registries and registrations that follow rules
+   already in existence when this work started.
+
+
+9.  Acknowledgements
+
+   The editor and contributors would like to express their thanks to
+   those who contributed significant early review comments, sometimes
+   accompanied by text, especially Mark Davis, Paul Hoffman, Simon
+
+
+
+Klensin                  Expires August 27, 2007               [Page 25]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   Josefsson, and Sam Weiler.  In addition, some specific ideas were
+   incorporated from suggestions and text supplied by Michael Everson,
+   Asmus Freytag, Michel Suignard, and Ken Whistler, although, as usual,
+   they bear little or no responsibility for the conclusions the editor
+   and contributors reached after receiving their suggestions.
+
+
+10.  Contributors
+
+   While the listed editor held the pen, this document represents the
+   joint work and conclusions of an ad hoc design team consisting of the
+   editor and, in alphabetic order, Harald Alvestrand, Tina Dam, Patrik
+   Faltstrom, and Cary Karp.  In addition, there were many specific
+   contributions and helpful comments from those listed in the
+   Acknowledgments section and others who have contributed to the
+   development and use of the IDNA protocols.
+
+
+11.  IANA Considerations
+
+   While this document does not contain specific actions for IANA, it
+   anticipates the creation of a registry of Unicode blocks and
+   characters permitted in IDNs and a mechanism for expanding that
+   registry.  See Section 5.
+
+
+12.  Security Considerations
+
+   The registration and resolution models described above change the
+   mechanisms available for applications and resolvers to determine the
+   validity of labels they encounter.  In some respects, the ability to
+   test is strengthened.  For example, putative labels that contain
+   unassigned code points will now be rejected, while IDNA2003 permitted
+   them (something that is now recognized as a considerable source of
+   risk).  On the other hand, the protocol specification no longer
+   assumes that the application that looks up a name will be able to
+   determine, and apply, information about the protocol version used in
+   registration.  In theory, that may increase risk since the
+   application will be able to do less pre-lookup validation.  In
+   practice, the protection afforded by that test has been largely
+   illusory for reasons explained in RFC 4690 and above.
+
+   Any change to Stringprep or, more broadly, the IETF's model of the
+   use of internationalized character strings in different protocols,
+   creates some risk of inadvertent changes to those protocols,
+   invalidating deployed applications or databases, and so on.  Our
+   current hypothesis is that the same considerations that would require
+   changing the IDN prefix (see Section 8.3.2) are the ones that would,
+
+
+
+Klensin                  Expires August 27, 2007               [Page 26]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+   e.g., invalidate certificates or hashes that depend on Stringprep,
+   but those cases require careful consideration and evaluation.  More
+   important, it is not necessary to change Stringprep2003 at all in
+   order to make the IDNA changes contemplated here.  It might be far
+   preferable to create a separate document, or separate profile
+   components, for IDN work, leaving the question of upgrading to other
+   protocols to experts on them.
+
+
+13.  Change Log
+
+   Version -01 of this document is a considerable rewrite from -00.
+   Many sections have been clarified or extended and several new
+   sections have been added to reflect discussions in a number of
+   contexts since -00 was issued.
+
+
+14.  References
+
+14.1.  Normative References
+
+   [FC-NFKC]  The Unicode Consortium, "Derived Property:
+              FC_NFKC_Closure", June 2006, <http://www.unicode.org/
+              Public/UNIDATA/DerivedNormalizationProps.txt>.
+
+   [IDNA200X-BIDI]
+              Alvestrand, H. and C. Karp, "An IDNA problem in right-to-
+              left scripts", October 2006, <http://www.ietf.org/
+              internet-drafts/draft-alvestrand-idna-bidi-00.txt>.
+
+   [IDNA200X-Permitted]
+              Faltstrom, P., "The Unicode Codepoints and IDN",
+              February 2007, <http://stupid.domain.name/idnabis/
+              draft-faltstrom-idnabis-tables-02.txt>.
+
+              A version of this document, is available in HTML format at
+              http://stupid.domain.name/idnabis/
+              draft-faltstrom-idnabis-tables-02.txt
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC3454]  Hoffman, P. and M. Blanchet, "Preparation of
+              Internationalized Strings ("stringprep")", RFC 3454,
+              December 2002.
+
+   [RFC3490]  Faltstrom, P., Hoffman, P., and A. Costello,
+              "Internationalizing Domain Names in Applications (IDNA)",
+
+
+
+Klensin                  Expires August 27, 2007               [Page 27]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+              RFC 3490, March 2003.
+
+   [RFC3491]  Hoffman, P. and M. Blanchet, "Nameprep: A Stringprep
+              Profile for Internationalized Domain Names (IDN)",
+              RFC 3491, March 2003.
+
+   [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
+              for Internationalized Domain Names in Applications
+              (IDNA)", RFC 3492, March 2003.
+
+   [RFC3743]  Konishi, K., Huang, K., Qian, H., and Y. Ko, "Joint
+              Engineering Team (JET) Guidelines for Internationalized
+              Domain Names (IDN) Registration and Administration for
+              Chinese, Japanese, and Korean", RFC 3743, April 2004.
+
+   [RFC4290]  Klensin, J., "Suggested Practices for Registration of
+              Internationalized Domain Names (IDN)", RFC 4290,
+              December 2005.
+
+   [Unicode-UAX15]
+              The Unicode Consortium, "Unicode Standard Annex #15:
+              Unicode Normalization Forms", 2006,
+              <http://www.unicode.org/reports/tr15/>.
+
+   [Unicode32]
+              The Unicode Consortium, "The Unicode Standard, Version
+              3.0", 2000.
+
+              (Reading, MA, Addison-Wesley, 2000.  ISBN 0-201-61633-5).
+              Version 3.2 consists of the definition in that book as
+              amended by the Unicode Standard Annex #27: Unicode 3.1
+              (http://www.unicode.org/reports/tr27/) and by the Unicode
+              Standard Annex #28: Unicode 3.2
+              (http://www.unicode.org/reports/tr28/).
+
+   [Unicode40]
+              The Unicode Consortium, "The Unicode Standard, Version
+              4.0", 2003.
+
+   [Unicode50]
+              The Unicode Consortium, "The Unicode Standard, Version
+              5.0", 2007.
+
+              Boston, MA, USA: Addison-Wesley.  ISBN 0-321-48091-0
+
+
+
+
+
+
+
+Klensin                  Expires August 27, 2007               [Page 28]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+14.2.  Informative Refe0rences
+
+   [ICANN-Guidelines]
+              ICANN, "IDN Implementation Guidelines", 2006,
+              <http://www.icann.org/topics/idn/>.
+
+   [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
+              STD 13, RFC 1034, November 1987.
+
+   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, November 1987.
+
+   [RFC1123]  Braden, R., "Requirements for Internet Hosts - Application
+              and Support", STD 3, RFC 1123, October 1989.
+
+   [RFC2782]  Gulbrandsen, A., Vixie, P., and L. Esibov, "A DNS RR for
+              specifying the location of services (DNS SRV)", RFC 2782,
+              February 2000.
+
+   [RFC3987]  Duerst, M. and M. Suignard, "Internationalized Resource
+              Identifiers (IRIs)", RFC 3987, January 2005.
+
+   [RFC4690]  Klensin, J., Faltstrom, P., Karp, C., and IAB, "Review and
+              Recommendations for Internationalized Domain Names
+              (IDNs)", RFC 4690, September 2006.
+
+
+Author's Address
+
+   John C Klensin (editor)
+   1770 Massachusetts Ave, Ste 322
+   Cambridge, MA  02140
+   USA
+
+   Phone: +1 617 245 1457
+   Fax:
+   Email: john+ietf@jck.com
+   URI:
+
+
+
+
+
+
+
+
+
+
+
+
+
+Klensin                  Expires August 27, 2007               [Page 29]
+
+Internet-Draft               IDNAbis Issues                February 2007
+
+
+Full Copyright Statement
+
+   Copyright (C) The IETF Trust (2007).
+
+   This document is subject to the rights, licenses and restrictions
+   contained in BCP 78, and except as set forth therein, the authors
+   retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+   THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+   THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is provided by the IETF
+   Administrative Support Activity (IASA).
+
+
+
+
+
+Klensin                  Expires August 27, 2007               [Page 30]
+
+

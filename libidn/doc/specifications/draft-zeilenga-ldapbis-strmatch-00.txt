@@ -1,0 +1,731 @@
+
+
+
+
+
+
+INTERNET-DRAFT                           Editor: Kurt D. Zeilenga
+Intended Category: Standard Track                OpenLDAP Foundation
+Expires in six months                            5 August 2002
+
+
+
+            Internationalized String Matching Rules for X.500
+                 <draft-zeilenga-ldapbis-strmatch-00.txt>
+
+
+Status of this Memo
+
+  This document is an Internet-Draft and is in full conformance with all
+  provisions of Section 10 of RFC2026.
+
+  This document is intended to be published as a Standard Track RFC.
+  Distribution of this memo is unlimited.  Technical discussion of this
+  document will take place on the IETF LDAP Revision Working Group
+  mailing list <ietf-ldapbis@openldap.org>.  Please send editorial
+  comments directly to the author <Kurt@OpenLDAP.org>.
+
+  Internet-Drafts are working documents of the Internet Engineering Task
+  Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+  Internet-Drafts are draft documents valid for a maximum of six months
+  and may be updated, replaced, or obsoleted by other documents at any
+  time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as ``work in progress.''
+
+  The list of current Internet-Drafts can be accessed at
+  <http://www.ietf.org/ietf/1id-abstracts.txt>. The list of
+  Internet-Draft Shadow Directories can be accessed at
+  <http://www.ietf.org/shadow.html>.
+
+  Copyright 2002, The Internet Society.  All Rights Reserved.
+
+  Please see the Copyright section near the end of this document for
+  more information.
+
+
+Abstract
+
+  The existing X.500 Directory Service technical specifications do not
+  precisely define how string matching is to be preformed.  This has
+  lead to a number of interoperabilitly problems.  This document
+  provides string preparation profiles for string-based syntaxes and
+  matching rules for standard string syntaxes and matching rules defined
+  in X.520.
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 1]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  This document is intended to be submitted to the ITU for publication
+  as an amendment to X.520 and published as an Informational RFC.
+
+
+Conventions
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in BCP 14 [RFC2119].
+
+
+1. Background and Intended Usage
+
+  The "X.520: Selected attribute types" [X.520] provides (amongst other
+  things) value syntaxes and matching rules for comparing values
+  commonly used in the Directory [X.500].  These specifications are
+  inadequate for strings composed of characters from the Universal
+  Character Set (UCS) [ISO10646] (a superset of Unicode [UNICODE]).
+
+  The Case Ignore Match, for example, is simply defined as being a case
+  insensitive comparison where insignificant spaces are ignored.  For
+  printableString, there is only one space character and case mapping is
+  bijective, hence this definition is sufficient.  However, for UCS-
+  based string types such as universalString, it's not sufficient.  For
+  example, a case insensitive matching implementation which folding
+  lower case characters to upper case would yield different different
+  results then an implementation which used upper to lower case folding.
+  Or one implementation may view space as referring to SPACE (U+00020),
+  a second implementation may view any character with the space
+  separator (Zs) property as a space, and another implementation may
+  view any character with the whitespace (WS) category as a space.
+
+  The lack of precise specification for string matching has led to
+  significant interoperability problems.  To address these problems,
+  this document updates X.520 [X.520] with a detailed specification of
+  string syntax and matching rule requirements.
+
+  The matching rule algorithms described in this document are based upon
+  the "stringprep" approach [STRPREP].  In "stringprep", presented and
+  stored values are first prepared for comparison and so that a
+  character-by-character comparison yields the "correct" result.
+
+  The algorithm used here is a refinement of the "stringprep" approach.
+  Design considerations are discussed in Section 2.
+
+  The algorithm involves an additional preparation step is added to
+  transcode all input values to Unicode before proceeding with the
+  preparation steps outlined in [STRPREP].  Additionally, the
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 2]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  "stringprep" normalization step also includes removal of space
+  insignificant to X.500 string matching.
+
+  As described, preparation of strings involves the following steps:
+      1) Transcode
+      2) Map
+      3) Normalize
+      4) Prohibit
+      5) Check bidi
+
+  These steps are described in Section 3.
+
+  Section 4 replaces section 6.1 of X.520 [X.520].  It updates select
+  string matching rules.
+
+  Section 5 replaces portions of section 6.2 of X.520 [X.520].  It
+  updates select syntax-based matching rules.
+
+
+2. Design Considerations
+
+  The X.500 string matching rule specification provided in Section 3
+  designed to leverage the "stringprep" framework [STRPREP] for
+  comparing of strings.  As noted above, a transcoding step was added as
+  X.500 supports matching between strings of different character sets.
+
+
+2.1. Transcode
+
+  As mappings between character sets, such as T.61 and UCS, are not
+  bijective, all strings are first transliterated to a common character
+  encoding set.  UCS was the logical choice as all other character sets
+  (used in X.500) can be transcoded to it without information loss.
+  None of the other character sets offer this property.
+
+2.2. Map
+
+  TBD
+
+
+2.3. Normalize
+
+  Normalization is performed to ensure comparison is always done between
+  canonical-equivalent strings.  As directory strings are often used as
+  identifiers, we selected Form KC (compatibility composed) as it allows
+  a greater number of strings to be treated as equivalent.
+
+  Unfortunately, this choice is not best for all applications.
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 3]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  Additional matching rules which use different string preparation
+  algorithms may be introduced in the future to better support these
+  applications.  In particular, matching rules which use Form C
+  (composed) normalization instead of Form KC would also be generally
+  useful.
+
+2.4. Prohibit
+
+  TBD
+
+
+2.5. Check bidi
+
+  TBD
+
+
+3. String Preparation
+
+  The following 5-step process SHALL to be applied to each presented and
+  attribute value in preparation for string match rule evaluation.
+
+      1) Transcode
+      2) Map
+      3) Normalize
+      4) Prohibit
+      5) Check bidi
+
+  Failure in any step SHALL be cause the assertion to be Undefined.
+
+
+3.1. Transcode
+
+  Each non-Unicode string values are to transcoded to Unicode.
+
+  TeletexString values SHALL transcoded to Unicode as described in
+  [T61-UCS].
+
+  PrintableString value SHALL be transcoded directly to Unicode.
+
+  UniversalString, UTF8String, and bmpString values need not be
+  transcoded as they are Unicode-based strings (which, in the case of
+  bmpString, restricted to a subset of Unicode).
+
+  If the implementation is unable or unwilling to perform the
+  transcoding as described above, or the transcoding fails, this step
+  fails and the assertion SHALL be evaluated to Undefined.
+
+  Implementations SHOULD support transcoding for all stored non-Unicode
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 4]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  strings which may be matched against using the rules defined in
+  Section 3.
+
+  The transcoded string is the output string.
+
+
+3.2. Map
+
+  SOFT HYPEN (U+00AD) and MONGOLIAN TODO SOFT HYPHEN (U+1806) code
+  points are to be mapped to nothing.  COMBINING GRAPHEME JOINER
+  (U+034F) and VARIATION SELECTORs (U+180B-180D,FF00-FE0F) are code
+  points are also to be mapped to nothing.  The OBJECT REPLACEMENT
+  CHARACTER (U+FFFC) is mapped to nothing.
+
+  For non-numeric matching rules, CHARACTER TABULATION (U+0009), LINE
+  FEED (LF) (U+000A), LINE TABULATION (U+000B), FORM FEED (FF) (U+000C),
+  CARRIAGE RETURN (CR) (U+000D), and NEXT LINE (NEL) (U+0085) are to be
+  mapped to SPACE (U+0020).  For numeric matching rules, these are
+  mapped to nothing.
+
+  All other code points of Control class are to be mapped to nothing.
+
+  ZERO WIDTH SPACE (U+200B) is to be mapped to nothing.  For non-numeric
+  matching rules, all other code points with Separator (space, line, or
+  page) property are to be mapped to SPACE (U+0020).  For numeric
+  matching rules, all Separators characters are mapped to nothing.
+
+  For case ignore, numeric, and stored prefix string matching rules,
+  characters are to be case folded per B.2 of [STRPREP].
+
+
+3.3. Normalize
+
+  In this step, the input string SHALL be normalized by first
+  canonicalization to Unicode Form KC (compatibility composed) as
+  described in [UAX15] and, then, removal of insignificant SPACE
+  (U+0020) code points (spaces).
+
+        Note - numerous code points are mapped to SPACE (U+0020) by the
+               preceding step.
+
+  The following spaces regarded as not significant:
+    - leading spaces (i.e. those preceding the first character that is
+      not a space);
+    - trailing spaces (i.e. those following the last character that is
+      not a space);
+    - multiple consecutive spaces (these are taken as equivalent to a
+      single space character).
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 5]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  (A string consisting entirely of spaces is equivalent to a string
+  containing exactly one space.)
+
+  For example, removal of spaces from the Form KC string
+          "<SPACE><SPACE>foo<SPACE><SPACE>bar<SPACE><SPACE>" would
+  result in the output string:
+          "<SPACE>foo<SPACE>bar<SPACE>".
+
+  and the Form KC string:
+          "<SPACE><SPACE><SPACE>" would result in the output string
+          "<SPACE>".
+
+
+3.4. Prohibit
+
+  All Unassigned, Private Use, and non-character code points are
+  prohibited.  Surrogate codes (U+D800-DFFFF) are prohibited.
+
+  The REPLACEMENT CHARACTER (U+FFFD) code is prohibited.
+
+  The first code point of a string is probibited from being a combining
+  character.
+
+  The step fails if the input string contains any prohibited code point.
+  The output string is the input string.
+
+
+3.5. Check bidi
+
+  There are no bidirectional restrictions.  The output string is the
+  input string.
+
+
+4 String Matching Rules
+
+  In the matching rules specified in this section, all presented and
+  stored string values SHALL be prepared for matching as described in
+  Section 3.   String preparation produces strings suitable for
+  character-by-character matching.
+
+
+4.1. Case Exact / Ignore Match
+
+  The Case Exact Match rule compares for equality a presented string
+  with a attribute value of type DirectoryString or one of the data
+  types appearing in the choice type DirectoryString, e.g. UTF8String.
+
+      caseExactMatch MATCHING-RULE ::= {
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 6]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+          SYNTAX DirectoryString {ub-match}
+          ID id-mr-caseExactMatch }
+
+  The Case Ignore Match rule compares for equality a presented string
+  with an attribute value of type DirectoryString or one of the data
+  types appearing in the choice type DirectoryString, e.g. UTF8String,
+  without regard to the case (upper or lower) of the strings (e.g.
+  "Dundee" and "DUNDEE" match).  The rule is identical to the
+  caseExactMatch rule except upper case characters are folded to lower
+  case during string preparation as discussed in 3.2.
+
+      caseIgnoreMatch MATCHING-RULE ::= {
+          SYNTAX DirectoryString {ub-match}
+          ID id-mr-caseIgnoreMatch }
+
+  Both rules returns TRUE if the prepared strings are the same length
+  and corresponding characters are identical.
+
+
+4.2. Case Exact / Ignore Ordering Match
+
+  The Case Exact Ordering Match rule compares the collation order of a
+  presented string with an attribute value of type DirectoryString or
+  one of the data types appearing in the choice type DirectoryString,
+  e.g. UTF8String.
+
+      caseExactOrderingMatch MATCHING-RULE ::= {
+          SYNTAX DirectoryString {ub-match}
+          ID id-mr-caseExactOrderingMatch }
+
+  The Case Ignore Ordering Match rule compares the collation order of a
+  presented string an attribute value of type DirectoryString or one of
+  the data types appearing in the choice type DirectoryString, e.g.
+  UTF8String, without regard to the case (upper or lower) of the
+  strings.  The rule is identical to the caseExactOrderingMatch rule
+  except upper case characters are folded to lower case during string
+  preparation as discussed in 3.2.
+
+      caseIgnoreOrderingMatch MATCHING-RULE ::= {
+          SYNTAX DirectoryString {ub-match}
+          ID id-mr-caseIgnoreOrderingMatch }
+
+  Both rules returns TRUE if the attribute value is "less" or appears
+  earlier than the presented value, when the prepared strings are
+  compared using Unicode code point collation order.
+
+
+4.3. Case Exact / Ignore Substrings Match
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 7]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  The Case Exact Substrings Match rule determines whether a presented
+  value is a substring of an attribute value of type DirectoryString or
+  one of the data types appearing in the choice type DirectoryString,
+  e.g. UTF8String.
+
+      caseExactSubstringsMatch MATCHING-RULE ::= {
+          SYNTAX SubstringAssertion -- only the PrintableString choice
+          ID id-mr-caseExactSubstringsMatch }
+      SubstringAssertion ::= SEQUENCE OF CHOICE {
+          initial [0] DirectoryString {ub-match},
+          any [1] DirectoryString {ub-match},
+          final [2] DirectoryString {ub-match},
+      control Attribute }
+      -- Used to specify interpretation of the following items
+      -- at most one initial and one final component
+
+  The Case Ignore Substrings Match rule determines whether a presented
+  value is a substring of an attribute value of type DirectoryString or
+  one of the data types appearing in the choice type DirectoryString,
+  e.g. UTF8String, without regard to the case (upper or lower) of the
+  strings.  The rule is identical to the caseExactSubstringsMatch rule
+  except upper case characters are folded to lower case during string
+  preparation as discussed in 3.2.
+
+      caseIgnoreSubstringsMatch MATCHING-RULE ::= {
+          SYNTAX SubstringAssertion
+          ID id-mr-caseIgnoreSubstringsMatch }
+
+  Both rules returns TRUE if there is a partitioning of the prepared
+  attribute value (into portions) such that:
+    - the specified substrings (initial, any, final) match different
+      portions of the value in the order of the strings sequence.
+    - initial, if present, matches the first portion of the value;
+    - any, if present, matches some arbitrary portion of the value;
+    - final, if present, matches the last portion of the value.
+    - control is not used for the caseExactSubstringsMatch,
+      caseIgnoreSubstringsMatch, telephoneNumberSubstringsMatch, or any
+      other form of substring match for which only initial, any, or
+      final elements are used in the matching algorithm; if a control
+      element is encountered, it is ignored.  The control element is
+      only used for matching rules that explicitly specify its use in
+      the matching algorithm. Such a matching rule may also redefine the
+      semantics of the initial, any and final substrings.
+        NOTE - The generalWordMatch matching rule is an example of such
+               a matching rule.
+
+  There shall be at most one initial, and at most one final in strings.
+  If initial is present, it shall be the first element of strings.  If
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 8]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  final is present, it shall be the last element of strings. There shall
+  be zero or more any in strings.
+
+  For a component of substrings to match a portion of the attribute
+  value, corresponding characters must be identical (including all
+  combining characters in the combining character sequences).
+
+
+4.4. Numeric String Match
+
+  The Numeric String Match rule compares for equality a presented
+  numeric string with an attribute value of type NumericString.
+
+      numericStringMatch MATCHING-RULE ::= {
+          SYNTAX NumericString
+          ID id-mr-numericStringMatch }
+
+  The rule is identical to the caseIgnoreMatch rule (case is irrelevant
+  as characters are numeric) except that all space characters are
+  removed during string preparation.
+
+
+4.5. Numeric String Ordering Match
+
+  The Numeric String Ordering Match rule compares the collation order of
+  a presented string with an attribute value of type NumericString.
+
+      numericStringOrderingMatch MATCHING-RULE ::= {
+          SYNTAX NumericString
+          ID id-mr-numericStringOrderingMatch }
+
+  The rule is identical to the caseIgnoreOrderingMatch rule (case is
+  irrelevant as characters are numeric) except that all space characters
+  are removed during string preparation.
+
+
+4.6. Numeric String Substrings Match
+
+  The Numeric String Substrings Match rule determines whether a
+  presented value is a substring of an attribute value of type
+  NumericString.
+
+      numericStringSubstringsMatch MATCHING-RULE ::= {
+          SYNTAX SubstringAssertion
+          ID id-mr-numericStringSubstringsMatch }
+
+  The rule is identical to the caseIgnoreSubstringsMatch rule (case is
+  irrelevant as characters are numeric) except that all space characters
+
+
+
+Zeilenga               X.500 Intl. String Matching              [Page 9]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  are removed during string preparation.
+
+
+4.7. Case Ignore List Match
+
+  The Case Ignore List Match rule compares for equality a presented
+  sequence of strings with an attribute value which is a sequence of
+  DirectoryStrings, without regard to the case (upper or lower) of the
+  strings.
+
+      caseIgnoreListMatch MATCHING-RULE ::= {
+          SYNTAX CaseIgnoreList
+          ID id-mr-caseIgnoreListMatch }
+      CaseIgnoreList ::= SEQUENCE OF DirectoryString {ub-match}
+
+  The rule returns TRUE if and only if the number of strings in each is
+  the same, and corresponding strings match. The latter matching is as
+  for the caseIgnoreMatch matching rule.
+
+
+4.8. Case Ignore List Substrings Match
+
+  The Case Ignore List Substring rule compares a presented substring
+  with an attribute value which is a sequence of DirectoryStrings, but
+  where the case (upper or lower) is not significant for comparison
+  purposes.
+
+      caseIgnoreListSubstringsMatch MATCHING-RULE ::= {
+          SYNTAX SubstringAssertion
+          ID id-mr-caseIgnoreListSubstringsMatch }
+
+  A presented value matches a stored value if and only if the presented
+  value matches the string formed by concatenating the strings of the
+  stored value. This matching is done according to the
+  caseIgnoreSubstringsMatch rule; however, none of the initial, any, or
+  final values of the presented value are considered to match a
+  substring of the concatenated string which spans more than one of the
+  strings of the stored value.
+
+
+4.9. Stored Prefix Match
+
+  The Stored Prefix Match rule determines whether an attribute value,
+  whose syntax is DirectoryString, is a prefix (i.e.  initial substring)
+  of the presented value, without regard to the case (upper or lower) of
+  the strings.
+
+             NOTE - It can be used, for example, to compare values in
+
+
+
+Zeilenga               X.500 Intl. String Matching             [Page 10]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+             the Directory which are telephone area codes with a
+             purported value which is a telephone number.
+
+      storedPrefixMatch MATCHING-RULE ::= {
+          SYNTAX DirectoryString {ub-match}
+          ID id-mr-storedPrefixMatch }
+
+  The rule returns TRUE if the attribute value is an initial substring
+  of the presented value with corresponding characters identical except
+  possibly with regard to case.
+
+5. Other changes to X.520
+
+  This document makes the following changes to X.520:
+
+  The section 6.2.8 sentence:
+      The rules for matching are identical to those for caseIgnoreMatch,
+      except that all space and "-" characters are skipped during the
+      comparison.
+
+  is replaced with:
+      The rules for matching are identical to those for
+      numericStringMatch, except that HYPHEN-MINUS (U+002D), ARMENIAN
+      HYPHEN (U+058A), HYPHEN (U+2010), NON-BREAKING HYPHEN (U+2011),
+      MINUS SIGN (U+2212), SMALL HYPHEN-MINUS (U+FE63), and FULLWIDTH
+      HYPHEN-MINUS (U+FF0D) are to be mapped to nothing during the
+      string preparation map step.
+
+  The section 6.2.9 sentence:
+      The rules for matching are identical to those for
+      caseExactSubstringsMatch, except that all space and "-" characters
+      are skipped during the comparison.
+
+  is replaced with:
+      The rules for matching are identical to those for
+      caseExactSubstringsMatch, except that HYPHEN-MINUS (U+002D),
+      ARMENIAN HYPHEN (U+058A), HYPHEN (U+2010), NON-BREAKING HYPHEN
+      (U+2011), MINUS SIGN (U+2212), SMALL HYPHEN-MINUS (U+FE63), and
+      FULLWIDTH HYPHEN-MINUS (U+FF0D) are to be mapped to nothing during
+      the string preparation map step.
+
+
+6. Security Considerations
+
+  TBD
+
+
+7. Acknowledgments
+
+
+
+Zeilenga               X.500 Intl. String Matching             [Page 11]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  The approach used in this document based upon design principals and
+  algorithms described in "Preparation of Internationalized Strings
+  ('stringprep')" [STRPREP] by Paul Hoffman and Marc Blanchet.
+  Additional guidance was drawn from Unicode Technical Standards,
+  Technical Reports, and Notes.
+
+  Section 3.3 and 4 of this document is derived from Section 6.1 of
+  [X.520].
+
+
+8. Author's Address
+
+  Kurt Zeilenga
+  E-mail: <kurt@openldap.org>
+
+
+9. References
+
+9.1. Normative References
+
+  [RFC2119]  S. Bradner, "Key words for use in RFCs to Indicate
+             Requirement Levels", BCP 14 (also RFC 2119), March 1997.
+
+  [X.520]    International Telephone Union, "The Directory: Selected
+             Attribute Types", X.520, 2000.
+
+  [STRPREP]  P. Hoffman, M. Blanchet, "Preparation of Internationalized
+             Strings ('stringprep')", draft-hoffman-stringprep-xx.txt (a
+             work in progress).
+
+  [ISO10646] Universal Multiple-Octet Coded Character Set (UCS) -
+             Architecture and Basic Multilingual Plane, ISO/IEC 10646-1
+             : 1993.
+
+  [UAX15]    M. Davis, M. Duerst, "Unicode Standard Annex #15: Unicode
+             Normalization Forms, Version 3.2.0".
+             <http://www.unicode.org/unicode/reports/tr15/tr15-22.html>.
+
+  [UNICODE]  The Unicode Consortium, "The Unicode Standard, Version
+             3.2.0" is defined by "The Unicode Standard, Version 3.0"
+             (Reading, MA, Addison-Wesley, 2000. ISBN 0-201-61633-5), as
+             amended by the "Unicode Standard Annex #27: Unicode 3.1"
+             (http://www.unicode.org/reports/tr27/) and by the "Unicode
+             Standard Annex #28: Unicode 3.2"
+             (http://www.unicode.org/reports/tr28/).
+
+
+9.2. Informative References
+
+
+
+Zeilenga               X.500 Intl. String Matching             [Page 12]
+
+INTERNET-DRAFT     draft-zeilenga-ldapbis-strmatch-00      5 August 2002
+
+
+  [X.500]    International Telephone Union, "The Directory: Overview of
+             Concepts, Models and Service", X.500, 2000.
+
+
+
+
+Copyright 2002, The Internet Society.  All Rights Reserved.
+
+  This document and translations of it may be copied and furnished to
+  others, and derivative works that comment on or otherwise explain it
+  or assist in its implementation may be prepared, copied, published and
+  distributed, in whole or in part, without restriction of any kind,
+  provided that the above copyright notice and this paragraph are
+  included on all such copies and derivative works.  However, this
+  document itself may not be modified in any way, such as by removing
+  the copyright notice or references to the Internet Society or other
+  Internet organizations, except as needed for the  purpose of
+  developing Internet standards in which case the procedures for
+  copyrights defined in the Internet Standards process must be followed,
+  or as required to translate it into languages other than English.
+
+  The limited permissions granted above are perpetual and will not be
+  revoked by the Internet Society or its successors or assigns.
+
+  This document and the information contained herein is provided on an
+  "AS IS" basis and THE AUTHORS, THE INTERNET SOCIETY, AND THE INTERNET
+  ENGINEERING TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+  INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Zeilenga               X.500 Intl. String Matching             [Page 13]
+

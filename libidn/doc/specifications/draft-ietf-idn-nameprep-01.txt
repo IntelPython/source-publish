@@ -1,0 +1,1997 @@
+Internet Draft                                          Paul Hoffman
+draft-ietf-idn-nameprep-01.txt                            IMC & VPNC
+January 15, 2001                                       Marc Blanchet
+Expires in six months                                       ViaGenie
+
+               Preparation of Internationalized Host Names
+
+Status of this memo
+
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 of RFC2026.
+
+Internet-Drafts are working documents of the Internet Engineering Task
+Force (IETF), its areas, and its working groups. Note that other groups
+may also distribute working documents as Internet-Drafts.
+
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time. It is inappropriate to use Internet-Drafts as reference material
+or to cite them other than as "work in progress."
+
+     The list of current Internet-Drafts can be accessed at
+     http://www.ietf.org/ietf/1id-abstracts.txt
+
+     The list of Internet-Draft Shadow Directories can be accessed at
+     http://www.ietf.org/shadow.html.
+
+
+Abstract
+
+This document describes how to prepare internationalized host names for
+for use in the DNS. The steps include:
+- mapping characters to other characters, such as to change their case
+- normalizing the characters
+- excluding characters that are prohibited from appearing in
+internationalized host names
+
+1. Introduction
+
+When expanding today's DNS to include internationalized host names,
+those new names will be handled in many parts of the DNS. The IDN
+Working Group's requirements document [IDNReq] describes a framework for
+domain name handling as well as requirements for the new names. The IDN
+Working Group's comparison document [IDNComp] gives a framework for how
+various parts of the IDN solution work together.
+
+A user can enter a domain name into an application program in a myriad
+of fashions. Depending on the input method, the characters entered in
+the domain name may or may not be those that are allowed in
+internationalized host names. Thus, there must be a way to normalized
+the user's input before the name is resolved in the DNS.
+
+It is a design goal of this document to allow users to enter host names
+in applications and have the highest chance of getting the name correct.
+This means that the user should not be limited to only entering exactly
+the characters that might have been used, but to instead be able to
+enter characters that unambiguously normalize to characters in the
+desired host name. At the same time, this process must not introduce any
+chance that two host names could be represented by two distinct strings
+of characters that look identical to typical users. It is also a design
+goal to have all preprocessing of IDN done before going on the wire, so
+that no transformation is done in the DNS server space. Name preparation
+can be done in other places, such as in the registration process.
+
+This document describes the steps needed to convert a name part from one
+that is entered by the user to one that can be used in the DNS.
+
+1.1 Terminology
+
+The key words "MUST", "SHALL", "REQUIRED", "SHOULD", "RECOMMENDED", and
+"MAY" in this document are to be interpreted as described in RFC 2119
+[RFC2119].
+
+Examples in this document use the notation for code points and names
+from the Unicode Standard [Unicode3] and ISO 10646. For example, the
+letter "a" may be represented as either "U+0061" or "LATIN SMALL LETTER
+A". In the lists of prohibited characters, the "U+" is left off to make
+the lists easier to read.
+
+Note: A glossary of terms used in Unicode and ISO 10646 can be found in
+[Glossary]. Information on the 10646/Unicode character model can be
+found in [CharModel].
+
+
+2. Preparation Overview
+
+The steps for preparing names are:
+
+1) Input from the application service interface -- This can be done in
+many ways and is not specified in this document
+
+2) Map -- For each character in the input, check if it has a mapping
+and, if so, replace it with its mapping. The mappings are a combination
+of folding uppercase characters to lowercase and hyphen mapping. This
+is described in Section 4.
+
+3) Normalize -- Normalize the characters. This is described in Section 5.
+
+4) Look for prohibited output -- Check for any characters that are not
+allowed in the output. If any are found, return an error to the
+application service interface. This is described in Section 6.
+
+5) Resolution of the prepared name -- This must be specified in a
+different IDN document.
+
+The above steps MUST be performed in the order given in order to comply
+with this specification.
+
+The steps in this document have associated tables in the document. The
+tables are derived from outside sources, and the derivation is briefly
+described in the document. Although a great deal of effort has gone into
+preparing the tables, there is a chance that the tables do not correctly
+reflect the outside sources. Regardless of whether or not the tables
+differ from the sources, implementations MUST use the tables in this
+document for their processing. That is, if there is an error in the
+tables, the tables must still be used. Future versions of this document
+may include corrections and additions to the tables.
+
+
+3. Mapping
+
+Each character in the input stream is checked against the mapping table.
+The mapping table can be found in Appendix E of this document. That
+table includes all the steps described in the subsections below.
+
+The mappings can be one-to-none, one-to-one, or one-to-many. That is,
+some characters may be eliminated or replaced by more than one
+character, and the output of this step might be shorter or longer than
+the input.
+
+Design note: Characters that are not wanted in internationalized name
+parts can either be mapped to nothing in the mapping step, or cause an
+error in the prohibition step. The general guideline used to pick
+between the two outcomes was that removing alphabetic, non-protocol
+characters be done in the mapping step, but all other removals be done
+in the prohibition step. This allows for simple linguistic errors on the
+part of an input mechanism to be caught in the mapping step, but to not
+hide serious errors such as entering protocol characters or invisible
+characters from the user.
+
+3.1 Case mapping
+
+For each character in the input, if there is a lowercase mapping for
+that character, the input character is changed to the mapped lowercase
+character(s). The entries in the mapping table are derived from [UTR21].
+
+Design note: this step could have been "change all lowercase characters
+into uppercase characters". However, the upper-to-lower folding was
+chosen because most users of the Internet today enter host names in
+lowercase.
+
+3.2 Additional folding mappings
+
+There are some characters that do not have mappings in [UTR21] but still
+need processing. These characters include a few Greek characters and
+many symbols that contain Latin characters. The list of characters to
+add to the mapping table were determined by the following algorithm:
+
+b = Normalize(Fold(a));
+c = Normalize(Fold(b));
+if c is not the same as b, add a mapping for "a to c".
+
+Because Normalize(CaseFold(c)) always equals c, the table is stable from
+that point on.
+
+3.3 Mapped out
+
+The following characters are simply deleted from the input (that is,
+they are mapped to nothing) because their presence or absence should not
+make two domain names different.
+
+Some characters are only useful in line-based text, and are otherwise
+invisible and ignored.
+
+00AD        SOFT HYPHEN
+1806        MONGOLIAN TODO SOFT HYPHEN
+200B        ZERO WIDTH SPACE
+FEFF        ZERO WIDTH NO-BREAK SPACE
+
+Variation selectors and cursive connectors select different glyphs, but
+do not bear semantics.
+
+180B        MONGOLIAN FREE VARIATION SELECTOR ONE
+180C        MONGOLIAN FREE VARIATION SELECTOR TWO
+180D        MONGOLIAN FREE VARIATION SELECTOR THREE
+200C        ZERO WIDTH NON-JOINER
+200D        ZERO WIDTH JOINER
+
+
+4. Normalizaiton
+
+The output of the mapping step is normalized using form KC, as described
+in [UTR15]. Using form KC instead of form C causes many characters that
+are identical or near-identical to be converted into a single character.
+Note that this specification refers to a specific vesion of [UTR15].
+If a later version of [UTR15] changes the algorithm used for normalizing,
+that later version MUST NOT be used with this specification. Note that
+it is likely that this specification will be revised if UTR15 is changed,
+but until that happens, only the specified version of [UTR15] must
+be used.
+
+
+5. Prohibited Output
+
+Before the text can be emitted, it must be checked for prohibited
+characters. There is a variety of prohibited characters, as described in
+this section.
+
+One of the goals of IDN is to allow the widest possible set of host
+names as long as those host names do not cause other problems, such as
+conflict with other standards. Specifically, experience with current DNS
+names have shown that there is a desire for host names that include
+personal names, company names, and spoken phrases. A goal of this
+section is to prohibit as few characters that might be used in these
+contexts as possible.
+
+Note that every character listed in this section MUST NOT be transmitted
+on the DNS service interface. If a DNS server receives a request
+containing a prohibited character, then the DNS server MUST NOT
+resolve that name.
+
+Some characters listed in one section would also appear in other
+sections. Each character is only listed once.
+
+The collected list of prohibited characters can be found in Appendix F
+of this document. The list in Appendix F MUST be used by implementations
+of this specification. If there are any discrepancies between the list
+in Appendix F and subsections below, the list Appendix F always takes
+precedence.
+
+5.1 Currently-prohibited ASCII characters
+
+Some of the ASCII characters that are currently prohibited in host names
+by [STD13] are also used in protocol elements such as URIs. The other
+characters in the range U+0000 to U+007F that are not currently allowed
+are also prohibited in host name parts to reserve them for future use in
+protocol elements.
+
+0000-002C
+002E-002F
+003A-0040
+005B-0060
+007B-007F
+
+5.2 Space characters
+
+Space characters would make visual transcription of URLs nearly
+impossible and could lead to user entry errors in many ways.
+
+0020        SPACE
+00A0        NO-BREAK SPACE
+2000        EN QUAD
+2001        EM QUAD
+2002        EN SPACE
+2003        EM SPACE
+2004        THREE-PER-EM SPACE
+2005        FOUR-PER-EM SPACE
+2006        SIX-PER-EM SPACE
+2007        FIGURE SPACE
+2008        PUNCTUATION SPACE
+2009        THIN SPACE
+200A        HAIR SPACE
+202F        NARROW NO-BREAK SPACE
+3000        IDEOGRAPHIC SPACE
+1680        OGHAM SPACE MARK
+200B        ZERO WIDTH SPACE
+
+5.3 Control characters
+
+Control characters cannot be seen and can cause unpredictable results
+when displayed.
+
+0000-001F   [CONTROL CHARACTERS]
+007F        DELETE
+0080-009F   [CONTROL CHARACTERS]
+2028        LINE SEPARATOR
+2029        PARAGRAPH SEPARATORS
+
+5.4 Private use and replacement characters
+
+Because private-use characters do not have defined meanings, they are
+prohibited. The private-use characters are:
+
+E000-F8FF   [PRIVATE USE, PLANE 0]
+F0000-FFFFD [PRIVATE USE, PLANE 15]
+100000-10FFFD  [PRIVATE USE, PLANE 16]
+
+The replacement character (U+FFFD) has no known semantic definition in a
+name, and is often used in renderers to say "there would be some
+character here, but it cannot be rendered". For example, on a computer
+with no Asian fonts, a name with three katakana characters might be
+rendered with three replacement characters.
+
+FFFD        REPLACEMENT CHARACTER
+
+5.5 Non-character codepoints
+
+Non-character code points are code points that have been assigned in
+ISO 10646 but are not characters. Because they are already assigned,
+they are guaranteed not to later change into characters.
+
+FFFE-FFFF   [NONCHARACTER CODE POINTS]
+1FFFE-1FFFF [NONCHARACTER CODE POINTS]
+2FFFE-2FFFF [NONCHARACTER CODE POINTS]
+3FFFE-3FFFF [NONCHARACTER CODE POINTS]
+4FFFE-4FFFF [NONCHARACTER CODE POINTS]
+5FFFE-5FFFF [NONCHARACTER CODE POINTS]
+6FFFE-6FFFF [NONCHARACTER CODE POINTS]
+7FFFE-7FFFF [NONCHARACTER CODE POINTS]
+8FFFE-8FFFF [NONCHARACTER CODE POINTS]
+9FFFE-9FFFF [NONCHARACTER CODE POINTS]
+AFFFE-AFFFF [NONCHARACTER CODE POINTS]
+BFFFE-BFFFF [NONCHARACTER CODE POINTS]
+CFFFE-CFFFF [NONCHARACTER CODE POINTS]
+DFFFE-DFFFF [NONCHARACTER CODE POINTS]
+EFFFE-EFFFF [NONCHARACTER CODE POINTS]
+FFFFE-FFFFF [NONCHARACTER CODE POINTS]
+10FFFE-10FFFF  [NONCHARACTER CODE POINTS]
+
+5.6 Surrogate codes
+
+The following are permanently reserved for use as surrogate code values
+in the UTF-16 encoding, will never be assigned to characters and are
+therefore prohibited:
+
+D800-DFFF   [SURROGATE CODES]
+
+5.7 Inappropriate for plain text
+
+The following characters should not appear in regular text.
+
+FFF9        INTERLINEAR ANNOTATION ANCHOR
+FFFA        INTERLINEAR ANNOTATION SEPARATOR
+FFFB        INTERLINEAR ANNOTATION TERMINATOR
+FFFC        OBJECT REPLACEMENT CHARACTER
+
+5.8 Inappropriate for domain names
+
+The ideographic description characters allow different sequences of
+characters to be rendered the same way, which makes them inappropriate
+for host names that must have a single canonical order.
+
+2FF0-2FFF   IDEOGRAPHIC DESCRIPTION CHARACTERS
+
+5.9 Change display properties
+
+The following characters, some of which are deprecated in ISO 10646,
+can cause changes in display or the order in which characters appear
+when rendered.
+
+200E        LEFT-TO-RIGHT MARK
+200F        RIGHT-TO-LEFT MARK
+202A        LEFT-TO-RIGHT EMBEDDING
+202B        RIGHT-TO-LEFT EMBEDDING
+202C        POP DIRECTIONAL FORMATTING
+202D        LEFT-TO-RIGHT OVERRIDE
+202E        RIGHT-TO-LEFT OVERRIDE
+206A        INHIBIT SYMMETRIC SWAPPING
+206B        ACTIVATE SYMMETRIC SWAPPING
+206C        INHIBIT ARABIC FORM SHAPING
+206D        ACTIVATE ARABIC FORM SHAPING
+206E        NATIONAL DIGIT SHAPES
+206F        NOMINAL DIGIT SHAPES
+
+
+6. Unassigned Characters
+
+All characters not yet assigned in [ISO10646] are called "unassigned
+characters". Authoritative name servers MUST NOT have internationalized
+name parts that contain any unassigned characters. DNS requests MAY
+contain name parts that contain unassigned characters. Note that this is
+the only part of this document where the requirements for queries
+differs from the requirements for names in DNS zones.
+
+Using two different policies for where unassigned characters can appear
+in the DNS prevents the need for versioning the IDNprotocol [IDNrev].
+This is very useful since it makes the overall processing simpler and do
+not impose a "protocol" to handle versioning. It is expected that ISO
+10646 will be updated fairly frequently; recently, it has happened
+approximately once a year. Each time a new version of ISO 10646 appears,
+a new version of this document can be created. Some end users will want
+to use the new characters as soon as they are defined.
+
+The list of unassigned characters can be found in Appendix G of this
+document. The list in Appendix G MUST be used by implementations of this
+specification. If there are any discrepancies between the list in
+Appendix G and the ISO 10646 specification, the list Appendix G always
+takes precedence.
+
+Due to the way that versioning is handled in this section, host names
+that are embedded in structures that cannot be changed (such as the
+signed parts of digital certificates) MUST NOT have internationalized
+name parts that contain any unassigned characters.
+
+6.1 Categories of characters
+
+Each character in ISO 10646 can be categorized by how it acts in
+the process described in earlier sections of this document:
+
+AO      Characters that may be in the output
+
+MN      Characters that cannot be in the output because they are
+          mapped to nothing or never appear as output from
+          normalization
+
+D       Characters that cannot be in the output because they are
+          disallowed in the prohibition step
+
+U       Unassigned characters
+
+A subsequent version of this document that references a newer version of
+ISO 10646 with new characters will inherently have some characters move
+from category U to either D, MN, or AO. For backwards compatibility, no
+future version of this document will move characters from any other
+category. That is, no current AO, MN, or D characters will ever change
+to a different category.
+
+Authoritative name servers MUST NOT contain any name that has characters
+outside of AO for the latest version of this document. That is, they are
+forbidden to contain any IDN names containing characters from the MN, D,
+or U categories.
+
+Applications creating name queries MUST treat U code points as if they
+were AO when preparing the name parts according to this document. Those
+applications MAY optionally have a preprocess that provide stricter
+checks: treating unassigned characters in the input as errors, or
+warning the user about the fact that the character is unassigned in the
+version of this document that the software is based on; such a choice is
+a local matter for the software.
+
+Non-authoritative DNS servers MAY reject names that contain characters
+that are in categories MN or D for the version of this document that
+they implement, but MUST NOT reject names because they contain name
+parts with characters from category U.
+
+6.2 Reasons for difference between authoritative servers and requests
+
+Different software using different versions of this document need to
+interoperate with maximal compatibility. The scheme described in this
+section (authoritative name servers MUST NOT use unassigned characters,
+requests MAY include unassigned characters) allows that compatibility
+without introducing any known security or interoperability issues.
+
+The list below shows what happens if a request contains a character from
+category U that is allowed in a newer version of this document. The
+request either resolves to the domain name that was intended, or
+resolves to no domain at all. In this list, the request comes from an
+application using version "oldVersion" of this document, the
+authoritative name server is using version "newVersion" of this
+document, and the character X was in category U on oldVersion, and has
+changed category to AO, MN, or D. There are 3 possible scenarios:
+
+1. X becomes AO -- In newVersion, X is in category AO. Because the
+application passed X through, it gets back correct data from the
+authoritative name server. There is one exceptional case, where X is a
+combining mark.
+
+The order of combining marks is normalized, so if another combining mark
+Y has a lower combining class than X then XY will be put in the
+canonical order YX. (Unassigned characters are never reordered, so this
+doesn't happen in oldVersion). If the request contains YX, the request
+will get correct data from the authoritative name server. However, no
+domain name can be registered with XY, so a request with XY will get a
+"no such host" error.
+
+2. X becomes MN -- In newVersion, X is normalized to character "nX" and
+therefore X is now put in category MN. This cannot exist in any domain
+name, so any request containing X will get back a "no such host" error.
+Note, however, if the request had contained the letter nX, it would have
+gotten back correct data.
+
+3. X becomes D -- In newVersion, X is in category MN. This cannot exist
+in any domain name, so any request containing X will get back a "no such
+host" error.
+
+In none of the cases does the request get data for a host name other
+than the one it actually wanted.
+
+The processing in this document is always stable. If a string S is the
+result of processing on newVersion, then it will remain the same when
+processed on oldVersion.
+
+There is always a way for the application to get the correct data from
+the authoritative name server. For example, suppose that <ALPHA> was
+unassigned in oldVersion, and that it is assigned in newVersion, but
+case-folded to <alpha>. As long as the application supplies strings
+containing <alpha> instead of <ALPHA>, the correct data will be
+returned. Because the processing is stable, a different application
+running newVersion can pass a processed host name to the application
+running oldVersion. It will only contain <alpha>, and will return the
+correct results from the authoritative name server.
+
+6.3 Versions of applications and authoritative name servers
+
+Another way to see that this versioning system works is to compare what
+happens when an application uses a newer or older version of this
+document.
+
+Newer application -- Suppose that a application or intermediary DNS
+server is using version newVersion and the authoritative name server is
+using version oldVersion. This case is simple: there will be no names on
+the server that cannot be accessed by the application because the
+resolver uses a superset of the code points accepted by the server.
+
+Newer server -- Suppose that an application or intermediary DNS server
+is using oldVersion and the authoritative name server is using
+newVersion. Because the application passed through any unassigned
+characters, the user can access names on the server that use characters
+in newVersion. No names on the site can have characters that are
+unassigned in newVersion, since that is illegal. In this case, the
+application has to enter the unassigned characters in the correct order,
+and has to use unassigned characters that would make it through both the
+mapping and the normalization steps.
+
+
+7. Security Considerations
+
+Much of the security of the Internet relies on the DNS. Thus, any change
+to the characteristics of the DNS can change the security of much of the
+Internet.
+
+Host names are used by users to connect to Internet servers. The
+security of the Internet would be compromised if a user entering a
+single internationalized name could be connected to different servers
+based on different interpretations of the internationalized host name.
+
+Current applications may assume that the characters allowed in host
+names will always be the same as they are in [STD13]. This document
+vastly increases the number of characters available in host names. Every
+program that uses "special" characters in conjunction with host names
+may be vulnerable to attack based on the new characters allowed by this
+specification.
+
+
+8. References
+
+[CharModel] Unicode Technical Report;17, Character Model.
+<http://www.unicode.org/unicode/reports/tr17/>.
+
+[Glossary] Unicode Glossary, <http://www.unicode.org/glossary/>.
+
+[IDNComp] Paul Hoffman, "Comparison of Internationalized Domain Name
+Proposals", draft-ietf-idn-compare
+
+[IDNReq] James Seng, "Requirements of Internationalized Domain Names",
+draft-ietf-idn-requirement
+
+[IDNRev] Marc Blanchet, "Handling versions of internationalized domain
+names protocols", draft-ietf-idn-version
+
+[ISO10646] ISO/IEC 10646-1:2000. International Standard -- Information
+technology -- Universal Multiple-Octet Coded Character Set (UCS) -- Part
+1: Architecture and Basic Multilingual Plane.
+
+[Normalize] Character Normalization in IETF Protocols,
+draft-duerst-i18n-norm-03
+
+[RFC2119] Scott Bradner, "Key words for use in RFCs to Indicate
+Requirement Levels", March 1997, RFC 2119.
+
+[RFC2396] Tim Berners-Lee, et. al., "Uniform Resource Identifiers (URI):
+Generic Syntax", August 1998, RFC 2396.
+
+[RFC2732] Robert Hinden, et. al., Format for Literal IPv6 Addresses in
+URL's, December 1999, RFC 2732.
+
+[STD13] Paul Mockapetris, "Domain names - implementation and
+specification", November 1987, STD 13 (RFC 1034 and 1035).
+
+[Unicode3] The Unicode Consortium, "The Unicode Standard -- Version
+3.0", ISBN 0-201-61633-5. Described at
+<http://www.unicode.org/unicode/standard/versions/Unicode3.0.html>.
+
+[UTR15] Mark Davis and Martin Duerst. Unicode Normalization Forms.
+Unicode Technical Report;15.
+<http://www.unicode.org/unicode/reports/tr15/>.
+
+[UTR21] Mark Davis. Case Mappings. Unicode Technical Report;21.
+<http://www.unicode.org/unicode/reports/tr21/>.
+
+
+A. Acknowledgements
+
+Many people from the IETF IDN Working Group and the Unicode Technical
+Committee contributed ideas that went into the first draft of this
+document. Mark Davis and Patrik Faltstrom were particularly helpful in
+some of the ideas, such as the versioning description.
+
+The IDN namprep design team made many useful changes to the first
+draft. That team and its advisors include:
+
+Asmus Freytag
+Cathy Wissink
+Francois Yergeau
+James Seng
+Marc Blanchet
+Mark Davis
+Martin Duerst
+Patrik Faltstrom
+Paul Hoffman
+
+Additional significant improvements were proposed by:
+
+Jonathan Rosenne
+
+
+B. Differences Between -00 and -01 Drafts
+
+Throughout: Changed "canonicalize" to "normalize". Removed the
+normative references to ISO 10646.
+
+1.1: Clarified the second paragraph and added the third.
+
+1.2: Removed the IDN summary because we have diverged from the
+comparison draft significantly.
+
+1.3: Removed the open issues list.
+
+2: Removed the references to the parts of IDNComp.
+
+2.1: Removed the section on where preparation happens.
+
+2.2: Reversed the order of the middle three steps.
+
+3, 4, and 5: Changed the order to match the new ordering.
+
+4: Added the description of the design goals for one-to-none vs.
+prohibition. Changed the table on which case mapping is based. Pretty
+much changed the whole section.
+
+5: Removed many characters. Two reasons were to remove the ones that now
+get corrected by NFKC, and removed the ones that "looked like" other
+forbidden characters.
+
+5.2: Added and removed various characters.
+
+5.3: Added higher-plane private use characters.
+
+5.5: Added non-character code points.
+
+5.6: Changed "surrogate characters" to "surrogate codes" and corrected
+the description of why they are prohibited.
+
+6: Replaced future IANA description with new versioning proposal.
+
+7: Added third paragraph.
+
+8: Added [CharModel] and [Glossary]. Updated the non-normative
+reference for ISO 10646.
+
+A: Added names of commenters.
+
+C: Removed the IANA Considerations because we are not sure we will
+we have any.
+
+E, F, G: Added the long appendicies at the end of the document.
+
+
+C. IANA Considerations
+
+[[[ We probably won't have any. ]]]
+
+
+D. Author Contact Information
+
+Paul Hoffman
+Internet Mail Consortium and VPN Consortium
+127 Segre Place
+Santa Cruz, CA  95060 USA
+paul.hoffman@imc.org and paul.hoffman@vpnc.org
+
+Marc Blanchet
+Viagenie inc.
+2875 boul. Laurier, bur. 300
+Ste-Foy, Quebec, Canada, G1V 2M2
+Marc.Blanchet@viagenie.qc.ca
+
+
+E. Mapping Table
+
+The following is the mapping table from Section 3. The table has three
+columns:
+- the character that is mapped from
+- the zero or more characters that it is mapped to
+- the reason for the mapping
+The columns are separated by semicolons. Note that the second column may
+be empty, or it may have one character, or it may have more than one
+character, with each character separated by a space.
+
+0041; 0061; Case map
+0042; 0062; Case map
+0043; 0063; Case map
+0044; 0064; Case map
+0045; 0065; Case map
+0046; 0066; Case map
+0047; 0067; Case map
+0048; 0068; Case map
+0049; 0069; Case map
+004A; 006A; Case map
+004B; 006B; Case map
+004C; 006C; Case map
+004D; 006D; Case map
+004E; 006E; Case map
+004F; 006F; Case map
+0050; 0070; Case map
+0051; 0071; Case map
+0052; 0072; Case map
+0053; 0073; Case map
+0054; 0074; Case map
+0055; 0075; Case map
+0056; 0076; Case map
+0057; 0077; Case map
+0058; 0078; Case map
+0059; 0079; Case map
+005A; 007A; Case map
+00AD; ; Map out
+00B5; 03BC; Case map
+00C0; 00E0; Case map
+00C1; 00E1; Case map
+00C2; 00E2; Case map
+00C3; 00E3; Case map
+00C4; 00E4; Case map
+00C5; 00E5; Case map
+00C6; 00E6; Case map
+00C7; 00E7; Case map
+00C8; 00E8; Case map
+00C9; 00E9; Case map
+00CA; 00EA; Case map
+00CB; 00EB; Case map
+00CC; 00EC; Case map
+00CD; 00ED; Case map
+00CE; 00EE; Case map
+00CF; 00EF; Case map
+00D0; 00F0; Case map
+00D1; 00F1; Case map
+00D2; 00F2; Case map
+00D3; 00F3; Case map
+00D4; 00F4; Case map
+00D5; 00F5; Case map
+00D6; 00F6; Case map
+00D8; 00F8; Case map
+00D9; 00F9; Case map
+00DA; 00FA; Case map
+00DB; 00FB; Case map
+00DC; 00FC; Case map
+00DD; 00FD; Case map
+00DE; 00FE; Case map
+00DF; 0073 0073; Case map
+0100; 0101; Case map
+0102; 0103; Case map
+0104; 0105; Case map
+0106; 0107; Case map
+0108; 0109; Case map
+010A; 010B; Case map
+010C; 010D; Case map
+010E; 010F; Case map
+0110; 0111; Case map
+0112; 0113; Case map
+0114; 0115; Case map
+0116; 0117; Case map
+0118; 0119; Case map
+011A; 011B; Case map
+011C; 011D; Case map
+011E; 011F; Case map
+0120; 0121; Case map
+0122; 0123; Case map
+0124; 0125; Case map
+0126; 0127; Case map
+0128; 0129; Case map
+012A; 012B; Case map
+012C; 012D; Case map
+012E; 012F; Case map
+0130; 0069; Case map
+0131; 0069; Case map
+0132; 0133; Case map
+0134; 0135; Case map
+0136; 0137; Case map
+0139; 013A; Case map
+013B; 013C; Case map
+013D; 013E; Case map
+013F; 0140; Case map
+0141; 0142; Case map
+0143; 0144; Case map
+0145; 0146; Case map
+0147; 0148; Case map
+0149; 02BC 006E; Case map
+014A; 014B; Case map
+014C; 014D; Case map
+014E; 014F; Case map
+0150; 0151; Case map
+0152; 0153; Case map
+0154; 0155; Case map
+0156; 0157; Case map
+0158; 0159; Case map
+015A; 015B; Case map
+015C; 015D; Case map
+015E; 015F; Case map
+0160; 0161; Case map
+0162; 0163; Case map
+0164; 0165; Case map
+0166; 0167; Case map
+0168; 0169; Case map
+016A; 016B; Case map
+016C; 016D; Case map
+016E; 016F; Case map
+0170; 0171; Case map
+0172; 0173; Case map
+0174; 0175; Case map
+0176; 0177; Case map
+0178; 00FF; Case map
+0179; 017A; Case map
+017B; 017C; Case map
+017D; 017E; Case map
+017F; 0073; Case map
+0181; 0253; Case map
+0182; 0183; Case map
+0184; 0185; Case map
+0186; 0254; Case map
+0187; 0188; Case map
+0189; 0256; Case map
+018A; 0257; Case map
+018B; 018C; Case map
+018E; 01DD; Case map
+018F; 0259; Case map
+0190; 025B; Case map
+0191; 0192; Case map
+0193; 0260; Case map
+0194; 0263; Case map
+0196; 0269; Case map
+0197; 0268; Case map
+0198; 0199; Case map
+019C; 026F; Case map
+019D; 0272; Case map
+019F; 0275; Case map
+01A0; 01A1; Case map
+01A2; 01A3; Case map
+01A4; 01A5; Case map
+01A6; 0280; Case map
+01A7; 01A8; Case map
+01A9; 0283; Case map
+01AC; 01AD; Case map
+01AE; 0288; Case map
+01AF; 01B0; Case map
+01B1; 028A; Case map
+01B2; 028B; Case map
+01B3; 01B4; Case map
+01B5; 01B6; Case map
+01B7; 0292; Case map
+01B8; 01B9; Case map
+01BC; 01BD; Case map
+01C4; 01C6; Case map
+01C5; 01C6; Case map
+01C7; 01C9; Case map
+01C8; 01C9; Case map
+01CA; 01CC; Case map
+01CB; 01CC; Case map
+01CD; 01CE; Case map
+01CF; 01D0; Case map
+01D1; 01D2; Case map
+01D3; 01D4; Case map
+01D5; 01D6; Case map
+01D7; 01D8; Case map
+01D9; 01DA; Case map
+01DB; 01DC; Case map
+01DE; 01DF; Case map
+01E0; 01E1; Case map
+01E2; 01E3; Case map
+01E4; 01E5; Case map
+01E6; 01E7; Case map
+01E8; 01E9; Case map
+01EA; 01EB; Case map
+01EC; 01ED; Case map
+01EE; 01EF; Case map
+01F0; 006A 030C; Case map
+01F1; 01F3; Case map
+01F2; 01F3; Case map
+01F4; 01F5; Case map
+01F6; 0195; Case map
+01F7; 01BF; Case map
+01F8; 01F9; Case map
+01FA; 01FB; Case map
+01FC; 01FD; Case map
+01FE; 01FF; Case map
+0200; 0201; Case map
+0202; 0203; Case map
+0204; 0205; Case map
+0206; 0207; Case map
+0208; 0209; Case map
+020A; 020B; Case map
+020C; 020D; Case map
+020E; 020F; Case map
+0210; 0211; Case map
+0212; 0213; Case map
+0214; 0215; Case map
+0216; 0217; Case map
+0218; 0219; Case map
+021A; 021B; Case map
+021C; 021D; Case map
+021E; 021F; Case map
+0222; 0223; Case map
+0224; 0225; Case map
+0226; 0227; Case map
+0228; 0229; Case map
+022A; 022B; Case map
+022C; 022D; Case map
+022E; 022F; Case map
+0230; 0231; Case map
+0232; 0233; Case map
+0345; 03B9; Case map
+037A; 0020 03B9; Additional folding
+0386; 03AC; Case map
+0388; 03AD; Case map
+0389; 03AE; Case map
+038A; 03AF; Case map
+038C; 03CC; Case map
+038E; 03CD; Case map
+038F; 03CE; Case map
+0390; 03B9 0308 0301; Case map
+0391; 03B1; Case map
+0392; 03B2; Case map
+0393; 03B3; Case map
+0394; 03B4; Case map
+0395; 03B5; Case map
+0396; 03B6; Case map
+0397; 03B7; Case map
+0398; 03B8; Case map
+0399; 03B9; Case map
+039A; 03BA; Case map
+039B; 03BB; Case map
+039C; 03BC; Case map
+039D; 03BD; Case map
+039E; 03BE; Case map
+039F; 03BF; Case map
+03A0; 03C0; Case map
+03A1; 03C1; Case map
+03A3; 03C2; Case map
+03A4; 03C4; Case map
+03A5; 03C5; Case map
+03A6; 03C6; Case map
+03A7; 03C7; Case map
+03A8; 03C8; Case map
+03A9; 03C9; Case map
+03AA; 03CA; Case map
+03AB; 03CB; Case map
+03B0; 03C5 0308 0301; Case map
+03C2; 03C2; Case map
+03C3; 03C2; Case map
+03D0; 03B2; Case map
+03D1; 03B8; Case map
+03D2; 03C5; Additional folding
+03D3; 03CD; Additional folding
+03D4; 03CB; Additional folding
+03D5; 03C6; Case map
+03D6; 03C0; Case map
+03DA; 03DB; Case map
+03DC; 03DD; Case map
+03DE; 03DF; Case map
+03E0; 03E1; Case map
+03E2; 03E3; Case map
+03E4; 03E5; Case map
+03E6; 03E7; Case map
+03E8; 03E9; Case map
+03EA; 03EB; Case map
+03EC; 03ED; Case map
+03EE; 03EF; Case map
+03F0; 03BA; Case map
+03F1; 03C1; Case map
+03F2; 03C2; Case map
+0400; 0450; Case map
+0401; 0451; Case map
+0402; 0452; Case map
+0403; 0453; Case map
+0404; 0454; Case map
+0405; 0455; Case map
+0406; 0456; Case map
+0407; 0457; Case map
+0408; 0458; Case map
+0409; 0459; Case map
+040A; 045A; Case map
+040B; 045B; Case map
+040C; 045C; Case map
+040D; 045D; Case map
+040E; 045E; Case map
+040F; 045F; Case map
+0410; 0430; Case map
+0411; 0431; Case map
+0412; 0432; Case map
+0413; 0433; Case map
+0414; 0434; Case map
+0415; 0435; Case map
+0416; 0436; Case map
+0417; 0437; Case map
+0418; 0438; Case map
+0419; 0439; Case map
+041A; 043A; Case map
+041B; 043B; Case map
+041C; 043C; Case map
+041D; 043D; Case map
+041E; 043E; Case map
+041F; 043F; Case map
+0420; 0440; Case map
+0421; 0441; Case map
+0422; 0442; Case map
+0423; 0443; Case map
+0424; 0444; Case map
+0425; 0445; Case map
+0426; 0446; Case map
+0427; 0447; Case map
+0428; 0448; Case map
+0429; 0449; Case map
+042A; 044A; Case map
+042B; 044B; Case map
+042C; 044C; Case map
+042D; 044D; Case map
+042E; 044E; Case map
+042F; 044F; Case map
+0460; 0461; Case map
+0462; 0463; Case map
+0464; 0465; Case map
+0466; 0467; Case map
+0468; 0469; Case map
+046A; 046B; Case map
+046C; 046D; Case map
+046E; 046F; Case map
+0470; 0471; Case map
+0472; 0473; Case map
+0474; 0475; Case map
+0476; 0477; Case map
+0478; 0479; Case map
+047A; 047B; Case map
+047C; 047D; Case map
+047E; 047F; Case map
+0480; 0481; Case map
+048C; 048D; Case map
+048E; 048F; Case map
+0490; 0491; Case map
+0492; 0493; Case map
+0494; 0495; Case map
+0496; 0497; Case map
+0498; 0499; Case map
+049A; 049B; Case map
+049C; 049D; Case map
+049E; 049F; Case map
+04A0; 04A1; Case map
+04A2; 04A3; Case map
+04A4; 04A5; Case map
+04A6; 04A7; Case map
+04A8; 04A9; Case map
+04AA; 04AB; Case map
+04AC; 04AD; Case map
+04AE; 04AF; Case map
+04B0; 04B1; Case map
+04B2; 04B3; Case map
+04B4; 04B5; Case map
+04B6; 04B7; Case map
+04B8; 04B9; Case map
+04BA; 04BB; Case map
+04BC; 04BD; Case map
+04BE; 04BF; Case map
+04C1; 04C2; Case map
+04C3; 04C4; Case map
+04C7; 04C8; Case map
+04CB; 04CC; Case map
+04D0; 04D1; Case map
+04D2; 04D3; Case map
+04D4; 04D5; Case map
+04D6; 04D7; Case map
+04D8; 04D9; Case map
+04DA; 04DB; Case map
+04DC; 04DD; Case map
+04DE; 04DF; Case map
+04E0; 04E1; Case map
+04E2; 04E3; Case map
+04E4; 04E5; Case map
+04E6; 04E7; Case map
+04E8; 04E9; Case map
+04EA; 04EB; Case map
+04EC; 04ED; Case map
+04EE; 04EF; Case map
+04F0; 04F1; Case map
+04F2; 04F3; Case map
+04F4; 04F5; Case map
+04F8; 04F9; Case map
+0531; 0561; Case map
+0532; 0562; Case map
+0533; 0563; Case map
+0534; 0564; Case map
+0535; 0565; Case map
+0536; 0566; Case map
+0537; 0567; Case map
+0538; 0568; Case map
+0539; 0569; Case map
+053A; 056A; Case map
+053B; 056B; Case map
+053C; 056C; Case map
+053D; 056D; Case map
+053E; 056E; Case map
+053F; 056F; Case map
+0540; 0570; Case map
+0541; 0571; Case map
+0542; 0572; Case map
+0543; 0573; Case map
+0544; 0574; Case map
+0545; 0575; Case map
+0546; 0576; Case map
+0547; 0577; Case map
+0548; 0578; Case map
+0549; 0579; Case map
+054A; 057A; Case map
+054B; 057B; Case map
+054C; 057C; Case map
+054D; 057D; Case map
+054E; 057E; Case map
+054F; 057F; Case map
+0550; 0580; Case map
+0551; 0581; Case map
+0552; 0582; Case map
+0553; 0583; Case map
+0554; 0584; Case map
+0555; 0585; Case map
+0556; 0586; Case map
+0587; 0565 0582; Case map
+1806; ; Map out
+180B; ; Map out
+180C; ; Map out
+180D; ; Map out
+1E00; 1E01; Case map
+1E02; 1E03; Case map
+1E04; 1E05; Case map
+1E06; 1E07; Case map
+1E08; 1E09; Case map
+1E0A; 1E0B; Case map
+1E0C; 1E0D; Case map
+1E0E; 1E0F; Case map
+1E10; 1E11; Case map
+1E12; 1E13; Case map
+1E14; 1E15; Case map
+1E16; 1E17; Case map
+1E18; 1E19; Case map
+1E1A; 1E1B; Case map
+1E1C; 1E1D; Case map
+1E1E; 1E1F; Case map
+1E20; 1E21; Case map
+1E22; 1E23; Case map
+1E24; 1E25; Case map
+1E26; 1E27; Case map
+1E28; 1E29; Case map
+1E2A; 1E2B; Case map
+1E2C; 1E2D; Case map
+1E2E; 1E2F; Case map
+1E30; 1E31; Case map
+1E32; 1E33; Case map
+1E34; 1E35; Case map
+1E36; 1E37; Case map
+1E38; 1E39; Case map
+1E3A; 1E3B; Case map
+1E3C; 1E3D; Case map
+1E3E; 1E3F; Case map
+1E40; 1E41; Case map
+1E42; 1E43; Case map
+1E44; 1E45; Case map
+1E46; 1E47; Case map
+1E48; 1E49; Case map
+1E4A; 1E4B; Case map
+1E4C; 1E4D; Case map
+1E4E; 1E4F; Case map
+1E50; 1E51; Case map
+1E52; 1E53; Case map
+1E54; 1E55; Case map
+1E56; 1E57; Case map
+1E58; 1E59; Case map
+1E5A; 1E5B; Case map
+1E5C; 1E5D; Case map
+1E5E; 1E5F; Case map
+1E60; 1E61; Case map
+1E62; 1E63; Case map
+1E64; 1E65; Case map
+1E66; 1E67; Case map
+1E68; 1E69; Case map
+1E6A; 1E6B; Case map
+1E6C; 1E6D; Case map
+1E6E; 1E6F; Case map
+1E70; 1E71; Case map
+1E72; 1E73; Case map
+1E74; 1E75; Case map
+1E76; 1E77; Case map
+1E78; 1E79; Case map
+1E7A; 1E7B; Case map
+1E7C; 1E7D; Case map
+1E7E; 1E7F; Case map
+1E80; 1E81; Case map
+1E82; 1E83; Case map
+1E84; 1E85; Case map
+1E86; 1E87; Case map
+1E88; 1E89; Case map
+1E8A; 1E8B; Case map
+1E8C; 1E8D; Case map
+1E8E; 1E8F; Case map
+1E90; 1E91; Case map
+1E92; 1E93; Case map
+1E94; 1E95; Case map
+1E96; 0068 0331; Case map
+1E97; 0074 0308; Case map
+1E98; 0077 030A; Case map
+1E99; 0079 030A; Case map
+1E9A; 0061 02BE; Case map
+1E9B; 1E61; Case map
+1EA0; 1EA1; Case map
+1EA2; 1EA3; Case map
+1EA4; 1EA5; Case map
+1EA6; 1EA7; Case map
+1EA8; 1EA9; Case map
+1EAA; 1EAB; Case map
+1EAC; 1EAD; Case map
+1EAE; 1EAF; Case map
+1EB0; 1EB1; Case map
+1EB2; 1EB3; Case map
+1EB4; 1EB5; Case map
+1EB6; 1EB7; Case map
+1EB8; 1EB9; Case map
+1EBA; 1EBB; Case map
+1EBC; 1EBD; Case map
+1EBE; 1EBF; Case map
+1EC0; 1EC1; Case map
+1EC2; 1EC3; Case map
+1EC4; 1EC5; Case map
+1EC6; 1EC7; Case map
+1EC8; 1EC9; Case map
+1ECA; 1ECB; Case map
+1ECC; 1ECD; Case map
+1ECE; 1ECF; Case map
+1ED0; 1ED1; Case map
+1ED2; 1ED3; Case map
+1ED4; 1ED5; Case map
+1ED6; 1ED7; Case map
+1ED8; 1ED9; Case map
+1EDA; 1EDB; Case map
+1EDC; 1EDD; Case map
+1EDE; 1EDF; Case map
+1EE0; 1EE1; Case map
+1EE2; 1EE3; Case map
+1EE4; 1EE5; Case map
+1EE6; 1EE7; Case map
+1EE8; 1EE9; Case map
+1EEA; 1EEB; Case map
+1EEC; 1EED; Case map
+1EEE; 1EEF; Case map
+1EF0; 1EF1; Case map
+1EF2; 1EF3; Case map
+1EF4; 1EF5; Case map
+1EF6; 1EF7; Case map
+1EF8; 1EF9; Case map
+1F08; 1F00; Case map
+1F09; 1F01; Case map
+1F0A; 1F02; Case map
+1F0B; 1F03; Case map
+1F0C; 1F04; Case map
+1F0D; 1F05; Case map
+1F0E; 1F06; Case map
+1F0F; 1F07; Case map
+1F18; 1F10; Case map
+1F19; 1F11; Case map
+1F1A; 1F12; Case map
+1F1B; 1F13; Case map
+1F1C; 1F14; Case map
+1F1D; 1F15; Case map
+1F28; 1F20; Case map
+1F29; 1F21; Case map
+1F2A; 1F22; Case map
+1F2B; 1F23; Case map
+1F2C; 1F24; Case map
+1F2D; 1F25; Case map
+1F2E; 1F26; Case map
+1F2F; 1F27; Case map
+1F38; 1F30; Case map
+1F39; 1F31; Case map
+1F3A; 1F32; Case map
+1F3B; 1F33; Case map
+1F3C; 1F34; Case map
+1F3D; 1F35; Case map
+1F3E; 1F36; Case map
+1F3F; 1F37; Case map
+1F48; 1F40; Case map
+1F49; 1F41; Case map
+1F4A; 1F42; Case map
+1F4B; 1F43; Case map
+1F4C; 1F44; Case map
+1F4D; 1F45; Case map
+1F50; 03C5 0313; Case map
+1F52; 03C5 0313 0300; Case map
+1F54; 03C5 0313 0301; Case map
+1F56; 03C5 0313 0342; Case map
+1F59; 1F51; Case map
+1F5B; 1F53; Case map
+1F5D; 1F55; Case map
+1F5F; 1F57; Case map
+1F68; 1F60; Case map
+1F69; 1F61; Case map
+1F6A; 1F62; Case map
+1F6B; 1F63; Case map
+1F6C; 1F64; Case map
+1F6D; 1F65; Case map
+1F6E; 1F66; Case map
+1F6F; 1F67; Case map
+1F80; 1F00 03B9; Case map
+1F81; 1F01 03B9; Case map
+1F82; 1F02 03B9; Case map
+1F83; 1F03 03B9; Case map
+1F84; 1F04 03B9; Case map
+1F85; 1F05 03B9; Case map
+1F86; 1F06 03B9; Case map
+1F87; 1F07 03B9; Case map
+1F88; 1F00 03B9; Case map
+1F89; 1F01 03B9; Case map
+1F8A; 1F02 03B9; Case map
+1F8B; 1F03 03B9; Case map
+1F8C; 1F04 03B9; Case map
+1F8D; 1F05 03B9; Case map
+1F8E; 1F06 03B9; Case map
+1F8F; 1F07 03B9; Case map
+1F90; 1F20 03B9; Case map
+1F91; 1F21 03B9; Case map
+1F92; 1F22 03B9; Case map
+1F93; 1F23 03B9; Case map
+1F94; 1F24 03B9; Case map
+1F95; 1F25 03B9; Case map
+1F96; 1F26 03B9; Case map
+1F97; 1F27 03B9; Case map
+1F98; 1F20 03B9; Case map
+1F99; 1F21 03B9; Case map
+1F9A; 1F22 03B9; Case map
+1F9B; 1F23 03B9; Case map
+1F9C; 1F24 03B9; Case map
+1F9D; 1F25 03B9; Case map
+1F9E; 1F26 03B9; Case map
+1F9F; 1F27 03B9; Case map
+1FA0; 1F60 03B9; Case map
+1FA1; 1F61 03B9; Case map
+1FA2; 1F62 03B9; Case map
+1FA3; 1F63 03B9; Case map
+1FA4; 1F64 03B9; Case map
+1FA5; 1F65 03B9; Case map
+1FA6; 1F66 03B9; Case map
+1FA7; 1F67 03B9; Case map
+1FA8; 1F60 03B9; Case map
+1FA9; 1F61 03B9; Case map
+1FAA; 1F62 03B9; Case map
+1FAB; 1F63 03B9; Case map
+1FAC; 1F64 03B9; Case map
+1FAD; 1F65 03B9; Case map
+1FAE; 1F66 03B9; Case map
+1FAF; 1F67 03B9; Case map
+1FB2; 1F70 03B9; Case map
+1FB3; 03B1 03B9; Case map
+1FB4; 03AC 03B9; Case map
+1FB6; 03B1 0342; Case map
+1FB7; 03B1 0342 03B9; Case map
+1FB8; 1FB0; Case map
+1FB9; 1FB1; Case map
+1FBA; 1F70; Case map
+1FBB; 1F71; Case map
+1FBC; 03B1 03B9; Case map
+1FBE; 03B9; Case map
+1FC2; 1F74 03B9; Case map
+1FC3; 03B7 03B9; Case map
+1FC4; 03AE 03B9; Case map
+1FC6; 03B7 0342; Case map
+1FC7; 03B7 0342 03B9; Case map
+1FC8; 1F72; Case map
+1FC9; 1F73; Case map
+1FCA; 1F74; Case map
+1FCB; 1F75; Case map
+1FCC; 03B7 03B9; Case map
+1FD2; 03B9 0308 0300; Case map
+1FD3; 03B9 0308 0301; Case map
+1FD6; 03B9 0342; Case map
+1FD7; 03B9 0308 0342; Case map
+1FD8; 1FD0; Case map
+1FD9; 1FD1; Case map
+1FDA; 1F76; Case map
+1FDB; 1F77; Case map
+1FE2; 03C5 0308 0300; Case map
+1FE3; 03C5 0308 0301; Case map
+1FE4; 03C1 0313; Case map
+1FE6; 03C5 0342; Case map
+1FE7; 03C5 0308 0342; Case map
+1FE8; 1FE0; Case map
+1FE9; 1FE1; Case map
+1FEA; 1F7A; Case map
+1FEB; 1F7B; Case map
+1FEC; 1FE5; Case map
+1FF2; 1F7C 03B9; Case map
+1FF3; 03C9 03B9; Case map
+1FF4; 03CE 03B9; Case map
+1FF6; 03C9 0342; Case map
+1FF7; 03C9 0342 03B9; Case map
+1FF8; 1F78; Case map
+1FF9; 1F79; Case map
+1FFA; 1F7C; Case map
+1FFB; 1F7D; Case map
+1FFC; 03C9 03B9; Case map
+200B; ; Map out
+200C; ; Map out
+200D; ; Map out
+20A8; 0072 0073; Additional folding
+2102; 0063; Additional folding
+2103; 00B0 0063; Additional folding
+2107; 025B; Additional folding
+2109; 00B0 0066; Additional folding
+210B; 0068; Additional folding
+210C; 0068; Additional folding
+210D; 0068; Additional folding
+2110; 0069; Additional folding
+2111; 0069; Additional folding
+2112; 006C; Additional folding
+2115; 006E; Additional folding
+2116; 006E 006F; Additional folding
+2119; 0070; Additional folding
+211A; 0071; Additional folding
+211B; 0072; Additional folding
+211C; 0072; Additional folding
+211D; 0072; Additional folding
+2120; 0073 006D; Additional folding
+2121; 0074 0065 006C; Additional folding
+2122; 0074 006D; Additional folding
+2124; 007A; Additional folding
+2126; 03C9; Case map
+2128; 007A; Additional folding
+212A; 006B; Case map
+212B; 00E5; Case map
+212C; 0062; Additional folding
+212D; 0063; Additional folding
+2130; 0065; Additional folding
+2131; 0066; Additional folding
+2133; 006D; Additional folding
+2160; 2170; Case map
+2161; 2171; Case map
+2162; 2172; Case map
+2163; 2173; Case map
+2164; 2174; Case map
+2165; 2175; Case map
+2166; 2176; Case map
+2167; 2177; Case map
+2168; 2178; Case map
+2169; 2179; Case map
+216A; 217A; Case map
+216B; 217B; Case map
+216C; 217C; Case map
+216D; 217D; Case map
+216E; 217E; Case map
+216F; 217F; Case map
+24B6; 24D0; Case map
+24B7; 24D1; Case map
+24B8; 24D2; Case map
+24B9; 24D3; Case map
+24BA; 24D4; Case map
+24BB; 24D5; Case map
+24BC; 24D6; Case map
+24BD; 24D7; Case map
+24BE; 24D8; Case map
+24BF; 24D9; Case map
+24C0; 24DA; Case map
+24C1; 24DB; Case map
+24C2; 24DC; Case map
+24C3; 24DD; Case map
+24C4; 24DE; Case map
+24C5; 24DF; Case map
+24C6; 24E0; Case map
+24C7; 24E1; Case map
+24C8; 24E2; Case map
+24C9; 24E3; Case map
+24CA; 24E4; Case map
+24CB; 24E5; Case map
+24CC; 24E6; Case map
+24CD; 24E7; Case map
+24CE; 24E8; Case map
+24CF; 24E9; Case map
+3371; 0068 0070 0061; Additional folding
+3373; 0061 0075; Additional folding
+3375; 006F 0076; Additional folding
+3380; 0070 0061; Additional folding
+3381; 006E 0061; Additional folding
+3382; 03BC 0061; Additional folding
+3383; 006D 0061; Additional folding
+3384; 006B 0061; Additional folding
+3385; 006B 0062; Additional folding
+3386; 006D 0062; Additional folding
+3387; 0067 0062; Additional folding
+338A; 0070 0066; Additional folding
+338B; 006E 0066; Additional folding
+338C; 03BC 0066; Additional folding
+3390; 0068 007A; Additional folding
+3391; 006B 0068 007A; Additional folding
+3392; 006D 0068 007A; Additional folding
+3393; 0067 0068 007A; Additional folding
+3394; 0074 0068 007A; Additional folding
+33A9; 0070 0061; Additional folding
+33AA; 006B 0070 0061; Additional folding
+33AB; 006D 0070 0061; Additional folding
+33AC; 0067 0070 0061; Additional folding
+33B4; 0070 0076; Additional folding
+33B5; 006E 0076; Additional folding
+33B6; 03BC 0076; Additional folding
+33B7; 006D 0076; Additional folding
+33B8; 006B 0076; Additional folding
+33B9; 006D 0076; Additional folding
+33BA; 0070 0077; Additional folding
+33BB; 006E 0077; Additional folding
+33BC; 03BC 0077; Additional folding
+33BD; 006D 0077; Additional folding
+33BE; 006B 0077; Additional folding
+33BF; 006D 0077; Additional folding
+33C0; 006B 03C9; Additional folding
+33C1; 006D 03C9; Additional folding
+33C3; 0062 0071; Additional folding
+33C6; 0063 2215 006B 0067; Additional folding
+33C7; 0063 006F 002E; Additional folding
+33C8; 0064 0062; Additional folding
+33C9; 0067 0079; Additional folding
+33CB; 0068 0070; Additional folding
+33CD; 006B 006B; Additional folding
+33CE; 006B 006D; Additional folding
+33D7; 0070 0068; Additional folding
+33D9; 0070 0070 006D; Additional folding
+33DA; 0070 0072; Additional folding
+33DC; 0073 0076; Additional folding
+33DD; 0077 0062; Additional folding
+FB00; 0066 0066; Case map
+FB01; 0066 0069; Case map
+FB02; 0066 006C; Case map
+FB03; 0066 0066 0069; Case map
+FB04; 0066 0066 006C; Case map
+FB05; 0073 0074; Case map
+FB06; 0073 0074; Case map
+FB13; 0574 0576; Case map
+FB14; 0574 0565; Case map
+FB15; 0574 056B; Case map
+FB16; 057E 0576; Case map
+FB17; 0574 056D; Case map
+FEFF; ; Map out
+FF21; FF41; Case map
+FF22; FF42; Case map
+FF23; FF43; Case map
+FF24; FF44; Case map
+FF25; FF45; Case map
+FF26; FF46; Case map
+FF27; FF47; Case map
+FF28; FF48; Case map
+FF29; FF49; Case map
+FF2A; FF4A; Case map
+FF2B; FF4B; Case map
+FF2C; FF4C; Case map
+FF2D; FF4D; Case map
+FF2E; FF4E; Case map
+FF2F; FF4F; Case map
+FF30; FF50; Case map
+FF31; FF51; Case map
+FF32; FF52; Case map
+FF33; FF53; Case map
+FF34; FF54; Case map
+FF35; FF55; Case map
+FF36; FF56; Case map
+FF37; FF57; Case map
+FF38; FF58; Case map
+FF39; FF59; Case map
+FF3A; FF5A; Case map
+
+
+F. Prohibited Character List
+
+0000-002C
+002E-002F
+003A-0040
+005B-0060
+007B-007F
+0080-009F
+00A0
+1680
+2000
+2001
+2002
+2003
+2004
+2005
+2006
+2007
+2008
+2009
+200A
+200B
+200E
+200F
+2028
+2029
+202A
+202B
+202C
+202D
+202E
+202F
+206A
+206B
+206C
+206D
+206E
+206F
+2FF0-2FFF
+3000
+D800-DFFF
+E000-F8FF
+FFF9
+FFFA
+FFFB
+FFFC
+FFFD
+FFFE-FFFF
+1FFFE-1FFFF
+2FFFE-2FFFF
+3FFFE-3FFFF
+4FFFE-4FFFF
+5FFFE-5FFFF
+6FFFE-6FFFF
+7FFFE-7FFFF
+8FFFE-8FFFF
+9FFFE-9FFFF
+AFFFE-AFFFF
+BFFFE-BFFFF
+CFFFE-CFFFF
+DFFFE-DFFFF
+EFFFE-EFFFF
+F0000-FFFFD
+FFFFE-FFFFF
+100000-10FFFD
+10FFFE-10FFFF
+
+NOTE WELL: Software that follows this specification that will be used to
+check names before they are put in authoritative name servers MUST add
+all unassigned characters to the list of characters that are prohibited.
+See Section 6 for more details.
+
+
+G. Unassigned Character List
+
+000220-000221
+000234-00024F
+0002AE-0002AF
+0002EF-0002FF
+00034F-00035F
+000363-000373
+000376-000379
+00037B-00037D
+00037F-000383
+00038B
+00038D
+0003A2
+0003CF
+0003D8-0003D9
+0003F6-0003FF
+000487
+00048A-00048B
+0004C5-0004C6
+0004C9-0004CA
+0004CD-0004CF
+0004F6-0004F7
+0004FA-000530
+000557-000558
+000560
+000588
+00058B-000590
+0005A2
+0005BA
+0005C5-0005CF
+0005EB-0005EF
+0005F5-00060B
+00060D-00061A
+00061C-00061E
+000620
+00063B-00063F
+000656-00065F
+00066E-00066F
+0006EE-0006EF
+0006FF
+00070E
+00072D-00072F
+00074B-00077F
+0007B1-000900
+000904
+00093A-00093B
+00094E-00094F
+000955-000957
+000971-000980
+000984
+00098D-00098E
+000991-000992
+0009A9
+0009B1
+0009B3-0009B5
+0009BA-0009BB
+0009BD
+0009C5-0009C6
+0009C9-0009CA
+0009CE-0009D6
+0009D8-0009DB
+0009DE
+0009E4-0009E5
+0009FB-000A01
+000A03-000A04
+000A0B-000A0E
+000A11-000A12
+000A29
+000A31
+000A34
+000A37
+000A3A-000A3B
+000A3D
+000A43-000A46
+000A49-000A4A
+000A4E-000A58
+000A5D
+000A5F-000A65
+000A75-000A80
+000A84
+000A8C
+000A8E
+000A92
+000AA9
+000AB1
+000AB4
+000ABA-000ABB
+000AC6
+000ACA
+000ACE-000ACF
+000AD1-000ADF
+000AE1-000AE5
+000AF0-000B00
+000B04
+000B0D-000B0E
+000B11-000B12
+000B29
+000B31
+000B34-000B35
+000B3A-000B3B
+000B44-000B46
+000B49-000B4A
+000B4E-000B55
+000B58-000B5B
+000B5E
+000B62-000B65
+000B71-000B81
+000B84
+000B8B-000B8D
+000B91
+000B96-000B98
+000B9B
+000B9D
+000BA0-000BA2
+000BA5-000BA7
+000BAB-000BAD
+000BB6
+000BBA-000BBD
+000BC3-000BC5
+000BC9
+000BCE-000BD6
+000BD8-000BE6
+000BF3-000C00
+000C04
+000C0D
+000C11
+000C29
+000C34
+000C3A-000C3D
+000C45
+000C49
+000C4E-000C54
+000C57-000C5F
+000C62-000C65
+000C70-000C81
+000C84
+000C8D
+000C91
+000CA9
+000CB4
+000CBA-000CBD
+000CC5
+000CC9
+000CCE-000CD4
+000CD7-000CDD
+000CDF
+000CE2-000CE5
+000CF0-000D01
+000D04
+000D0D
+000D11
+000D29
+000D3A-000D3D
+000D44-000D45
+000D49
+000D4E-000D56
+000D58-000D5F
+000D62-000D65
+000D70-000D81
+000D84
+000D97-000D99
+000DB2
+000DBC
+000DBE-000DBF
+000DC7-000DC9
+000DCB-000DCE
+000DD5
+000DD7
+000DE0-000DF1
+000DF5-000E00
+000E3B-000E3E
+000E5C-000E80
+000E83
+000E85-000E86
+000E89
+000E8B-000E8C
+000E8E-000E93
+000E98
+000EA0
+000EA4
+000EA6
+000EA8-000EA9
+000EAC
+000EBA
+000EBE-000EBF
+000EC5
+000EC7
+000ECE-000ECF
+000EDA-000EDB
+000EDE-000EFF
+000F48
+000F6B-000F70
+000F8C-000F8F
+000F98
+000FBD
+000FCD-000FCE
+000FD0-000FFF
+001022
+001028
+00102B
+001033-001035
+00103A-00103F
+00105A-00109F
+0010C6-0010CF
+0010F7-0010FA
+0010FC-0010FF
+00115A-00115E
+0011A3-0011A7
+0011FA-0011FF
+001207
+001247
+001249
+00124E-00124F
+001257
+001259
+00125E-00125F
+001287
+001289
+00128E-00128F
+0012AF
+0012B1
+0012B6-0012B7
+0012BF
+0012C1
+0012C6-0012C7
+0012CF
+0012D7
+0012EF
+00130F
+001311
+001316-001317
+00131F
+001347
+00135B-001360
+00137D-00139F
+0013F5-001400
+001677-00167F
+00169D-00169F
+0016F1-00177F
+0017DD-0017DF
+0017EA-0017FF
+00180F
+00181A-00181F
+001878-00187F
+0018AA-001DFF
+001E9C-001E9F
+001EFA-001EFF
+001F16-001F17
+001F1E-001F1F
+001F46-001F47
+001F4E-001F4F
+001F58
+001F5A
+001F5C
+001F5E
+001F7E-001F7F
+001FB5
+001FC5
+001FD4-001FD5
+001FDC
+001FF0-001FF1
+001FF5
+001FFF
+002047
+00204E-002069
+002071-002073
+00208F-00209F
+0020B0-0020CF
+0020E4-0020FF
+00213B-002152
+002184-00218F
+0021F4-0021FF
+0022F2-0022FF
+00237C
+00239B-0023FF
+002427-00243F
+00244B-00245F
+0024EB-0024FF
+002596-00259F
+0025F8-0025FF
+002614-002618
+002672-002700
+002705
+00270A-00270B
+002728
+00274C
+00274E
+002753-002755
+002757
+00275F-002760
+002768-002775
+002795-002797
+0027B0
+0027BF-0027FF
+002900-002E7F
+002E9A
+002EF4-002EFF
+002FD6-002FEF
+002FFC-002FFF
+00303B-00303D
+003040
+003095-003098
+00309F-0030A0
+0030FF-003104
+00312D-003130
+00318F
+0031B8-0031FF
+00321D-00321F
+003244-00325F
+00327C-00327E
+0032B1-0032BF
+0032CC-0032CF
+0032FF
+003377-00337A
+0033DE-0033DF
+0033FF
+004DB6-004DFF
+009FA6-009FFF
+00A48D-00A48F
+00A4A2-00A4A3
+00A4B4
+00A4C1
+00A4C5
+00A4C7-00ABFF
+00D7A4-00D7FF
+00FA2E-00FAFF
+00FB07-00FB12
+00FB18-00FB1C
+00FB37
+00FB3D
+00FB3F
+00FB42
+00FB45
+00FBB2-00FBD2
+00FD40-00FD4F
+00FD90-00FD91
+00FDC8-00FDCF
+00FDFC-00FE1F
+00FE24-00FE2F
+00FE45-00FE48
+00FE53
+00FE67
+00FE6C-00FE6F
+00FE73
+00FE75
+00FEFD-00FEFE
+00FF00
+00FF5F-00FF60
+00FFBF-00FFC1
+00FFC8-00FFC9
+00FFD0-00FFD1
+00FFD8-00FFD9
+00FFDD-00FFDF
+00FFE7
+00FFEF-00FFF8

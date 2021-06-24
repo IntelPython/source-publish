@@ -1,0 +1,451 @@
+
+
+Internet Architecture Board                                 P. Faltstrom
+Internet-Draft                                                       IAB
+Expires: May 27, 2004                                  November 27, 2003
+
+
+      Synchronization of Stringprep with Unicode Normalization rules
+              draft-faltstrom-unicode-synchronisation-00.txt
+
+Status of this Memo
+
+    This document is an Internet-Draft and is in full conformance with
+    all provisions of Section 10 of RFC2026.
+
+    Internet-Drafts are working documents of the Internet Engineering
+    Task Force (IETF), its areas, and its working groups. Note that other
+    groups may also distribute working documents as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum of six months
+    and may be updated, replaced, or obsoleted by other documents at any
+    time. It is inappropriate to use Internet-Drafts as reference
+    material or to cite them other than as "work in progress."
+
+    The list of current Internet-Drafts can be accessed at http://
+    www.ietf.org/ietf/1id-abstracts.txt.
+
+    The list of Internet-Draft Shadow Directories can be accessed at
+    http://www.ietf.org/shadow.html.
+
+    This Internet-Draft will expire on May 27, 2004.
+
+Copyright Notice
+
+    Copyright (C) The Internet Society (2003). All Rights Reserved.
+
+Abstract
+
+    This memo provides information about potential problems for
+    applications that use the Unicode Character set in IETF standards. It
+    especially examines differences between normalization rules in
+    different versions of the Unicode character set.
+
+1. The problem
+
+    The Unicode Standard Annex #15 (Unicode Normalization Forms) [3]
+    specify how the normalization rules are to be applied to strings. In
+    Annex 12 (Corrigenda) differences between normalization rules between
+    versions of Unicode are discussed.
+
+    The IETF uses these Normalization rules in various standards,
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 1]
+
+Internet-Draft            Normalization Rules              November 2003
+
+
+    especially the ones creating profiles of stringprep [RFC3454] [2].
+
+    The Unicode Consortium has well-defined policies in place to govern
+    changes that affect backwards compatibility. Once a character is
+    encoded, its canonical combining class and decomposition mapping will
+    not be changed in a way that will destabilize normalization.
+
+    What this means is: If a string contains only characters from a given
+    version of the Unicode Standard (e.g., Unicode 3.1.1), and it is put
+    into a normalized form in accordance with that version of Unicode,
+    then it will be in normalized form according to any past or future
+    versions of Unicode.
+
+    This guarantee has been in place for Unicode 3.1 and after. It has
+    been necessary to correct the decompositions of a small number of
+    characters since Unicode 3.1, as listed in the Normalization
+    Corrections data file, but such corrections are in accordance with
+    the above principles: all text normalized on old systems will test as
+    normalized in future systems. All text normalized in future systems
+    will test as normalized on past systems. What may change, for those
+    few characters, is that unnormalized text may normalize differently
+    on past and future systems.
+
+2. Scenario
+
+    Assume a client receives a non-normalized string, and then applies
+    normalization according to normalization rules in a particular
+    version of Unicode. If the client passes the normalized string to a
+    server that also has normalized a non-normalized copy of the string,
+    but has used a different version of the Unicode normalization rules,
+    the two strings might not match.
+
+    Example: In version 3.1 of Unicode, codepoint U+2F874 is normalized
+    to U+5F33. In version 3.2 U+2F874 is normalized to U+5F53. Say we
+    have on the Internet nodes A and B. Assume that A is using version
+    3.1 of Unicode, and B is using version 3.2. U+2F874 is passed to both
+    A and B. After normalization they will store the strings U+5F33 and
+    U+5F53 respectively. The end result is that even if the same
+    codepoint, U+2F874, is passed to both nodes, they will after
+    normalization have different strings (U+5F33 and U+5F53). If A sends
+    a message with normalized version of U+2F874 (U+5F33) to B as a
+    search string, there will be no match at B because B has normalized
+    the data (U+2F874) to U+5F53.
+
+    For the problem to exist, the string (only consisting of the
+    codepoint U+2F874 in the example above) needs only include at least
+    one of the codepoints in the correction list (see appendix A). As of
+    version 4.0.0 of Unicode, the list of corrections (since Unicode 3.1)
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 2]
+
+Internet-Draft            Normalization Rules              November 2003
+
+
+    consists of exactly 5 codepoints. Over time, as additional errors in
+    the normalization rules are found, this list will grow. The list is
+    controlled by the Unicode Consortium; IETF has little or no specific
+    input into it.
+
+3. Recommendation
+
+    Applications that implement stringprep or one of its profiles must be
+    aware of the existence of the corrections table [4]. Version 4.0.0 of
+    this correction list can be found in Appendix A. If a string that is
+    to be used for matching includes any of these codepoints, unexpected
+    results (non-matching when matching should occur) may occur. Because
+    of this, it is recommended that in sensitive applications /
+    deployments, special care should be taken.
+
+    Examples of problems include (but are not limited to) problems in
+    protocols which use stringprep and pass a normalized version of
+    strings received from a human. Such protocols include the DNS [5]
+    (dispute resolution at the time of domain name registration) and
+    protocols using domain names (HTTP [6], SMTP [7] etc), LDAP [8]
+    (characters in the domain name labels as well as searches on
+    attribute values), Kerberos [9]Kerberos, SASL [10] (authentication
+    mechanism), iSCSI [11] (names of volumes).
+
+    As codepoints can be added to the list at any time, addition of
+    codepoints can affect already normalized strings. Say a registry
+    accepts registrations of domain names. If a domain name U+2F868 is to
+    be registered, according to nameprep profile in Unicode 3.2 the
+    string U+2136A is to be registered. If later the registry switches to
+    use version 4.0 of Unicode, the question is whether the registered
+    string U+2136A is to stay, or whether it should be changed to U+36FC.
+    It might even be the case that U+36FC is already registered, and by a
+    different domain name holder. The change in normalization rules in
+    this case create a potential dispute resolution.
+
+3.1 Message to the Unicode Consortium
+
+    The IETF strongly encourages the Unicode Consortium to keep the size
+    and rate of change of the correction list to an absolute minimum, as
+    it will be impossible for implementations (applications) to know what
+    version of the normalization tables which are in use. This is
+    because, in practice, the tables in many cases will be part of the
+    operating system.  The end user will expect the same normalization
+    rules to be used in all applications in her environment.
+
+3.2 Alternatives for the IETF
+
+    When the Stringprep [2] specification is updated in the IETF, there
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 3]
+
+Internet-Draft            Normalization Rules              November 2003
+
+
+    will be three possible paths forward and a choice must be made:
+
+    1.  Stay with use of Unicode 3.2
+    2.  Change to a later version of Unicode than 3.2, but without the
+        changes listed in the correction list at that time
+    3.  Change to a later version of Unicode than 3.2, and accept
+        incompatible changes in the normalization tables
+
+4. Security Considerations
+
+    This memo discusses the impact that corrections to the Unicode
+    normalization rules will have on protocols in the IETF that uses
+    those rules. Inconsistencies among versions of the rules will create
+    non-backward compatibility problems.  Even if protocols and
+    implementations are created correctly, this will lead to strings that
+    should match in a search or other operation being reported as not
+    matching.
+
+    These false negatives for strings that include the codepoints in the
+    Unicode Correction Table might lead, for example, to the following
+    problems:
+    o  Domain names lookups that should succeed fail instead
+    o  Collisions between registered domain names occur (i.e., two
+       different names appear to match, even when there were no
+       collisions at registration time
+    o  Searches in LDAP databases fail
+    o  Searching for iSCSI devices fail
+    o  Authentication to Kerberos realms (logging in to systems using
+       Kerberos) fail
+
+Normative References
+
+    [1]  The Unicode Consortium, "The Unicode Standard", ISBN
+         0-321-18578-1 The Unicode Standard 4.0, April 2003.
+
+    [2]  Hoffman, P. and M. Blanchet, "Preparation of Internationalized
+         Strings ("stringprep")", RFC 3454, December 2002.
+
+    [3]  Davis, M. and M. Durst, "Unicode Normalization Forms", Unicode
+         Technical Report 15, April 2003.
+
+    [4]  The Unicode Consortium, "Normalization Corrections", http://
+         www.unicode.org/Public/UNIDATA/NormalizationCorrections.txt
+         Version 4.0.0, April 2003.
+
+Informative References
+
+    [5]   Hoffman, P. and M. Blanchet, "Nameprep: A Stringprep Profile
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 4]
+
+Internet-Draft            Normalization Rules              November 2003
+
+
+          for Internationalized Domain Names (IDN)", RFC 3491, March
+          2003.
+
+    [6]   Fielding, R., Gettys, J., Mogul, J., Nielsen, H., Masinter, L.,
+          Leach, P. and T. Berners-Lee, "Hypertext Transfer Protocol --
+          HTTP/1.1", RFC 2616, June 1999.
+
+    [7]   Klensin, J., "Simple Mail Transfer Protocol", RFC 2821, April
+          2001.
+
+    [8]   Zeilenga, K., "LDAP: Internationalized String Preparation",
+          draft-zeilenga-ldapbis-strprep-00.txt (work in progress), May
+          2003.
+
+    [9]   Altman, J., "Preparation of Internationalized Strings Profile
+          for Kerberos UTF-8 Strings",
+          draft-ietf-krb-wg-utf8-profile-01.txt (work in progress),
+          February 2003.
+
+    [10]  Zeilenga, K., "SASLprep: Stringprep profile for user names and
+          passwords", draft-ietf-sasl-saslprep-03.txt (work in progress),
+          June 2003.
+
+    [11]  Bakke, M., "String Profile for iSCSI Names",
+          draft-ietf-ips-iscsi-string-prep-04.txt (work in progress),
+          March 2003.
+
+
+Author's Address
+
+    Patrik Faltstroms
+    Internet Architecture Board
+
+    EMail: paf@cisco.com
+
+Appendix A. Appendix A
+
+
+    # NormalizationCorrections-4.0.0.txt
+    #
+    # This file is a normative contributory data file in the
+    # Unicode Character Database.
+    #
+    # The normalization stabilization policy of the Unicode
+    # Consortium ordinarily precludes any change to the decomposition
+    # for any character, once established in a relevant version
+    # of the UnicodeData.txt data file. However, under certain
+    # exceptional (and rare) conditions, an error in a decomposition
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 5]
+
+Internet-Draft            Normalization Rules              November 2003
+
+
+    # mapping may be discovered that is truly just an unintended
+    # typo in the data, and not a matter of dubious interpretation.
+    #
+    # Whenever such an error may be found, and if it meets the
+    # requirements for possible exceptions to normalization
+    # stability, the correction is entered in this data file,
+    # so that any implementation depending on absolute stability
+    # of normalization, *including* any errors in the data, can
+    # safely reconstruct the exact state of the data tables at
+    # any given version of Unicode.
+    #
+    # Currently this list has exactly six entries in it, one for the
+    # typo found and corrected in Corrigendum #3, and five for
+    # the typos and misidentifications found and corrected in
+    # Corrigendum #4. All efforts
+    # will be made to keep the entries limited to just those fixes.
+    #
+    # Interpretation of the fields:
+    #   Field 1: Unicode code point
+    #   Field 2: Original (erroneous) decomposition
+    #   Field 3: Corrected decomposition
+    #   Field 4: Version of Unicode for which the correction was
+    #            entered into UnicodeData.txt, in n.n.n format.
+    #   Comment: Indicates the Unicode Corrigendum which documents
+    #            the correction
+    #
+    #
+    F951;96FB;964B;3.2.0 # Corrigendum 3
+    2F868;2136A;36FC;4.0.0 # Corrigendum 4
+    2F874;5F33;5F53;4.0.0 # Corrigendum 4
+    2F91F;43AB;243AB;4.0.0 # Corrigendum 4
+    2F95F;7AAE;7AEE;4.0.0 # Corrigendum 4
+    2F9BF;4D57;45D7;4.0.0 # Corrigendum 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 6]
+
+Internet-Draft            Normalization Rules              November 2003
+
+
+Intellectual Property Statement
+
+    The IETF takes no position regarding the validity or scope of any
+    intellectual property or other rights that might be claimed to
+    pertain to the implementation or use of the technology described in
+    this document or the extent to which any license under such rights
+    might or might not be available; neither does it represent that it
+    has made any effort to identify any such rights. Information on the
+    IETF's procedures with respect to rights in standards-track and
+    standards-related documentation can be found in BCP-11. Copies of
+    claims of rights made available for publication and any assurances of
+    licenses to be made available, or the result of an attempt made to
+    obtain a general license or permission for the use of such
+    proprietary rights by implementors or users of this specification can
+    be obtained from the IETF Secretariat.
+
+    The IETF invites any interested party to bring to its attention any
+    copyrights, patents or patent applications, or other proprietary
+    rights which may cover technology that may be required to practice
+    this standard. Please address the information to the IETF Executive
+    Director.
+
+
+Full Copyright Statement
+
+    Copyright (C) The Internet Society (2003). All Rights Reserved.
+
+    This document and translations of it may be copied and furnished to
+    others, and derivative works that comment on or otherwise explain it
+    or assist in its implementation may be prepared, copied, published
+    and distributed, in whole or in part, without restriction of any
+    kind, provided that the above copyright notice and this paragraph are
+    included on all such copies and derivative works. However, this
+    document itself may not be modified in any way, such as by removing
+    the copyright notice or references to the Internet Society or other
+    Internet organizations, except as needed for the purpose of
+    developing Internet standards in which case the procedures for
+    copyrights defined in the Internet Standards process must be
+    followed, or as required to translate it into languages other than
+    English.
+
+    The limited permissions granted above are perpetual and will not be
+    revoked by the Internet Society or its successors or assignees.
+
+    This document and the information contained herein is provided on an
+    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 7]
+
+Internet-Draft            Normalization Rules              November 2003
+
+
+    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Acknowledgment
+
+    Funding for the RFC Editor function is currently provided by the
+    Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Faltstrom                 Expires May 27, 2004                  [Page 8]
+
+
+</x-flowed>
+

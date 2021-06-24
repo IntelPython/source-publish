@@ -1,0 +1,78 @@
+IESG Statement on IDN:
+
+ IDNA [IDNA] specifies an encoding of characters in the Unicode 
+ character repertoire [UNICODE] which is backwards-compatible with the 
+ current definition of hostnames. This implies that domain names 
+ encoded according to IDNA will be able to be transported between 
+ peers using any existing protocol, including DNS.
+
+ IDNA, through its requirement of Nameprep [NAMEPREP], uses equivalence 
+ tables that are based only on the characters themselves; no attention 
+ is paid to the intended language (if any) for the domain name. However, 
+ for many domain names, the intended language of one or more parts of 
+ the domain name actually does matter to the users.
+
+ Similarly, many names cannot be presented and used without ambiguity 
+ unless the scripts to which their characters belong are known. In both 
+ cases, this additional information should be of concern to the registry.
+
+ If there are no constraints on registration in a zone, people can 
+ register combinations of characters in a manner that increases the 
+ risk of misunderstandings, cybersquatting, and other forms of 
+ confusion. A somewhat similar situation existed before the introduction 
+ of IDNA exemplified by domain names such as example.com and examp1e.com 
+ (note that the latter domain has the digit "1" instead of the letter 
+ "L").
+
+ For some human languages, there are strings of characters that have 
+ equivalent or near-equivalent meanings. When someone registers a name 
+ containing such a string, the registry might want to automatically 
+ generate a list of semantically or visually equivalent strings and 
+ suggest that they also be registered. Further, some registries might 
+ want to prevent particular characters for language-based reasons.
+
+ Some registries, in particular the gTLD ones, are not naturally part 
+ of any specific language group. In these cases, extra care must be 
+ taken not to create unacceptable problems for any of the languages that 
+ might be used.
+
+ It is suggested that a registry act conservatively when starting to 
+ accept IDNA-based domain names. Equivalences are very hard (if not 
+ impossible) to define after registration has started. Assume that the 
+ labels "x" and "y" at first are different, but later the tables for the 
+ registry are changed so that "x" and "y" are then treated as being the 
+ same. If x.example.com and y.example.com both were already registered 
+ to different registrants, it is unclear which of them has to withdraw 
+ the registration, how that selection process done, and so on. Thus, 
+ having complete, publicly-stated policies before accepting 
+ registration will lead to a much more stable registration process.
+
+ There are also other problems that we know to be difficult when 
+ dealing with IDNA-based domain names, for instance when to convert them 
+ between their display format and their wire format, how to deal with 
+ display formats on systems that do not support all of Unicode 3.2, and 
+ how to deal with the problem of domain names in one format showing up 
+ where names in the other format was expected by protocols or by people. 
+ These problems are largely outside the scope of the IDNA standards 
+ themselves, but they are of concern to anyone attempting to implement 
+ the IDNA standard in products. See the IDNA specification for more 
+ examples.
+
+ The use of display-format IDNA-based domain names in other protocols 
+ is not yet part of any standard; implementors are admonished to use 
+ the wire format, i.e. ASCII-encoded, of the name until protocol 
+ updates allowing the use of display format, e.g. Unicode-based 
+ international character/glyph, are standardized.
+
+ [IDNA] "Internationalizing Domain Names in Applications (IDNA)", 
+ draft-ietf-idn-idna.
+
+ [NAMEPREP] "Nameprep: A Stringprep Profile for Internationalized Domain 
+ Names", draft-ietf-idn-nameprep.
+
+ [UNICODE] The Unicode Consortium. The Unicode Standard, Version 3.2.0 
+ is defined by The Unicode Standard, Version 3.0 (Reading, MA, 
+ Addison-Wesley, 2000. ISBN 0-201-61633-5), as amended by the Unicode 
+ Standard Annex #27: Unicode 3.1 (http://www.unicode.org/reports/tr27/) 
+ and by the Unicode Standard Annex #28: Unicode 3.2 
+ (http://www.unicode.org/reports/tr28/).

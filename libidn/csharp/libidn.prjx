@@ -1,0 +1,37 @@
+<Project name="libidn" standardNamespace="" description="" newfilesearch="None" enableviewstate="True" version="1.1" projecttype="C#">
+  <Contents>
+    <File name=".\AssemblyInfo.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\CombiningClass.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\Composition.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\DecompositionKeys.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\DecompositionMappings.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\IDNA.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\IDNAException.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\NFKC.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\Punycode.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\PunycodeException.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\RFC3454.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\Stringprep.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\StringprepException.cs" subtype="Code" buildaction="Compile" dependson="" data="" />
+    <File name=".\libidn.build" subtype="Code" buildaction="Nothing" dependson="" data="" />
+  </Contents>
+  <References />
+  <DeploymentInformation target="" script="" strategy="File" />
+  <Configuration runwithwarnings="True" name="Debug">
+    <CodeGeneration runtime="Mono" compiler="Mcs" compilerversion="Standard" warninglevel="1" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="" generatexmldocumentation="False" win32Icon="" noconfig="False" nostdlib="False" />
+    <Execution commandlineparameters="" consolepause="True" />
+    <Output directory=".\bin\Debug" assembly="libidn" executeScript="" executeBeforeBuild="" executeAfterBuild="" executeBeforeBuildArguments="" executeAfterBuildArguments="" />
+  </Configuration>
+  <Configurations active="Debug">
+    <Configuration runwithwarnings="True" name="Debug">
+      <CodeGeneration runtime="Mono" compiler="Mcs" compilerversion="Standard" warninglevel="1" nowarn="" includedebuginformation="True" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="" generatexmldocumentation="False" win32Icon="" noconfig="False" nostdlib="False" />
+      <Execution commandlineparameters="" consolepause="True" />
+      <Output directory=".\bin\Debug" assembly="libidn" executeScript="" executeBeforeBuild="" executeAfterBuild="" executeBeforeBuildArguments="" executeAfterBuildArguments="" />
+    </Configuration>
+    <Configuration runwithwarnings="True" name="Release">
+      <CodeGeneration runtime="MsNet" compiler="Csc" compilerversion="" warninglevel="1" nowarn="" includedebuginformation="False" optimize="False" unsafecodeallowed="False" generateoverflowchecks="False" mainclass="" target="Library" definesymbols="" generatexmldocumentation="False" win32Icon="" noconfig="False" nostdlib="False" />
+      <Execution commandlineparameters="" consolepause="True" />
+      <Output directory=".\bin\Release" assembly="libidn" executeScript="" executeBeforeBuild="" executeAfterBuild="" executeBeforeBuildArguments="" executeAfterBuildArguments="" />
+    </Configuration>
+  </Configurations>
+</Project>

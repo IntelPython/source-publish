@@ -1,0 +1,525 @@
+Internet Draft                                        Paul Hoffman
+draft-hoffman-idn-reg-00.txt                            IMC & VPNC
+March 25, 2003
+Ex pires in six months
+Intended status: Best Current Practice (BCP)
+
+
+         Framework for Registering Internationalized Domain Names
+
+
+Status of this Memo
+
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 of RFC2026.
+
+Internet-Drafts are working documents of the Internet Engineering Task
+Force (IETF), its areas, and its working groups. Note that other groups
+may also distribute working documents as Internet-Drafts.
+
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time. It is inappropriate to use Internet-Drafts as reference material
+or to cite them other than as "work in progress."
+
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+
+The list of Internet-Draft Shadow Directories can be accessed at
+http://www.ietf.org/shadow.html.
+
+
+Abstract
+
+This document describes a framework for registering internationalized
+domain names (IDNs) in a zone. Before accepting registrations of domain
+names into a zone, the zone's registry should decide which codepoints in
+the Unicode character set the zone will accept. The registry should also
+decide whether particular characters in a registered domain name should
+cause registration of multiple equivalent domain names. With those
+decisions, the registry can safely register names using the steps
+described here.
+
+
+1. Introduction
+
+IDNA [IDNA] specifies an encoding of characters in the Unicode character
+set [UNICODE] which is backwards-compatible with the current definition
+of hostnames. This implies that domain names encoded according to IDNA
+will be able to be transported between peers using any existing
+protocol, including DNS.
+
+IDNA, through its requirement of Nameprep [NAMEPREP], uses equivalence
+tables that are based only on the characters themselves; no attention is
+paid to the intended language (if any) for the domain name. However, for
+many domain names, the intended language of one or more parts of the
+domain name actually does matter to the registry for the names and to
+users.
+
+If there are no constraints on registration in a zone, people can
+register characters that increases the risk of misunderstandings,
+cybersquatting, and other forms of confusion. A similar situation
+existed before the introduction of IDNA exemplified by domain names such
+as example.com and examp1e.com (note that the latter domain has the
+digit "1" instead of the letter "l").
+
+For some human languages, there are characters and/or strings that have
+equivalent or near-equivalent meanings. If someone is allowed to
+register a name with such a character or string, the registry might want
+to automatically register all the names that have the same meaning in
+that language. Further, some registries might want to restrict the set
+of characters to be registered for language-based reasons. In addition,
+IDNA allows the use of thousands of non-alphanumeric characters, and
+some zone administrators will want to prohibit some or all of these
+characters.
+
+The intent of this document is that checking whether a label
+can be approved can be a mathematical, objective inspection of the
+codepoints in the label with no human intervention, and that all
+applications of a particular table will yield identical results.
+
+The mechanism described here does not require a registry to know the
+"intended language" of a label. It is impossible to describe the
+"intended language" of names that include numbers or acronyms. Proposals
+that have this requirement require human intervention to validate the
+assertion from the registrant and are therefore susceptible to fraud
+from the registrant. Further, such a requirement prevents the
+registration of labels that have two languages, some of which are common
+in countries with multiple languages.
+
+[IDN-ADMIN] shows a different proposal to the problem of registration
+policy. That document uses a more complex algorithm and a different
+registration philosophy that what is described here.
+
+It is suggested that a registry act conservatively when starting
+accepting IDNA-based domain names. Equivalences are very hard (if not
+impossible) to define after registration has started. Assume that the
+labels "x" and "y" at first are different, but later the tables for the
+registry are changed so that "x" and "y" are then treated as being the
+same. If x.example.com and y.example.com both were already registered to
+different registrants, it is unclear which of them has to withdraw the
+registration, how that selection process done, and so on. Thus, having
+complete, publicly-stated policies before accepting registration will
+lead to a much more stable registration process.
+
+This document does not deal with how to handle whois data for multiple
+registrations, and does not deal with regitrar-registry protocols.
+This document also only deals only with variants of single characters,
+not variants of strings.
+
+1.1 Terminology
+
+A "string" is an ordered set of one or more characters.
+
+This document discusses characters that have equivalent or
+near-equivalent characters or strings. The "base character" is the
+character that has one or more equivalents; the "variant(s)" are the
+character(s) and/or string(s) that are equivalent to the base character.
+
+A "registration bundle" is the set of all labels that comes from
+expanding all base characters for a single name into their variants.
+
+A registry is the administrative authority for a DNS zone. That is, the
+registry is the body that makes and enforces policies that are used in a
+particular zone in the DNS.
+
+The key words "MUST", "SHALL", "REQUIRED", "SHOULD", "RECOMMENDED", and
+"MAY" in this document are to be interpreted as described in RFC 2119
+[RFC2119].
+
+2. Language-based tables
+
+The registration strategy described in this document uses a table that
+lists all characters allowed for input and any variants of those
+characters. Note that the table lists all characters allowed, not only
+the ones that have variants.
+
+It is widely expected that there will be different tables for the same
+language created by different people. Many languages are spoken in many
+different countries, and each country might have a different view of
+which characters should or should not be considered needed for that
+language. For example, some people would say that the Latin characters
+are needed for various Indic languages, while others would say that
+they are not.
+
+A zone needs to have exactly one table; having more than one table can
+lead to unpredictable results because the variants in the different
+tables may conflict. The table must be carefully composed so that all
+expected variants will be created, and no unexpected variants are
+created.
+
+The registry's table MUST NOT have more than one entry for a particular
+base character. A table with more than one variant rule requires that
+some names be evaluated by humans and will open the registration process
+to dispute.
+
+The tables are language-specific, although it is possible to create a
+single table that covers multiple languages. The following three
+sub-sections describe the use of tables in three scenarios.
+
+2.1 Table for a zone that uses names from one language
+
+A zone that has a single language has a significant advantage over
+zones that cover multiple languages. Its table can be constructed
+without concern for variants that appear in other languages for the
+base characters of the language used in the zone.
+
+2.2 Table for a zone that uses names from a small number of languages
+
+If a zone covers more than one language, the registry must create its
+registration table from multiple language tables. Creating a table from
+many languages is easy if none of the languages have overlapping
+character variants for any single base character.
+
+A registry MUST NOT blindly combine multiple tables which have
+overlapping equivalences. Instead, the registry MUST carefully analyze
+every instance in the combined table where a base character has one or
+more different variants and select the desired set of variants for the
+base character.
+
+2.3 Table for a zone that has no language restrictions
+
+A registry that does not restrict the number of languages will probably
+allow a much wider range of characters to be used in names. At the same
+time, that registry cannot easily use character variants because
+variants for one language will be different from the variants used in a
+different language. To handle conflicting variants among languages, the
+registry can choose to have no variants for any base characters, or can
+choose to have variants for a subset of the languages that are
+expressible in the characters allowed.
+
+
+3. Table processing rules
+
+The input to the process is called the "input label". The output of the
+process is either failure (the input label cannot be registered at all),
+or a registration bundle that contains one or more labels that have been
+processed with ToASCII.
+
+Processing the input label requires two versions of ToASCII: "standard
+ToASCII" and "enhanced ToASCII". Standard ToASCII is exactly the same as
+the ToASCII in [IDNA]. Enhanced ToASCII is standard ToASCII with the
+steps from section 3.1 added.
+
+Note that the process MUST be executed only once. The process MUST NOT
+be run on any output of the process, only on the new label that was
+input.
+
+
+3.1 Creating enhanced ToASCII.
+
+During the processing, an "temporary bundle" contains partial labels,
+that is, labels that are being built and are not complete labels. The
+partial labels in the temporary bundle consist of Unicode characters.
+
+The following steps after step 2 but before step 3 of ToASCII.
+
+2a) Split the input label into individual characters, called "candidate
+characters". Compare each candidate character against the base
+characters in the table. If any candidate character does not exist in
+the set of base characters, the system MUST stop and not register any
+names (that is, it MUST not register either the base name or any labels
+that would have come from character variants).
+
+2b) Continue the steps in standard ToASCII for the input label. If
+ToASCII fails for the input label, the system MUST stop and not register
+any of the labels (even if the other labels would have passed ToASCII).
+If ToASCII succeeds, add the result to the registration bundle.
+
+2c) For each candidate character in the input label, do the following:
+
+   2c1) Copy the candidate character into every partial label in the
+   temporary bundle. If the base character that matches the candidate
+   character has no variants, go to step 2c3.
+
+   2c2) For each variant of the base character, do the following:
+
+      2c2a) Duplicate all of the current partial labels in the
+      temporary bundle.
+
+      2c2b) If this is the last variant, go to step 2c3; otherwise,
+      select the next variant, and go to step 2c2a.
+
+   2c3) Copy the variant into each partial label.
+
+   2c4) If there are more candidate characters, select the next
+   candidate character and got to step 2c1. Otherwise, go to step 2d.
+
+2d) The temporary bundle now contains zero or more labels that consist
+of Unicode characters. For each label in the temporary bundle:
+
+   2da) Process the label with standard ToASCII.
+
+   2db) If ToASCII succeeds, put the result in the registration bundle.
+   Otherwise, do not put anything into the registration bundle.
+
+   2dc) Select the next label and go to step 2da.
+
+2e) The resulting registration bundle has all the labels in ToASCII
+encoding. Finish.
+
+
+4. Table format
+
+The format of the table is meant to be machine-readable but not
+human-readable. It is fairly trivial to convert the table into one
+that can be read by people.
+
+Each character in the table is given in the "U+" notation for Unicode
+characters. The lines of the table are terminated with either a carriage
+return character (ASCII 0x0D), a linefeed character (ASCII 0x0A), or a
+sequence of carriage return followed by linefeed (ASCII 0x0D 0x0A). The
+order of the lines in the table do not matter.
+
+Each line in the table starts with the character that is allowed in the
+registry. If that character has any variants, the base character is
+followed by a vertical bar character ("|", ASCII 0x7C) and the variant
+string. If the base character has more than one variant, the variants
+are separated by a colon (":", ASCII 0x3A). Strings are given without
+any intervening spaces
+
+The following is an example of how a table might look. The entries in
+this table are purposely silly and should not be used by any registry as
+the basis for choosing variants. For the example, assume that the
+registry:
+- allows the FOR ALL character (U+2200) with no variants
+- allows the COMPLEMENT character (U+2201) which has a single variant
+  of LATIN CAPITAL LETTER C (U+0043)
+- allows the PROPORTION character (U+2237) which has one variant which
+  is the string COLON (U+003A) COLON (U+003A)
+- allows the PARTIAL DIFFERENTIAL character (U+2202) which has two
+  variants: LATIN SMALL LETTER D (U+0064) and GREEK SMALL LETTER DELTA
+  (U+03B4)
+
+The table would look like:
+U+2200
+U+2201|U+0043
+U+2237|U+003AU+003A
+U+2202|U+0064;U+03B4
+
+The registry's table MUST NOT have more than one entry for a particular
+base character.
+
+Implementors of table processors should remember that there are tens of
+thousands of characters whose codepoints are greater than 0xFFFF. Thus,
+any program that assumes that each character in the table is represented
+in exactly six octets ("U", "+", and exactly four octets representing
+the character value) will fail with tables that use characters whose
+value is greater than 0xFFFF.
+
+
+5. Steps after registering an input label
+
+A registry has three options for how to handle the case where
+the registration bundle has more than one label. The policy options are:
+
+1) Allocate all labels to the same registrant, making
+the zone information identical to that of the input label.
+
+2) Block all labels so they cannot be registered in the
+future.
+
+3) Allocate some labels and block some other labels.
+
+Option 1 will cause end users to be able to find names with variants
+more easily, but will result in larger zone files. For some
+language tables, the zone file could become so large that it
+could negatively affect the ability of the registry to perform name
+resolution.
+
+Option 2 does not increase the size of the zone file, but it
+may cause end users to not be able to find names with variants
+that they would expect.
+
+Option 3 is likely to cause the most confusion with users because
+including some variants will cause a name to be found, bout using
+other variants will cause the name to be not found.
+
+With any of these three options, the registry MUST keep a database that
+links each label in the registration bundle to the input label. This link
+needs to be maintained so that changes in the non-DNS registration
+information (such as the label's owner name and address) is reflected in
+every member of the registration bundle as well.
+
+If the registry chose option 1, when the zone information for the input
+label changes, the zone information for all the members of the
+registration bundle MUST change in exactly the same way. The zone
+information for every member of the registration bundle MUST remain
+identical as long as any of the members of the registration bundle
+remain in the zone. A registry can keep the zone information for the
+registration bundle identical using a database, or using DNAME records,
+or using a combination of the two.
+
+If the registry chose option 2, when the zone information for the input
+label changes, the blocked information for all the members of the
+registration bundle MUST be identical to that of the input label, and
+MUST remain identical as long as the input label remains in the zone. A
+registry can keep the zone and blocked name information for the
+registration bundle identical using a database.
+
+If the registry chose option 3, it must use an unspecified method to
+keep the elements in the registration bundle cohesive. This option
+SHOULD NOT be used except under carefully-controlled circumstances.
+
+
+6. Examples
+
+The following shows examples of the first two of the registry's options.
+Both examples assume that the registry for the zone example.com uses the
+following very short table, which says that LATIN SMALL LETTER L
+(U+006C) has a single variant, DIGIT ONE (U+0031).
+
+U+006C|U+0031
+
+A registrant approaches the zone and requests a registration for the
+name pale.example.com, for which there are two name servers
+(x.example.com and y.example.com). After processing the input label
+"pale", the registration bundle contains "pale" and "pa1e".
+
+6.1 Example 1: allocating multiple labels
+
+Assume that the registry for the zone example.com uses option 1
+(allocating multiple labels) as its registration policy.
+
+The registry allocates pale.example.com and pa1e.example.com to the
+registrant. The registry also creates a link in its registration
+database from pa1e.example.com to pale.example.com so that any changes
+to either the non-zone information or the zone information for one name
+will be reflected in the other name.
+
+The registry adds the following four records to the example.com zone:
+
+  $ORIGIN example.com.
+  pale IN NS x.example.com.
+  pale IN NS y.example.com.
+  pa1e IN NS x.example.com.
+  pa1e IN NS y.example.com.
+
+Note that the registry can instead use DNAME records for allocating
+labels. If the registry uses DNAMEs, the registry would instead add
+the following three records to the example.com zone:
+
+  $ORIGIN example.com.
+  pale IN NS x.example.com.
+  pale IN NS y.example.com.
+  pa1e IN DNAME pale.example.com.
+
+An end user who requests the name server for pa1e.example.com will get a
+positive response with the correct information.
+
+6.2 Example 2: blocking labels
+
+Assume that the registry for the zone example.com uses option 2
+(blocking labels) as its registration policy.
+
+The registry allocates pale.example.com to the registrant and blocks
+pa1e.example.com from being registered by anybody. The registry also
+creates a link in its registration database from pa1e.example.com to
+pale.example.com so that any changes to the non-zone information for
+pale.example.com will be reflected in the blocked name.
+
+The registry adds the following two records to the example.com zone:
+
+  $ORIGIN example.com.
+  pale IN NS x.example.com.
+  pale IN NS y.example.com.
+
+An end user who requests the name server for pa1e.example.com will get a
+response of "no such name".
+
+
+7. Owner implications of multiple labels
+
+The creation of a registration bundle for equivalent or near-equivalent
+labels in a zone at the time of registration leads to many delegations.
+This leads to records in parallel zones which MUST be synchronized. That
+is, the owner of a registration bundle MUST keep the same information in the
+zone for each label in the bundle.
+
+Using the examples from section 6, assume that the owner of the label
+"pale" and "pa1e" creates a subdomain, "www". If the owner of
+"example.com" used multiple delegations for the labels, the owner of
+"pale" and "pa1e" would use two records:
+
+  $ORIGIN pale.example.com.
+  www IN A 1.2.3.4
+
+  $ORIGIN pa1e.example.com.
+  www IN A 1.2.3.4
+
+An alternative for these two records, which helps the registrant
+keep their names in synch, would be:
+
+  $ORIGIN pale.example.com.
+  www IN A 1.2.3.4
+
+  $ORIGIN pa1e.example.com.
+  www IN CNAME www.pale.example.com.
+
+If the owner of "example.com" used a DNAME record to make "pale" and
+"pa1e" equivalent, the owner of "pale" and "pa1e" could instead use one
+record:
+
+  $ORIGIN pale.example.com.
+  www IN A 1.2.3.4
+
+
+8. Security considerations
+
+Apart from considerations listed in the IDNA specification, this
+document explicitly talks about equivalences that a registry can define
+as part of the policy which can be applied in a zone. A registry can
+apply an equivalence table which solves some problems with homographs
+already outlined in the security consideration section of IDNA. This
+might be considered good for security because it will reduce the
+possible confusion for the user, and lower the risk that the user will
+"connect" to a service which was not intended.
+
+
+9. References
+
+9.1 Normative References
+
+[IDNA] "Internationalizing Domain Names in Applications (IDNA)",
+draft-ietf-idn-idna.
+
+[NAMEPREP] "Nameprep: A Stringprep Profile for Internationalized Domain
+Names", draft-ietf-idn-nameprep.
+
+[RFC2119] "Key words for use in RFCs to Indicate Requirement Levels",
+March 1997, RFC 2119.
+
+[UNICODE] The Unicode Consortium. The Unicode Standard, Version 3.2.0 is
+defined by The Unicode Standard, Version 3.0 (Reading, MA,
+Addison-Wesley, 2000. ISBN 0-201-61633-5), as amended by the Unicode
+Standard Annex #27: Unicode 3.1 (http://www.unicode.org/reports/tr27/)
+and by the Unicode Standard Annex #28: Unicode 3.2
+(http://www.unicode.org/reports/tr28/).
+
+9.2 Non-normative References
+
+[IDN-ADMIN] "Internationalized Domain Names Registration and
+Administration Guideline for Chinese, Japanese and Korean",
+draft-jseng-idn-admin.
+
+
+10. IANA considerations
+
+There are no IANA considerations for this document. The tables described
+in this document can be created by anyone. Tables at IANA are often
+considered to be authoritative, but languages have no one who is
+authoritative for them. It is unclear what value, if any, there is for
+someone to know what table a particular zone says it is using for
+registration. Further, the tables are expected to be updated at
+irregular times as new characters are added to the list of acceptable
+characters. Therefore, it is probably unwise for IANA to keep a registry
+of these tables.
+
+
+11. Author's address
+
+Paul Hoffman
+Internet Mail Consortium and VPN Consortium
+127 Segre Place
+Santa Cruz, CA  95060  USA
+phoffman@imc.org

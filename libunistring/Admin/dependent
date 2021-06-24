@@ -1,0 +1,120 @@
+#!/bin/sh
+#
+# Copyright (C) 2015 Free Software Foundation, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+progname=$0
+
+# func_exit STATUS
+# exits with a given status.
+# This function needs to be used, rather than 'exit', when a 'trap' handler is
+# in effect that refers to $?.
+func_exit ()
+{
+  (exit $1); exit $1
+}
+
+# func_tmpdir
+# creates a temporary directory.
+# Input:
+# - progname                 name of this program
+# Sets variable
+# - tmp             pathname of freshly created temporary directory
+func_tmpdir ()
+{
+  # Use the environment variable TMPDIR, falling back to /tmp. This allows
+  # users to specify a different temporary directory, for example, if their
+  # /tmp is filled up or too small.
+  : ${TMPDIR=/tmp}
+  {
+    # Use the mktemp program if available. If not available, hide the error
+    # message.
+    tmp=`(umask 077 && mktemp -d "$TMPDIR/glXXXXXX") 2>/dev/null` &&
+    test -n "$tmp" && test -d "$tmp"
+  } ||
+  {
+    # Use a simple mkdir command. It is guaranteed to fail if the directory
+    # already exists.  $RANDOM is bash specific and expands to empty in shells
+    # other than bash, ksh and zsh.  Its use does not increase security;
+    # rather, it minimizes the probability of failure in a very cluttered /tmp
+    # directory.
+    tmp=$TMPDIR/gl$$-$RANDOM
+    (umask 077 && mkdir "$tmp")
+  } ||
+  {
+    echo "$progname: cannot create a temporary directory in $TMPDIR" >&2
+    func_exit 1
+  }
+}
+
+func_tmpdir
+trap 'exit_status=$?
+      if test "$signal" != 0; then
+        echo "caught signal $signal" >&2
+      fi
+      rm -rf "$tmp"
+      exit $exit_status' 0
+for signal in 1 2 3 13 15; do
+  trap '{ signal='$signal'; func_exit 1; }' $signal
+done
+signal=0
+
+sed_literal_to_basic_regex='s/\\/\\\\/g
+s/\[/\\[/g
+s/\^/\\^/g
+s/\([.*$]\)/[\1]/g'
+
+# Populate the cache
+(cd "$GNULIB_SRCDIR" \
+ && find modules -type f -print | while read modfile; do
+   sed -n -e '/^Depends-on:/,/^$/p' < "$modfile" \
+     | sed -e '/^Depends-on:/d' -e '/^$/d' > "$tmp/dependencies"
+   dependent=$(echo $modfile | sed -e 's,modules/,,')
+   dependent_regex=`echo "$dependent" | sed -e "$sed_literal_to_basic_regex"`
+   if test ! -f "$tmp/cache" \
+       || ! grep " $dependent_regex\$" "$tmp/cache" >/dev/null 2>&1; then
+     sed -e "s,\$, $dependent," < "$tmp/dependencies" >> "$tmp/cache"
+   fi
+ done)
+
+# Recursively list dependent modules
+func_get_dependent ()
+{
+  module_regex=`echo "$1" | sed -e "$sed_literal_to_basic_regex"`
+  if grep "^$module_regex " "$tmp/cache" > "$tmp/result" 2>/dev/null; then
+    sed -n -e 's,.* \([^ ]*\)$,\1,p' < "$tmp/result" | while read dependent; do
+      echo "$dependent"
+      func_get_dependent "$dependent"
+    done
+  fi
+}
+
+while read module; do
+  echo "$module"
+  func_get_dependent "$module"
+done
+
+rm -rf "$tmp"
+
+# Undo the effect of the previous 'trap' command. Some shellology:
+# We cannot use "trap - 0 1 2 3 13 15", because Solaris sh would attempt to
+# execute the command "-". "trap '' ..." is fine only for signal 0 (= normal
+# exit); for the others we need to call 'exit' explicitly. The value of $? is
+# 128 + signal number and is set before the trap-registered command is run.
+trap '' 0
+trap 'func_exit $?' 1 2 3 13 15
+
+exit 0

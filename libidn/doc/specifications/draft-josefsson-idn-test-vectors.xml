@@ -1,0 +1,661 @@
+<?xml version="1.0"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+
+<?rfc compact="yes"?>
+<?rfc toc="yes"?>
+<rfc category="info" ipr="full2026"
+     docName="draft-josefsson-idn-test-vectors">
+
+<front>
+
+<title>Nameprep and IDNA Test Vectors</title>
+
+<author initials="S." surname="Josefsson" fullname="Simon Josefsson">
+	<organization></organization>
+	<address>
+		<email>simon@josefsson.org</email>
+	</address>
+</author>
+	
+<date month="November" year="2003"/>
+
+<abstract>
+
+<t>This document contains test vectors for Nameprep and IDNA.</t>
+
+</abstract>
+
+</front>
+
+<middle>
+
+<section title="Introduction">
+
+<t>The Nameprep and IDNA specifications lack thorough examples that
+would have aided in implementing them.  This document act as a
+complement to those specifications providing such examples.</t>
+
+<t>It should be pointed out that this document is not normative, and
+thus any errors in this document should not be treated as gospel that
+defines Nameprep nor IDNA.  When conforming to the specification and
+generating output corresponding to values in this document is in
+conflict, implementations should conform to the specification.</t>
+
+<t><vspace blankLines="10000" /></t>
+
+</section>
+
+<section title="Format of Nameprep Test Vectors">
+
+<t>The tests follow a certain syntax, described here by showing one
+complete example with comments intermixed.  The comments are prefixed
+with the '#' character.</t>
+
+<figure>
+<artwork>
+# First the (UTF-8) string is printed as a C octet string, with
+# characters [A-Za-z .0-9] shown inline and other characters shown
+# escaped with \xAB where AB is the hex sequence of that octet.  The
+# number of octets are also shown.
+
+   in (length 3 bytes):
+   	\xE1\xBE\xB7
+
+# The input is also printed as Unicode codepoints.
+
+   input (length 1):
+   	U+1fb7
+
+# After printing the input, the nameprep steps starts.  When the
+# string is modified, the specific operation that caused it is printed
+# along with the new string of Unicode code points.
+
+# 1) Map -- For each character in the input, check if it has a mapping
+#    and, if so, replace it with its mapping.  This is described in
+#    section 3.
+
+   Table B.2 maps U+1fb7 to U+03b1 U+0342 U+03b9.
+   U+03b1 U+0342 U+03b9
+
+# 2) Normalize -- Possibly normalize the result of step 1 using Unicode
+#    normalization.  This is described in section 4.
+
+   Unicode normalization with form KC maps string into:
+   U+1fb6 U+03b9
+
+# 3) Prohibit -- Check for any characters that are not allowed in the
+#    output.  If any are found, return an error.  This is described in
+#    section 5.
+
+# 4) Check bidi -- Possibly check for right-to-left characters, and if
+#    any are found, make sure that the whole string satisfies the
+#    requirements for bidirectional strings.  If the string does not
+#    satisfy the requirements for bidirectional strings, return an
+#    error.  This is described in section 6.
+#
+#    1) The characters in section 5.8 MUST be prohibited.
+
+#    2) If a string contains any RandALCat character, the string MUST NOT
+#       contain any LCat character.
+
+#    3) If a string contains any RandALCat character, a RandALCat
+#       character MUST be the first character of the string, and a
+#       RandALCat character MUST be the last character of the string.
+
+# The output is printed as Unicode codepoints.
+
+   output (length 2):
+   	U+1fb6 U+03b9
+
+# And finally the output is printed as UTF-8
+
+   out (length 5 bytes):
+   	\xE1\xBE\xB6\xCE\xB9
+</artwork>
+</figure>
+
+</section>
+
+<section title="Format of IDNA Test Vectors">
+
+<t>The tests follow a certain syntax, described here by showing one
+complete example with comments intermixed.  The comments are prefixed
+with the '#' character.</t>
+
+<figure>
+<artwork>
+# First the (UTF-8) string is printed as a C octet string, with
+# characters [A-Za-z .0-9] shown inline and other characters shown
+# escaped with \xAB where AB is the hex sequence of that octet.  The
+# number of octets are also shown.
+
+   in (length 39 bytes):
+   	'Hello\x2DAnother\x2DWa'
+   	'y\x2D\xE3\x81\x9D\xE3\x82\x8C\xE3\x81\x9E\xE3\x82\x8C\xE3\x81'
+   	'\xAE\xE5\xA0\xB4\xE6\x89\x80
+
+# The input is also printed as Unicode codepoints.
+
+   input (length 39):
+   	U+0048 U+0065 U+006c U+006c U+006f U+002d U+0041 U+006e
+   	U+006f U+0074 U+0068 U+0065 U+0072 U+002d U+0057 U+0061
+   	U+0079 U+002d U+305d U+308c U+305e U+308c U+306e U+5834
+   	U+6240
+
+# After printing the input, the IDNA ToASCII step starts.  The output
+# is printed as an ASCII string.
+
+   out: xn--hello-another-way--fc4qua05auwb3674vfr0b
+
+</artwork>
+</figure>
+
+<t><vspace blankLines="10000" /></t>
+
+</section>
+
+<section title="Nameprep Test Vectors">
+
+<?rfc include="foo"?>
+
+</section>
+
+<section title="IDNA ToASCII Test Vectors">
+
+<?rfc include="bar"?>
+
+</section>
+
+<section title="IDNA ToUnicode Test Vectors">
+
+
+</section>
+
+<section title="Auxiliary Test Vectors">
+
+<t>These test vectors do not test Nameprep nor IDNA proper, rather
+they test the UTF-8 handling of software.  Instead of outputting the
+indicated Unicode code point, they should raise an error that the
+input was invalid.</t>
+
+<section title="Incorrect UTF-8 encoding of U+00DF">
+
+<figure>
+<artwork>
+in (length 2 bytes):
+	\xC3\xDF
+output (length 1):
+	U+00df 
+</artwork>
+</figure>
+
+</section>
+
+<section title="Incorrect UTF-8 encoding of U+01F0">
+
+<figure>
+<artwork>
+in (length 2 bytes):
+	\xC7\xF0
+output (length 1):
+	U+01f0 
+</artwork>
+</figure>
+
+</section>
+
+</section>
+
+<section title="Security Considerations">
+
+<t>The security considerations from Nameprep and IDNA are
+inherited.</t>
+
+<t>These test vectors are not believed to introduce new security
+considerations nor disrupt the operation of the Internet, but may
+expose security weaknesses in existing implementations.  Any such
+incident should not be regarded as a problem with this document,
+though, but rather taken as evidence that this document served its
+purpose.</t>
+
+</section>
+
+</middle>
+
+<back>
+
+<note title="Acknowledgments">
+<t>Some IDNA test vectors were borrowed from Punycode <xref
+target="RFC3492" />.  Several people pointed out invalid UTF-8
+encodings used in earlier versions of the draft.</t>
+</note>
+
+<section title="Nameprep test vectors in C syntax">
+
+<t>In order to avoid having implementors type in the test vectors
+above, a C structure with the data is provided.</t>
+
+<t>The comment field is the section titles used in this document.  The
+in field contains UTF-8 encoded strings.  The out field contains
+expected output, or NULL if the expected result is an error.  The
+profile field can be ignored.  The only significant setting for the
+flags field is STRINGPREP_NO_UNASSIGNED which signals to the Nameprep
+implementation that it should perform unassigned code point checking,
+aka the "AllowUnassigned" flag.  The rc field contains expected error
+codes, where 0 indicates success and the other flags should be self
+explanatory.</t>
+
+<figure>
+<artwork>
+struct stringprep
+{
+  char *comment;
+  char *in;
+  char *out;
+  char *profile;
+  int flags;
+  int rc;
+}
+strprep[] =
+{
+  {
+    "Map to nothing",
+    "foo\xC2\xAD\xCD\x8F\xE1\xA0\x86\xE1\xA0\x8B"
+    "bar""\xE2\x80\x8B\xE2\x81\xA0""baz\xEF\xB8\x80\xEF\xB8\x88"
+    "\xEF\xB8\x8F\xEF\xBB\xBF", "foobarbaz"
+  },
+  {
+    "Case folding ASCII U+0043 U+0041 U+0046 U+0045",
+    "CAFE", "cafe"
+  },
+  {
+    "Case folding 8bit U+00DF (german sharp s)",
+    "\xC3\x9F", "ss"
+  },
+  {
+    "Case folding U+0130 (turkish capital I with dot)",
+    "\xC4\xB0", "i\xcc\x87"
+  },
+  {
+    "Case folding multibyte U+0143 U+037A",
+    "\xC5\x83\xCD\xBA", "\xC5\x84 \xCE\xB9"
+  },
+  {
+    "Case folding U+2121 U+33C6 U+1D7BB",
+    "\xE2\x84\xA1\xE3\x8F\x86\xF0\x9D\x9E\xBB",
+    "telc\xE2\x88\x95""kg\xCF\x83"
+  },
+  {
+    "Normalization of U+006a U+030c U+00A0 U+00AA",
+    "\x6A\xCC\x8C\xC2\xA0\xC2\xAA", "\xC7\xB0 a"
+  },
+  {
+    "Case folding U+1FB7 and normalization",
+    "\xE1\xBE\xB7", "\xE1\xBE\xB6\xCE\xB9"
+  },
+  {
+    "Self-reverting case folding U+01F0 and normalization",
+    "\xC7\xF0", "\xC7\xB0"
+  },
+  {
+    "Self-reverting case folding U+0390 and normalization",
+    "\xCE\x90", "\xCE\x90"
+  },
+  {
+    "Self-reverting case folding U+03B0 and normalization",
+    "\xCE\xB0", "\xCE\xB0"
+  },
+  {
+    "Self-reverting case folding U+1E96 and normalization",
+    "\xE1\xBA\x96", "\xE1\xBA\x96"
+  },
+  {
+    "Self-reverting case folding U+1F56 and normalization",
+    "\xE1\xBD\x96", "\xE1\xBD\x96"
+  },
+  {
+    "ASCII space character U+0020",
+    "\x20", "\x20"
+  },
+  {
+    "Non-ASCII 8bit space character U+00A0",
+    "\xC2\xA0", "\x20"
+  },
+  {
+    "Non-ASCII multibyte space character U+1680",
+    "\xE1\x9A\x80", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Non-ASCII multibyte space character U+2000",
+    "\xE2\x80\x80", "\x20"
+  },
+  {
+    "Zero Width Space U+200b",
+    "\xE2\x80\x8b", ""
+  },
+  {
+    "Non-ASCII multibyte space character U+3000",
+    "\xE3\x80\x80", "\x20"
+  },
+  {
+    "ASCII control characters U+0010 U+007F",
+    "\x10\x7F", "\x10\x7F"
+  },
+  {
+    "Non-ASCII 8bit control character U+0085",
+    "\xC2\x85", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Non-ASCII multibyte control character U+180E",
+    "\xE1\xA0\x8E", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Zero Width No-Break Space U+FEFF",
+    "\xEF\xBB\xBF", ""
+  },
+  {
+    "Non-ASCII control character U+1D175",
+    "\xF0\x9D\x85\xB5", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Plane 0 private use character U+F123",
+    "\xEF\x84\xA3", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Plane 15 private use character U+F1234",
+    "\xF3\xB1\x88\xB4", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Plane 16 private use character U+10F234",
+    "\xF4\x8F\x88\xB4", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Non-character code point U+8FFFE",
+    "\xF2\x8F\xBF\xBE", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Non-character code point U+10FFFF",
+    "\xF4\x8F\xBF\xBF", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Surrogate code U+DF42",
+    "\xED\xBD\x82", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Non-plain text character U+FFFD",
+    "\xEF\xBF\xBD", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Ideographic description character U+2FF5",
+    "\xE2\xBF\xB5", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Display property character U+0341",
+    "\xCD\x81", "\xCC\x81"
+  },
+  {
+    "Left-to-right mark U+200E",
+    "\xE2\x80\x8E", "\xCC\x81", "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Deprecated U+202A",
+    "\xE2\x80\xAA", "\xCC\x81", "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Language tagging character U+E0001",
+    "\xF3\xA0\x80\x81", "\xCC\x81", "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Language tagging character U+E0042",
+    "\xF3\xA0\x81\x82", NULL, "Nameprep", 0,
+    STRINGPREP_CONTAINS_PROHIBITED
+  },
+  {
+    "Bidi: RandALCat character U+05BE and LCat characters",
+    "foo\xD6\xBE""bar", NULL, "Nameprep", 0,
+    STRINGPREP_BIDI_BOTH_L_AND_RAL
+  },
+  {
+    "Bidi: RandALCat character U+FD50 and LCat characters",
+    "foo\xEF\xB5\x90""bar", NULL, "Nameprep", 0,
+    STRINGPREP_BIDI_BOTH_L_AND_RAL
+  },
+  {
+    "Bidi: RandALCat character U+FB38 and LCat characters",
+    "foo\xEF\xB9\xB6""bar", "foo \xd9\x8e""bar"
+  },
+  { "Bidi: RandALCat without trailing RandALCat U+0627 U+0031",
+    "\xD8\xA7\x31", NULL, "Nameprep", 0,
+    STRINGPREP_BIDI_LEADTRAIL_NOT_RAL}
+  ,
+  {
+    "Bidi: RandALCat character U+0627 U+0031 U+0628",
+    "\xD8\xA7\x31\xD8\xA8", "\xD8\xA7\x31\xD8\xA8"
+  },
+  {
+    "Unassigned code point U+E0002",
+    "\xF3\xA0\x80\x82", NULL, "Nameprep", STRINGPREP_NO_UNASSIGNED,
+    STRINGPREP_CONTAINS_UNASSIGNED
+  },
+  {
+    "Larger test (shrinking)",
+    "X\xC2\xAD\xC3\x9F\xC4\xB0\xE2\x84\xA1\x6a\xcc\x8c\xc2\xa0\xc2"
+    "\xaa\xce\xb0\xe2\x80\x80", "xssi\xcc\x87""tel\xc7\xb0 a\xce\xb0 ",
+    "Nameprep"
+  },
+  {
+    "Larger test (expanding)",
+    "X\xC3\x9F\xe3\x8c\x96\xC4\xB0\xE2\x84\xA1\xE2\x92\x9F\xE3\x8c\x80",
+    "xss\xe3\x82\xad\xe3\x83\xad\xe3\x83\xa1\xe3\x83\xbc\xe3\x83\x88"
+    "\xe3\x83\xab""i\xcc\x87""tel\x28""d\x29\xe3\x82\xa2\xe3\x83\x91"
+    "\xe3\x83\xbc\xe3\x83\x88"
+  },
+};
+</artwork>
+</figure>
+
+</section>
+
+<section title="IDNA test vectors in C syntax">
+
+<t>In order to avoid having implementors type in the IDNA test vectors
+above, a C structure with the data is provided.</t>
+
+<t>The name field is the section titles used in this document.  The
+inlen and in field contains Unicode code points.  The out field
+contains expected ToASCII output.  The allowunassigned, and
+usestd3asciirules can be ignored.  The toasciirc and tounicoderc field
+contains expected error codes, where 0 indicates success and the other
+flags should be self explanatory.</t>
+
+<figure>
+<artwork>
+struct idna
+{
+  char *name;
+  size_t inlen;
+  unsigned long in[100];
+  char *out;
+  int allowunassigned;
+  int usestd3asciirules;
+  int toasciirc;
+  int tounicoderc;
+} idna[] =
+{
+  {
+    "Arabic (Egyptian)", 17,
+    {
+  0x0644, 0x064A, 0x0647, 0x0645, 0x0627, 0x0628, 0x062A, 0x0643,
+	0x0644, 0x0645, 0x0648, 0x0634, 0x0639, 0x0631, 0x0628, 0x064A,
+	0x061F},
+      IDNA_ACE_PREFIX "egbpdaj6bu4bxfgehfvwxn", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Chinese (simplified)", 9,
+    {
+  0x4ED6, 0x4EEC, 0x4E3A, 0x4EC0, 0x4E48, 0x4E0D, 0x8BF4, 0x4E2D, 0x6587},
+      IDNA_ACE_PREFIX "ihqwcrb4cv8a8dqg056pqjye", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Chinese (traditional)", 9,
+    {
+  0x4ED6, 0x5011, 0x7232, 0x4EC0, 0x9EBD, 0x4E0D, 0x8AAA, 0x4E2D, 0x6587},
+      IDNA_ACE_PREFIX "ihqwctvzc91f659drss3x8bo0yb", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Czech", 22,
+    {
+  0x0050, 0x0072, 0x006F, 0x010D, 0x0070, 0x0072, 0x006F, 0x0073,
+	0x0074, 0x011B, 0x006E, 0x0065, 0x006D, 0x006C, 0x0075, 0x0076,
+	0x00ED, 0x010D, 0x0065, 0x0073, 0x006B, 0x0079},
+      IDNA_ACE_PREFIX "Proprostnemluvesky-uyb24dma41a", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Hebrew", 22,
+    {
+  0x05DC, 0x05DE, 0x05D4, 0x05D4, 0x05DD, 0x05E4, 0x05E9, 0x05D5,
+	0x05D8, 0x05DC, 0x05D0, 0x05DE, 0x05D3, 0x05D1, 0x05E8, 0x05D9,
+	0x05DD, 0x05E2, 0x05D1, 0x05E8, 0x05D9, 0x05EA},
+      IDNA_ACE_PREFIX "4dbcagdahymbxekheh6e0a7fei0b", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Hindi (Devanagari)", 30,
+    {
+  0x092F, 0x0939, 0x0932, 0x094B, 0x0917, 0x0939, 0x093F, 0x0928,
+	0x094D, 0x0926, 0x0940, 0x0915, 0x094D, 0x092F, 0x094B, 0x0902,
+	0x0928, 0x0939, 0x0940, 0x0902, 0x092C, 0x094B, 0x0932, 0x0938,
+	0x0915, 0x0924, 0x0947, 0x0939, 0x0948, 0x0902},
+      IDNA_ACE_PREFIX "i1baa7eci9glrd9b2ae1bj0hfcgg6iyaf8o0a1dig0cd", 0, 0,
+      IDNA_SUCCESS},
+  {
+    "Japanese (kanji and hiragana)", 18,
+    {
+  0x306A, 0x305C, 0x307F, 0x3093, 0x306A, 0x65E5, 0x672C, 0x8A9E,
+	0x3092, 0x8A71, 0x3057, 0x3066, 0x304F, 0x308C, 0x306A, 0x3044,
+	0x306E, 0x304B},
+      IDNA_ACE_PREFIX "n8jok5ay5dzabd5bym9f0cm5685rrjetr6pdxa", 0, 0,
+      IDNA_SUCCESS},
+  {
+    "Russian (Cyrillic)", 28,
+    {
+  0x043F, 0x043E, 0x0447, 0x0435, 0x043C, 0x0443, 0x0436, 0x0435,
+	0x043E, 0x043D, 0x0438, 0x043D, 0x0435, 0x0433, 0x043E, 0x0432,
+	0x043E, 0x0440, 0x044F, 0x0442, 0x043F, 0x043E, 0x0440, 0x0443,
+	0x0441, 0x0441, 0x043A, 0x0438},
+      IDNA_ACE_PREFIX "b1abfaaepdrnnbgefbadotcwatmq2g4l", 0, 0,
+      IDNA_SUCCESS, IDNA_SUCCESS},
+  {
+    "Spanish", 40,
+    {
+  0x0050, 0x006F, 0x0072, 0x0071, 0x0075, 0x00E9, 0x006E, 0x006F,
+	0x0070, 0x0075, 0x0065, 0x0064, 0x0065, 0x006E, 0x0073, 0x0069,
+	0x006D, 0x0070, 0x006C, 0x0065, 0x006D, 0x0065, 0x006E, 0x0074,
+	0x0065, 0x0068, 0x0061, 0x0062, 0x006C, 0x0061, 0x0072, 0x0065,
+	0x006E, 0x0045, 0x0073, 0x0070, 0x0061, 0x00F1, 0x006F, 0x006C},
+      IDNA_ACE_PREFIX "PorqunopuedensimplementehablarenEspaol-fmd56a", 0, 0,
+      IDNA_SUCCESS},
+  {
+    "Vietnamese", 31,
+    {
+  0x0054, 0x1EA1, 0x0069, 0x0073, 0x0061, 0x006F, 0x0068, 0x1ECD,
+	0x006B, 0x0068, 0x00F4, 0x006E, 0x0067, 0x0074, 0x0068, 0x1EC3,
+	0x0063, 0x0068, 0x1EC9, 0x006E, 0x00F3, 0x0069, 0x0074, 0x0069,
+	0x1EBF, 0x006E, 0x0067, 0x0056, 0x0069, 0x1EC7, 0x0074},
+      IDNA_ACE_PREFIX "TisaohkhngthchnitingVit-kjcr8268qyxafd2f1b9g", 0, 0,
+      IDNA_SUCCESS},
+  {
+    "Japanese", 8,
+    {
+  0x0033, 0x5E74, 0x0042, 0x7D44, 0x91D1, 0x516B, 0x5148, 0x751F},
+      IDNA_ACE_PREFIX "3B-ww4c5e180e575a65lsy2b", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Japanese", 24,
+    {
+  0x5B89, 0x5BA4, 0x5948, 0x7F8E, 0x6075, 0x002D, 0x0077, 0x0069,
+	0x0074, 0x0068, 0x002D, 0x0053, 0x0055, 0x0050, 0x0045, 0x0052,
+	0x002D, 0x004D, 0x004F, 0x004E, 0x004B, 0x0045, 0x0059, 0x0053},
+      IDNA_ACE_PREFIX "-with-SUPER-MONKEYS-pc58ag80a8qai00g7n9n", 0, 0,
+      IDNA_SUCCESS},
+  {
+    "Japanese", 25,
+    {
+  0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x002D, 0x0041, 0x006E,
+	0x006F, 0x0074, 0x0068, 0x0065, 0x0072, 0x002D, 0x0057, 0x0061,
+	0x0079, 0x002D, 0x305D, 0x308C, 0x305E, 0x308C, 0x306E, 0x5834,
+	0x6240},
+      IDNA_ACE_PREFIX "Hello-Another-Way--fc4qua05auwb3674vfr0b", 0, 0,
+      IDNA_SUCCESS},
+  {
+    "Japanese", 8,
+    {
+  0x3072, 0x3068, 0x3064, 0x5C4B, 0x6839, 0x306E, 0x4E0B, 0x0032},
+      IDNA_ACE_PREFIX "2-u9tlzr9756bt3uc0v", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Japanese", 13,
+    {
+  0x004D, 0x0061, 0x006A, 0x0069, 0x3067, 0x004B, 0x006F, 0x0069,
+	0x3059, 0x308B, 0x0035, 0x79D2, 0x524D},
+      IDNA_ACE_PREFIX "MajiKoi5-783gue6qz075azm5e", 0, 0, IDNA_SUCCESS,
+      IDNA_SUCCESS},
+  {
+    "Japanese", 9,
+    {
+  0x30D1, 0x30D5, 0x30A3, 0x30FC, 0x0064, 0x0065, 0x30EB, 0x30F3, 0x30D0},
+      IDNA_ACE_PREFIX "de-jg4avhby1noc0d", 0, 0, IDNA_SUCCESS, IDNA_SUCCESS},
+  {
+    "Japanese", 7,
+    {
+  0x305D, 0x306E, 0x30B9, 0x30D4, 0x30FC, 0x30C9, 0x3067},
+      IDNA_ACE_PREFIX "d9juau41awczczp", 0, 0, IDNA_SUCCESS, IDNA_SUCCESS},
+  {
+    "Greek", 8,
+    {0x03b5, 0x03bb, 0x03bb, 0x03b7, 0x03bd, 0x03b9, 0x03ba, 0x03ac},
+    IDNA_ACE_PREFIX "hxargifdar", 0, 0, IDNA_SUCCESS, IDNA_SUCCESS},
+  {
+    "Maltese (Malti)", 10,
+    {0x0062, 0x006f, 0x006e, 0x0121, 0x0075, 0x0073, 0x0061, 0x0127,
+     0x0127, 0x0061},
+    IDNA_ACE_PREFIX "bonusaa-5bb1da", 0, 0, IDNA_SUCCESS, IDNA_SUCCESS},
+  {
+    "Russian (Cyrillic)", 28,
+    {0x043f, 0x043e, 0x0447, 0x0435, 0x043c, 0x0443, 0x0436, 0x0435,
+     0x043e, 0x043d, 0x0438, 0x043d, 0x0435, 0x0433, 0x043e, 0x0432,
+     0x043e, 0x0440, 0x044f, 0x0442, 0x043f, 0x043e, 0x0440, 0x0443,
+     0x0441, 0x0441, 0x043a, 0x0438},
+    IDNA_ACE_PREFIX "b1abfaaepdrnnbgefbadotcwatmq2g4l", 0, 0,
+    IDNA_SUCCESS, IDNA_SUCCESS},
+};
+</artwork>
+</figure>
+
+</section>
+
+<references title="Normative References">
+   <?rfc include="reference.RFC.3491.xml"?>
+   <?rfc include="reference.RFC.3490.xml"?>
+</references>
+
+<references title="Informative References">
+   <?rfc include="reference.RFC.3492.xml"?>
+</references>
+
+</back>
+
+</rfc>

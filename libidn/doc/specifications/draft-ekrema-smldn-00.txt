@@ -1,0 +1,310 @@
+Standardization of Multilingualizing		Rifaah Ekrema
+Domain Names( MLDN)		                Mohamed A. Elhamalaway
+[Target Category: Standards Track]		Omar Bakleh
+                                                Khaled Alahmad
+<draft-Ekrema-smldn-00.txt>			Fidaa Al-Jundi
+Expire: 8-April-2005 				Mhd. Elfatih Altijani
+
+"By submitting this Internet-Draft, I certify that any applicable 
+patent or other IPR claims of which I am aware have been disclosed, 
+orwill be disclosed, and any of which I become aware will be 
+disclosed,in accordance with RFC 3668."
+
+
+	Standardization of Multilingualizing Domain Names( MLDN)
+
+
+Status of this Memo:
+	This document is an Internet-Draft and is in full conformance with all 
+	provisions of Section 10 of RFC2026 except that the right to produce 
+	derivative works is not granted.
+
+	Internet-Drafts are working documents of the Internet Engineering Task 
+	Force(IETF), its areas, and its working groups. Note that other groups may 
+	also distribute working documents as Internet-Drafts.
+
+	Internet-Drafts are draft documents valid for a maximum of six months and 
+	may be updated, replaced, or to be made obsolete by other documents at any 
+	time. It is inappropriate to use Internet-Drafts as reference material or to 
+	cite them other than as "work in progress.
+
+	The list of current Internet-Drafts can be accessed at:
+	http://www.ietf.org/ietf/1id-abstracts.txt
+
+	The list of Internet-Draft Shadow Directories can be accessed 
+	at: http://www.ietf.org/shadow.html.
+        
+        Copyright Notice:
+        Copyright (C) The Internet Society (2004).  All Rights Reserved. 
+         
+Abstract:
+	Until now, many standards was issued to standardize creating and managing 
+	IDN (Internationalized Domain Names), all those standards discussed the 
+	technical problem issued from the need to keep the structure of the internet 
+	that uses standard (ASCII) domain names untouched; using this pretext those 
+	standards forced  some rules that make lingual grammars for some languages 
+	not respected on the language domain names.
+
+	This document will try to define a new type of domain names called the 
+	"multilingual domain names" (MLDNs) , these names are supposed to respect 
+	the grammatical and spelling of every language so at least, every language 
+	can use the words of its own dictionary in its own domain names.
+	The system supposed to manage the reservation and the resolution of the new 
+	domain names (MLDNs) must also respect the infrastructure of the traditional 
+	domain names system (DNS) untouched so it will not jeopardize the stability  
+	of the internet.
+	In the rest of the document we will refer to that system by MLDNS (Multi-
+	Lingual Domain Names System).  
+
+	MLDNS Will use the same large repertoire of Unicode characters to compose 
+	its domain names and that means the use of none-ASCII characters, this use 
+	must allow all languages to have their domain names that respect their 
+	language properties and rules. Also it must depends on a technique that 
+	keeps the stable DNS system untouched.
+
+	Comments on this document can be sent to the authors at:
+	arabic-idn-admin@aietf.org.
+
+Table of content:
+	1.Introduction
+	2.Problem Analysis
+	3.Introducing MLDN
+	4.ML Recommendations
+	5.MLDNA
+	6.Full Copyright Statement:
+	7.References
+	8.Terms
+	9.Authors
+
+
+1. Introduction:
+	Internationalized domain names (IDN) are still a subject of a great 
+	debates between technical associations and organizations, each one 
+	tries to create new standards that controls the new addressing mass 
+	that will be launched by the new unlimited possibilities of non ASCII 
+	domain names, all those standards agree on one major issue that is 
+	keeping the current stable DNS system  unaffected by the new era of 
+	using UNICODE domain names.
+
+	Focusing on technical issues in all drafts and RFCs talking about IDN 
+	imposed a lot of natural language usage limitations, and these 
+	limitations prevent national languages from using all their characters 
+	and all their vocabulary and their sentences structure in their 
+	national domain names. And in some times those limitations force the 
+	user to use domain names that does not satisfy the grammars of the 
+	natural language.
+
+	For example, the prevention of using space character in domain names 
+	will force languages that contain joint characters (characters that  
+	change their shapes according to their place in the word) to have un-
+	readable domain names, the suggested solution is to use dashes to 
+	separate between words consists of joinable characters and this is not 
+	acceptable grammatically. like Chinese and Arabic languages as  RFC 
+	3743 and internet draft "draft-bakleh-reg-adm-acg-apu-00.txt".
+
+
+2. Problem Analysis:
+	The problem mentioned in the introduction is caused by the fact that 
+	IDN rule makers have prepared general studies to control the creation 
+	of IDNs, such studies does not take in consideration the properties 
+	and the specialties of each language and as a result we have 
+	Internationalized domain name that does not satisfy the user needs of 
+	having user friendly domain names which are familiar to his own 
+	national language which is called multilingual domain name MLDN. 
+
+	This can be clearly seen by the fact that we have a UNIQUE nameprep 
+	proposed to test all the domain names in the world in all the 
+	languages of the world nations, and this nameprep is recommended to be 
+	the first layer to handle the domain name and decide wither it can be 
+	used as an IDN or not. which isn∆t a technical need to keep the 
+	current DNS stability and the network infrastructure untouched.
+ 
+
+3. Introducing MLDN:
+	The term MLDN stands for MultiLingual Domain Names, the only 
+	difference between IDN and MLDN is that MLDN allows each language to 
+	implement its own nameprep to test its own domain names, and it allows 
+	each language to put syntactical rules of composing its own domain 
+	names. And so it will be the sole  responsible of determining its 
+	domain names method and nameprep method managing its reservation and 
+	registration systems, but it is NOT allowed to each language to have 
+	its own ACE (ACII Compatible Encoding) to represent its domain names.
+  
+      
+4. ML Recommendations:
+	MLDN must have several namepreps but a unique ACE to encode the 
+	national domain name. based on these MLDNs recommendations:
+
+	1.MLDNA must not use more than one lingual character set in  any part 
+	  of MLDNs.
+
+	2.The lingual nameprep must gives the possibility to use all 
+	  language∆s words in the domain name system from both technical and 
+	  grammatical point of view.
+	
+	3.MLDNA reservation must have the technical possibility to register 
+	  any domain name agreed by its nameprep method.
+
+	4.MLDN must give each nation a full control to determine its lingual 
+	  nameprep and its elements (the UNICODE characters set and its 
+	  (MLgTLDs) Multilingual generic Top Level domain names and its 
+	  (MLccTLDs)  Multilingual country code Top Level Domain Names) to 
+	  be the UNIQUE  choice to use in its domain names. The nation's 
+	  control must be submitting by the accreditation of its official 
+  	  countries through its ccTLDs authorities as the sole publisher 
+	  through ICANN and IANA.
+
+	5.MLDN must create  an smart ACE based on variant characters 
+	  encoding according  its using rates to have  longer MLDNs more 
+	  than the PUNYCODE gives.
+                       
+5. MLDNA:
+	To realize this goal we have to take the previous RFCs talking about 
+	IDN (Internationalized domain names) in consideration, specially RFC 
+	3490 talking about IDNA (Internationalized Domain Names in 
+	Application) this RFC offers a reasonable solution to realize non 
+	ASCII domain names system based on the current DNS system.
+        IDNA suggests that the following structure to realize IDN system.
+        
+
+                            +------+
+                            | User |
+                            +------+
+                               ^
+                               | Input and display: local interface methods
+                               | (pen, keyboard, glowing phosphorus, ...)
+           +-------------------|-------------------------------+
+           |                   v                               |
+           |          +-----------------------------+          |
+           |          |        Application          |          |
+           |          |   (ToASCII and ToUnicode    |          |
+           |          |      operations may be      |          |
+           |          |        called here)         |          |
+           |          +-----------------------------+          |
+           |                   ^        ^                      | End system
+           |                   |        |                      |
+           | Call to resolver: |        | Application-specific |
+           |              ACE  |        | protocol:            |
+           |                   v        | ACE unless the       |
+           |           +----------+     | protocol is updated  |
+           |           | Resolver |     | to handle other      |
+           |           +----------+     | encodings            |
+           |                 ^          |                      |
+           +-----------------|----------|----------------------+
+               DNS protocol: |          |
+                         ACE |          |
+                             v          v
+                  +-------------+    +---------------------+
+                  | DNS servers |    | Application servers |
+                  +-------------+    +---------------------+
+        
+   This structure gives the possibility to realize what we have already 
+   called MLDN, according to this RFC each IDN system will have its 
+   toASCII function or layer that grantees the conversion of UNICODE 
+   domain names into standard domain name. the main obstacle in IDNA that 
+   prevents the realization of MLDN is the existence of the UNIQUE 
+   nameprep in the toASCII layer. 
+
+   So the idea of MLDNA is to use the IDNA structure but to let each 
+   language build its own nameprep and us it in the toASCII layer. 
+   Allowing the national language users to build its nameprep will permit 
+   them to put linguistic rules to control the creation of the languages 
+   national domain names according to its grammatical and orthographical 
+   rules. And this will guarantee the creation of user friendly MLDNs 
+   with the full respect to both internet current  infrastructure and 
+   national languages needs.
+
+
+6. Full Copyright Statement:
+
+        Copyright (C) The Internet Society (2004).  This document is subject to the 
+        rights, licenses and restrictions contained in BCP 78 and except as set forth 
+        therein, the authors retain all their rights. 
+         
+        THIS DOCUMENT AND THE INFORMATION CONTAINED HEREIN ARE PROVIDED ON AN "AS IS" 
+        BASIS AND THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS OR IS SPONSORED BY 
+        (IF ANY), THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE DISCLAIM 
+        ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY 
+        THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY 
+        IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  
+         
+        DISCLAIMER 
+         
+        THIS DOCUMENT AND THE INFORMATION CONTAINED HEREIN IS PROVIDED ON AN "AS IS" 
+        BASIS AND THE AUTHORS, THE ORGANIZATION THEY REPRESENT OR ARE SPONSORED BY, THE 
+        INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL 
+        WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT 
+        THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED 
+        WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+7. References:
+   [RFC3492]
+	Punycode: A Bootstring encoding of Unicode for Internationalized 
+	Domain Names in Applications (IDNA)A. Costello Univ. of 
+	California, Berkeley Category: Standards Track, March 2003
+
+   [RFC3491]:
+	Nameprep: A Stringprep Profile for Internationalized Domain Names 
+	(IDN) P. Hoffman, IMC & VPNC M. Blanchet, Viagenie Category: 
+	Standards Track, March 2003.
+
+   [RFC3490]:
+	Internationalizing Domain Names in Applications (IDNA) P. 
+	Faltstrom, Cisco, Category: Standards Track P. Hoffman, IMC & 
+	VPNC, A. Costello, UC Berkeley, March 2003. 
+
+   [RFC3743]:
+	Joint Engineering Team (JET) Guidelines for Internationalized 
+	Domain Names (IDN) Registration and Administration for Chinese, 
+	Japanese, and Korean.
+
+8. Terms:
+	MLDN: Multi Lingual Domain Name.
+	IDN: Internationalized Domain Name.
+	IDNA: Internationalized Domain Name in Application. (RFC 3490)
+	Nameprep: A Stringprep Profile for Internationalized Domain Names; draft-
+	ietf-idn-nameprep, Feb 2002, Paul Hoffman, Marc Blanchet, work in progress.
+	Punycode: An encoding of Unicode for use with IDNA, draft-ietf-idn-punycode, 
+	Feb 2002, Adam M. Costello,   work in progress.
+
+9. Authors:
+   Rifaah Ekrema:
+	AIETF Organization
+	P.O: 30775
+	Damascus, Syria.
+	Phone: +963 93 611087
+	Fax: +963 11 2238490
+	rifaah@aietf.org
+
+   Omar Bakleh:
+	Damascus University, Damascus, Syria
+        Phone: +963 93 363004
+        Fax: +963 11 2139804
+        Omar@damasuniv.shern.net
+        
+   Mohamed A. Elhamalaway: 
+	Al-Azhar University, Systems & Computers Engineering dept.
+	Cairo, Egypt.
+	Phone: +20 6321465
+	Fax: +20 6377446
+	mhamalwy@yahoo.com
+	
+
+   Fidaa Al-Jundi: 
+	Nozum Alhausabah Company,
+	Dubai, UAE.
+	Phone: +971 50 6507282
+	fida@hausabah.com
+
+   Khaled Alahmad:
+	High Institute of Applicable Science & technology,
+	Damascus, Syria
+	Phone: +963 93 330345
+	ka@ka-it.net
+
+   Mhd. Elfatih Altijani:
+	Technical Manager, Sudatel,
+	Alkhartoum, Sudan.
+	Phone: +249 12 390573
+	elfatih@sudatel.net
