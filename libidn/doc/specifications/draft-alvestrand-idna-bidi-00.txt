@@ -1,0 +1,616 @@
+
+
+
+Network Working Group                                 H. Alvestrand, Ed.
+Internet-Draft                                                    Google
+Expires: April 16, 2007                                     C. Karp, Ed.
+                                       Swedish Museum of Natural History
+                                                            Oct 13, 2006
+
+
+                An IDNA problem in right-to-left scripts
+                     draft-alvestrand-idna-bidi-00
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on April 16, 2007.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2006).
+
+Abstract
+
+   The use of right-to-left scripts in internationalized domain names
+   has presented several challenges.  This memo discusses one problem
+   resulting from a constraint on the use of combining characters at the
+   end of an RTL domain label, resulting in some words being declared
+   invalid as IDN labels, and proposes a means for ameliorating this
+   problem.
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 1]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+Table of Contents
+
+   1.  Introduction and problem description . . . . . . . . . . . . .  3
+   2.  Detailed examples  . . . . . . . . . . . . . . . . . . . . . .  4
+     2.1.  Dhivehi  . . . . . . . . . . . . . . . . . . . . . . . . .  4
+     2.2.  Yiddish  . . . . . . . . . . . . . . . . . . . . . . . . .  4
+   3.  Modification to RFC 3454 . . . . . . . . . . . . . . . . . . .  5
+   4.  Other issues in need of resolution . . . . . . . . . . . . . .  6
+   5.  Backwards compatibility considerations . . . . . . . . . . . .  7
+   6.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  8
+   7.  Security Considerations  . . . . . . . . . . . . . . . . . . .  8
+   8.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . .  8
+   9.  References . . . . . . . . . . . . . . . . . . . . . . . . . .  8
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 10
+   Intellectual Property and Copyright Statements . . . . . . . . . . 11
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 2]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+1.  Introduction and problem description
+
+   The IDNA specification "Stringprep", [RFC3454] makes the following
+   statement in its section 6 on the bidi algorithm, :
+
+      3) If a string contains any RandALCat character, a RandALCat
+      character MUST be the first character of the string, and a
+      RandALCat character MUST be the last character of the string.
+
+   (A RandAlCat character is a character with unambiguously right-to-
+   left directionality.)
+
+   The reasoning behind this prohibition is to ensure that every
+   component of a visually presented domain name has an unambiguously
+   preferred direction.  However, this makes certain words in languages
+   written with right-to-left scripts invalid as IDN labels, and in at
+   least one case means that all the words of an entire language are
+   forbidden as IDN labels.
+
+   This will be illustrated below with examples taken from the Dhivehi
+   and Yiddish languages, as written with the Thaana and Hebrew scripts,
+   respectively.
+
+   The problem may be addressed by more carefully considering the bidi
+   algorithm in Unicode Standard Annex #9 [UAX9] which states in section
+   3.3.3 W1: "Examine each non-spacing mark (NSM) in the level run, and
+   change the type of the NSM to the type of the previous character."
+   ("Previous" as used here refers to the sequence of Unicode characters
+   in a data stream, and is not related to the positions of the
+   characters when displayed.)
+
+   Section 3 of UAX9 contains several instructions for determining the
+   directionality of the characters in a string.  Some of them (for
+   instance those using explicit embedding) are irrelevant to IDNA
+   because the corresponding codes are not permitted as IDNA input, so a
+   slightly simplified version should be enough for IDNA purposes.
+
+   A note on terminology:
+
+   In this memo, we use "network order" to describe the sequence of
+   characters as transmitted on the wire or stored in a file; the terms
+   "first", "next" and "previous" are used to refer to the relationship
+   of characters in network order.
+
+   We use "display order" to talk about the sequence of characters as
+   imaged on a display medium; the terms "left" and "right" are used to
+   refer to the relationship of characters in display order.
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 3]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+2.  Detailed examples
+
+2.1.  Dhivehi
+
+   Dhivehi, the official language of the Maldives, is written with the
+   Thaana script.  This displays some of the characteristics of Arabic
+   script, including its directional properties, and the indication of
+   vowels by the diacritical marking of consonantal base characters.
+   This marking is obligatory, and both double vowels and syllable-final
+   consonants are indicated by the marking of special unvoiced
+   characters.  Every Dhivehi word therefore ends with a combining mark.
+
+   The word for "computer", which is romanized as "konpeetaru", is
+   written with the following sequence of Unicode code points:
+
+      U+0786 THAANA LETTER KAAFU (AL)
+
+      U+07AE THAANA OBOFILI (NSM)
+
+      U+0782 THAANA LETTER NOONU (AL)
+
+      U+07B0 THAANA SUKUN (NSM)
+
+      U+0795 THAANA LETTER PAVIYANI (AL)
+
+      U+07A9 THAANA LETTER EEBEEFILI (AL)
+
+      U+0793 THAANA LETTER TAVIYANI (AL)
+
+      U+07A6 THAANA ABAFILI (NSM)
+
+      U+0783 THAANA LETTER RAA (AL)
+
+      U+07AA THANAA UBIUFILI (NSM)
+
+   The directionality class of U+07AA in the Unicode database is NSM
+   (non-spacing mark), which is not R or AL; a conformant implementation
+   of the IDNA algorithm will say that "this is not in RandALCat", and
+   refuse to encode the string.
+
+2.2.  Yiddish
+
+   Yiddish is one of several languages written with the Hebrew script
+   (others include Hebrew and Ladino).  This is basically a consonantal
+   alphabet but Yiddish is written using an extended form that is fully
+   vocalic.  The vowels are indicated in several ways, of which one is
+   by repurposing letters that are consonants in Hebrew.  Other letters
+   are used both as vowels and consonants, with combining marks used to
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 4]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+   differentiate between them.  Finally, some base characters can
+   indicate several different vowels, which are also disambiguated by
+   combining marks.  Marked characters can appear in word-final position
+   and may therefore also be needed at the end of labels.  This is not
+   an invariable attribute of all Yiddish strings and there is thus
+   greater latitude here than there is with Dhivehi.
+
+   The "YIVO Institute for Jewish Research" is widely known by the
+   acronym of its Yiddish name.  This organization maintains a primary
+   reference standard for modern Standard Yiddish orthography, that is
+   also commonly referred to by the same acronym (as the "YIVO Rules").
+   YIVO is written with the Hebrew letters YOD YOD HIRIQ VAV VAV ALEF
+   QAMATS, where HIRIQ and QAMATS are combining "points":
+
+      U+05D9 HEBREW LETTER YOD (R)
+
+      U+05B4 HEBREW POINT HIRIQ (NSM)
+
+      U+05D5 HEBREW LETTER VAV (R)
+
+      U+05D0 HEBREW LETTER ALEF (R)
+
+      U+05B8 HEBREW POINT QAMATS (NSM)
+
+   The directionality class of U+05B8 HEBREW POINT QAMATS in the Unicode
+   database is NSM, which again causes the IDNA algorithm to reject the
+   string.  (It may also be noted that the requisite combined characters
+   also exist in precomposed form at separate positions in the Unicode
+   chart.  However, Stringprep also rejects those codepoints, for
+   reasons not discussed here.)
+
+
+3.  Modification to RFC 3454
+
+   If the following modification is made to RFC 3454, we believe that
+   the usefulness of the specification for languages written with right-
+   to-left scripts will be significantly improved:
+
+   Old text:
+
+      [Unicode3.2] defines several bidirectional categories; each
+      character has one bidirectional category assigned to it.  For the
+      purposes of the requirements below, an "RandALCat character" is a
+      character that has Unicode bidirectional categories "R" or "AL";
+      an "LCat character" is a character that has Unicode bidirectional
+      category "L".
+
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 5]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+
+
+   New text:
+
+      [Unicode3.2] defines several bidirectional categories; each
+      character has one bidirectional category assigned to it.
+
+      For characters that have category "R", "AL" or "L", the category
+      is fixed (UAX#9 defines them as having "strong" category); for
+      characters in category EN, ES, ET, AN, CS, NSM, BN, B, S, WS and
+      ON, the category is determined by applying the algorithm described
+      in UAX#9 section 3.3 to the string.
+
+      For the purposes of the requirements below, an "RandALCat
+      character" is a character that, after this determination, has
+      Unicode bidirectional categories "R" or "AL"; an "LCat character"
+      is a character that has Unicode bidirectional category "L".
+
+   Note that Unicode 5.0 is the current version of Unicode.  This fix
+   refers to Unicode 3.2 only, to maintain consistency with the rest of
+   RFC 3454; nothing here should affect the relationship between Unicode
+   versions and IDNA.
+
+   Also, as noted in the introduction, the Unicode UAX#9 algorithm is
+   quite complex.  For the purposes of IDNA, a simpler algorithm may be
+   defind that yields the same result within the constraints of this
+   context, but may be easier for people to implement consistently.
+   Such an algorithm may be included in later versions of this memo.
+
+
+4.  Other issues in need of resolution
+
+   This is not the only issue with right-to-left scripts.  Retaining
+   Yiddish for the purposes of further exemplification, its alphabet
+   includes three digraphs that can be encoded both as consecutive
+   instances of the two component characters, and as precomposed
+   ligatures.  One of these digraphs also requires additional combined
+   marking.  For example, the HEBREW LIGATURE YIDDISH DOUBLE VAV
+   (U+05F0) is orthographically equivalent to, and typographically
+   utterly confusable with, a sequence of two HEBREW LETTER VAV
+   (U+05D5).  However, the ligature has no canonical decomposition and
+   is therefore preserved by the IDNA algorithm.  These digraphs need to
+   be enumerated and the one form either made invalid for input in the
+   IDNA context, or normalized to the other.
+
+   We believe that there is a clear likelihood of similar issues
+   existing with other scripts and languages that are not currently used
+   extensively with IDNs.  Careful consideration of all the languages
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 6]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+   written in a given script, in consultation with all of the
+   corresponding speech communities, is therefore needed before we can
+   say with any degree of certainty that using that script for IDNs is
+   unproblematic.
+
+   Another set of issues concerns the proper display of IDNs with a
+   mixture of LTR and RTL labels, or only RTL labels; it is not clear to
+   these authors what the proper display order of the components of a
+   domain name are if the directiion of the components (in network
+   order) is, for instance, FirstRTL.SecondRTL.LTR - is it
+   LTRtsriF.LTRdnoceS.LTR or LTRdnoceS.LTRtsrif.LTR?  Again, this memo
+   does not attempt to suggest a solution to this problem.
+
+
+5.  Backwards compatibility considerations
+
+   As with any change to an existing standard, it is important to
+   consider what happens with existing implementations when the change
+   is introduced.  The following troublesome cases have been noted:
+
+   o  Old program used to input the newly allowed string.  If the old
+      program checks the input against RFC 3454, the string will not be
+      allowed, and that domain name will remain inaccessible.
+
+   o  Old program is asked to display the newly allowed string, and
+      checks it against RFC 3454 before displaying.  The program will
+      perform some kind of fallback, most likely displaying the Punycode
+      form of the string.
+
+   o  Old program tries to display the newly allowed string.  If the old
+      program has code for displaying the last character of a string
+      that is different from the code used to display the characters in
+      the middle of the string, display may be inconsistent and cause
+      confusion.
+
+   One particular example of the last case is if a program chooses to
+   examine the last character (in network order) of a string in order to
+   determine its directionality, rather than its first; if it finds an
+   NSM character and tries to display the string as if it was a left-to-
+   right string, the resulting display may be interesting, but not
+   useful.
+
+   The authors believe that these cases will have less harmful impact in
+   practice than continuing to deny the use of words from the languages
+   for which these strings are necessary as IDN labels.
+
+
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 7]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+6.  IANA Considerations
+
+   This document makes no request of IANA.
+
+   Note to RFC Editor: this section may be removed on publication as an
+   RFC.
+
+
+7.  Security Considerations
+
+   This modification will allow some strings to be used in Stringprep
+   contexts that are not allowed today.  It is possible that differences
+   in the interpretation of the specification between old and new
+   implementations could pose a security risk, but it is difficult to
+   envision any specific instantiation of this.
+
+   Any rational attempt to compute, for instance, a hash over an
+   identifier processed by stringprep would use network order for its
+   computation, and thus be unaffected by the changes proposed here.
+
+   While it is not believed to pose a problem, if display routines had
+   been written with specific knowledge of the current Stringprep
+   prohibitions, it is possible that the possible problems noted under
+   "backwards compatibility" could cause new kinds of confusion.
+
+
+8.  Acknowledgements
+
+   While the listed editors held the pen, this document represents the
+   joint work and conclusions of an ad hoc design team.  In addition to
+   the editors this consisted of, in alphabetic order, Tina Dam, Patrik
+   Faltstrom, and John Klensin.  Many further specific contributions and
+   helpful comments were received from the people listed below, and
+   others who have contributed to the development and use of the IDNA
+   protocols.
+
+   The team wishes in particular to thank Roozbeh Pournader for calling
+   its attention to the issue with the Thaana script, and Paul Hoffmann
+   for pointing out the need to be explicit about backwards
+   compatibility considerations.
+
+9.  References
+
+   [RFC3454]  Hoffman, P. and M. Blanchet, "Preparation of
+              Internationalized Strings ("stringprep")", RFC 3454,
+              December 2002.
+
+   [UAX9]     0, "Unicode Standard Annex #9: The Bidirectional
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 8]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+              Algorithm, revision 15", 03 2005.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                 [Page 9]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+Authors' Addresses
+
+   Harald Tveit Alvestrand (editor)
+   Google
+   Beddingen 10
+   Trondheim,   7014
+   Norway
+
+
+   Cary Karp (editor)
+   Swedish Museum of Natural History
+   Frescativ. 40
+   Stockholm,   10405
+   Sweden
+
+   Phone: +46 8 5195 4055
+   Fax:
+   Email: ck@nrm.museum
+   URI:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                [Page 10]
+
+Internet-Draft                IDNA RTL fix                      Oct 2006
+
+
+Intellectual Property Statement
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Disclaimer of Validity
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Copyright Statement
+
+   Copyright (C) The Internet Society (2006).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+Alvestrand & Karp        Expires April 16, 2007                [Page 11]
+

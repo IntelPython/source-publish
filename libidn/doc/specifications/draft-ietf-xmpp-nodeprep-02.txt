@@ -1,0 +1,784 @@
+
+
+Network Working Group                                     P. Saint-Andre
+Internet-Draft                                Jabber Software Foundation
+Expires: October 19, 2003                                  J. Hildebrand
+                                                            Jabber, Inc.
+                                                          April 20, 2003
+
+
+      Nodeprep: A Stringprep Profile for Node Identifiers in XMPP
+                      draft-ietf-xmpp-nodeprep-02
+
+Status of this Memo
+
+   This document is an Internet-Draft and is in full conformance with
+   all provisions of Section 10 of RFC2026.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at http://
+   www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on October 19, 2003.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+Abstract
+
+   This document defines a stringprep profile for node identifiers in
+   the Extensible Messaging and Presence Protocol (XMPP).
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 1]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   1.1 Terminology  . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   1.2 Discussion Venue . . . . . . . . . . . . . . . . . . . . . . .  3
+   1.3 Intellectual Property Notice . . . . . . . . . . . . . . . . .  3
+   2.  Character Repertoire . . . . . . . . . . . . . . . . . . . . .  5
+   3.  Mapping  . . . . . . . . . . . . . . . . . . . . . . . . . . .  6
+   4.  Normalization  . . . . . . . . . . . . . . . . . . . . . . . .  7
+   5.  Prohibited Output  . . . . . . . . . . . . . . . . . . . . . .  8
+   6.  Bidirectional Characters . . . . . . . . . . . . . . . . . . .  9
+   7.  Security Considerations  . . . . . . . . . . . . . . . . . . . 10
+   8.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 11
+       Normative References . . . . . . . . . . . . . . . . . . . . . 12
+       Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . 12
+   A.  Revision History . . . . . . . . . . . . . . . . . . . . . . . 13
+   A.1 Changes from draft-ietf-xmpp-nodeprep-01 . . . . . . . . . . . 13
+   A.2 Changes from draft-ietf-xmpp-nodeprep-00 . . . . . . . . . . . 13
+       Full Copyright Statement . . . . . . . . . . . . . . . . . . . 14
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 2]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+1. Introduction
+
+   This document, which defines a profile of stringprep (RFC 3454 [1]),
+   specifies processing rules that will enable users to enter
+   internationalized node identifiers in XMPP (see XMPP Core [2]) and
+   have the highest chance of getting the content of the strings
+   correct.  These processing rules are intended only for XMPP node
+   identifiers (which are often associated with usernames), and not
+   intended for arbitrary text.
+
+   This profile defines the following, as required by RFC 3454 [1]:
+
+   o  The intended applicability of the profile: internationalized node
+      identifiers within XMPP
+
+   o  The character repertoire that is the input and output to
+      stringprep: Unicode 3.2, specified in section 2
+
+   o  The mappings used: specified in section 3
+
+   o  The Unicode normalization used: specified in section 4
+
+   o  The characters that are prohibited as output: specified in section
+      5
+
+   o  Bidirectional character handling: specified in section 6
+
+
+1.1 Terminology
+
+   This document inherits the terminology defined in XMPP Core [2].
+
+   The capitalized key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+   "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in RFC
+   2119 [3].
+
+1.2 Discussion Venue
+
+   The authors welcome discussion and comments related to the topics
+   presented in this document.  The preferred forum is the
+   <xmppwg@jabber.org> mailing list, for which archives and subscription
+   information are available at <http://www.jabber.org/cgi-bin/mailman/
+   listinfo/xmppwg/>.
+
+1.3 Intellectual Property Notice
+
+   This document is in full compliance with all provisions of Section 10
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 3]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+   of RFC 2026.  Parts of this specification use the term "jabber" for
+   identifying namespaces and other protocol syntax.  Jabber[tm] is a
+   registered trademark of Jabber, Inc.  Jabber, Inc.  grants permission
+   to the IETF for use of the Jabber trademark in association with this
+   specification and its successors, if any.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 4]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+2. Character Repertoire
+
+   This profile uses Unicode 3.2 with the list of unassigned code points
+   being Table A.1, both defined in Appendix A of RFC 3454 [1].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 5]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+3. Mapping
+
+   This profile specifies mapping using the following tables from RFC
+   3454 [1]:
+
+      Table B.1
+
+      Table B.2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 6]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+4. Normalization
+
+   This profile specifies using Unicode normalization form KC, as
+   described in RFC 3454 [1].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 7]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+5. Prohibited Output
+
+   This profile specifies prohibiting use of the following tables from
+   RFC 3454 [1].
+
+      Table C.1.1
+
+      Table C.1.2
+
+      Table C.2.1
+
+      Table C.2.2
+
+      Table C.3
+
+      Table C.4
+
+      Table C.5
+
+      Table C.6
+
+      Table C.7
+
+      Table C.8
+
+      Table C.9
+
+   In addition, the following Unicode characters are also prohibited:
+
+      #x22 (")
+
+      #x26 (&)
+
+      #x27 (')
+
+      #x2F (/)
+
+      #x3A (:)
+
+      #x3C (<)
+
+      #x3E (>)
+
+      #x40 (@)
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 8]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+6. Bidirectional Characters
+
+   This profile specifies checking bidirectional strings as described in
+   section 6 of RFC 3454 [1].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003            [Page 9]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+7. Security Considerations
+
+   The Unicode and ISO/IEC 10646 repertoires have many characters that
+   look similar.  In many cases, users of security protocols might do
+   visual matching, such as when comparing the names of trusted third
+   parties.  Because it is impossible to map similar-looking characters
+   without a great deal of context such as knowing the fonts used,
+   stringprep does nothing to map similar-looking characters together
+   nor to prohibit some characters because they look like others.
+
+   Node identifiers are commonly employed as the username of entities
+   that connect to XMPP/Jabber servers for instant messaging and
+   presence services.  The security of such services could be
+   compromised if a user entering a single internationalized node
+   identifier could access another user's account information based on
+   different interpretations of the internationalized node identifier.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003           [Page 10]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+8. IANA Considerations
+
+   This is a profile of stringprep.  If and when it becomes an RFC, it
+   should be registered in the stringprep profile registry maintained by
+   the IANA [4].
+
+   Name of this profile:
+
+      Nodeprep
+
+   RFC in which the profile is defined:
+
+      This document
+
+   Indicator whether or not this is the newest version of the profile:
+
+      This is the first version of Nodeprep
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003           [Page 11]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+Normative References
+
+   [1]  Hoffman, P. and M. Blanchet, "Preparation of Internationalized
+        Strings ("stringprep")", RFC 3454, December 2002.
+
+   [2]  Saint-Andre, P. and J. Miller, "XMPP Core (draft-ietf-xmpp-core-
+        10, work in progress)", April 2003.
+
+   [3]  Bradner, S., "Key words for use in RFCs to Indicate Requirement
+        Levels", BCP 14, RFC 2119, March 1997.
+
+   [4]  Internet Assigned Numbers Authority, "Internet Assigned Numbers
+        Authority", January 1998, <http://www.iana.org/>.
+
+
+Authors' Addresses
+
+   Peter Saint-Andre
+   Jabber Software Foundation
+
+   EMail: stpeter@jabber.org
+   URI:   http://www.jabber.org/people/stpeter.php
+
+
+   Joe Hildebrand
+   Jabber, Inc.
+
+   EMail: jhildebrand@jabber.com
+   URI:   http://www.jabber.org/people/hildjj.php
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003           [Page 12]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+Appendix A. Revision History
+
+   Note to RFC Editor: please remove this entire appendix, and the
+   corresponding entries in the table of contents, prior to publication.
+
+A.1 Changes from draft-ietf-xmpp-nodeprep-01
+
+   o  Made small editorial changes to address RFC Editor requirements.
+
+
+A.2 Changes from draft-ietf-xmpp-nodeprep-00
+
+   o  Clarified references to Unicode 3.2 and unassigned code points.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003           [Page 13]
+
+Internet-Draft                  Nodeprep                      April 2003
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saint-Andre & Hildebrand    Expires October 19, 2003           [Page 14]
+

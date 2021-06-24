@@ -1,0 +1,396 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 6.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<script language="JavaScript">
+<!-- // Start of AdSubtract JavaScript block; you can ignore this.
+     // It is used when AdSubtract blocks cookies or pop-up windows.
+document.iMokie = "cookie blocked by AdSubtract";
+document.iMferrer = "referrer blocked by AdSubtract";
+function iMwin() {
+	this.location = "";
+	this.frames = new Array(9);
+	this.frames[0] = this;
+	this.frames[1] = this;
+	this.frames[2] = this;
+	this.frames[3] = this;
+	this.frames[4] = this;
+	this.frames[5] = this;
+	this.frames[6] = this;
+	this.frames[7] = this;
+	this.frames[8] = this;
+	this.length = 0;
+}
+// End of AdSubtract JavaScript block. -->
+</script>
+<title>Normalization Issue</title>
+<style>
+<!--
+body         { font-family: serif }
+.example     { font-family: sans-serif }
+li           { margin-top: 0.5em; margin-bottom: 0.5em }
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<h1 align="center"><font size="5">Public Review Issue #29: Normalization Issue</font></h1>
+<p align="center"><b>2004-02-11</b></p>
+<h2>Executive Summary</h2>
+<p>There is a problem in the language of the specification of <a href="http://www.unicode.org/unicode/reports/tr15/">UAX #15: Unicode Normalization Forms</a> for forms NFC and
+NFKC. A textual fix is required to make normalization formally self-consistent. Programs that depend on such logical consistency may be subject to security problems until fixed,
+although as yet we know of no realistic scenarios that would present such problems. The fix will not have an impact on real data found in practice (with the possible exception of
+test cases for the algorithm itself), because the affected sequences do not constitute well-formed text in any language.</p>
+<blockquote>
+  <p><i><b>Note: </b>we may add to this document over time, particularly regarding implementations surveyed.</i></p>
+</blockquote>
+<h2>Problem Data Example</h2>
+<p>Fortunately, the actual cases of problematic data are limited to sequences that should never occur in practice. An important feature of these combinations are that they do not
+occur in well-formed text in any language. For example, one never sees the sequence A:</p>
+<ol type="A">
+  <li>
+    <p class="example">U+1100 (&#4352;) HANGUL CHOSEONG KIYEOK +<br>
+    U+0300 (&#9676;&#768;) COMBINING GRAVE ACCENT +<br>
+    U+1161 (&#4449;) HANGUL JUNGSEONG A</li>
+</ol>
+<blockquote>
+  <p><b>Note: </b>some browsers may not correctly display the character in parentheses, such as (&#4352;). These are only for illustration: the character codes and names are
+  sufficient for identification.</p>
+</blockquote>
+<p>The full specification of all problem sequences are listed in the table <a href="#Problem_Sequences">Problem Sequences</a>, at the end of this document.</p>
+<h2>Problem Statement</h2>
+<p>The definitions of NFC and NFKC as they stand contain a contradiction, and will cause the following problems for implementations and interoperability:</p>
+<ol>
+  <li>Unless the definition is fixed, NFC and NFKC are not stable (&quot;idempotent&quot;) transformations.
+    <p>That is, there is some x such that <code>toNFC(toNFC(x)) &#8800; toNFC(x)</code>
+    <p>This is a crucial feature for consistent lookup. Requesting A and getting B, and then requesting B and getting C is clearly something to be avoided. It is also required for
+    fundamental logical consistency, e.g. so that <code>isNFC(toNFC(x))</code> always returns <code>TRUE</code>.</li>
+  <li>Unless the definition is fixed, NFC and NFKC do not obey canonical equivalence for these sequences, which is a primary goal for the format.
+    <p>That is, there are some x and y where <code>toNFD(x) &#8800; toNFD(y)</code>, but <code>toNFC(x) = toNFC(y)</code></li>
+  <li>The sample code included with the specification implemented the correct solution. Thus those existing implementations that followed that code differ from those that followed
+    the formal definition. Two such different implementations produce different results when normalizing text containing the problem sequences.</li>
+</ol>
+<h3>Security</h3>
+<p>It is difficult to construct realistic cases where these situations present a security hole, although it is certainly possible to come up with contrived examples. One
+possibility might be a string that is normalized by a gatekeeper function, and passed on with the expectation that any further normalization will maintain precisely the same
+string. However, the character sequences will not occur in real data, and the characters involved are extremely unlikely to be used in programming syntax, so it is difficult to
+come up with examples where this would allow infiltration or cause other malfunction.</p>
+<p>However, we welcome feedback from experts in this area.</p>
+<h2>Background</h2>
+<p>The process of forming a composition in Normalization Form NFC (or NFKC) involves:</p>
+<ol>
+  <li>decomposing the string according to the canonical (or compatibility, respectively) mappings of the Unicode Character Database that corresponds to the latest version of
+    Unicode supported by the implementation, then
+  <li>composing the resulting string according to the <i>canonical</i> mappings of the composition version of the Unicode Character Database by successively composing each <i>unblocked</i>
+    character with the last <i>starter</i>.</li>
+</ol>
+<p>Figure 1 shows a sample of how this works. The dark green cubes represent <i>starters</i> (characters with a <a href="http://www.unicode.org/Public/4.0-Update/extracted/DerivedCombiningClass-4.0.0.txt">Canonical
+Combining Class</a> (CCC) value of zero), and the light gray cubes represent <i>non-starters</i> (characters with a CCC value strictly greater than zero). In the first step, the
+string is fully decomposed, and reordered. In the second step, each character is checked against the last non-starter, and combined if all the conditions are met. Examples are
+provided in <a href="http://www.unicode.org/reports/tr15/#Examples">Annex 1: Examples and Charts</a>. For more detail, see <a href="http://www.unicode.org/unicode/reports/tr15/">UAX
+#15: Unicode Normalization Forms</a>.</p>
+<p align="center"><img height="141" alt="Basic composition process" src="pr-29-figure1.gif" width="429"></p>
+<p align="center"><b><font size="4">Figure 1. Composition Process</font></b></p>
+<p>Note that in the second row above (which is after Step 1), the CCC values of the gray boxes will be non-decreasing. Thus the values could be:</p>
+<div align="center">
+  <center>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">8</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">230</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">5</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">220</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">220</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">230</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+    </tr>
+  </table>
+  </center>
+</div>
+<p>The sequence of CCC values can never decrease, except to go to zero. Thus the following sequence could never occur after Step 1 has been performed. The values which disobey the
+constraint on non-decreasing values are shown in <font color="#FF0000"><u>red</u></font>:</p>
+<div align="center">
+  <center>
+  <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">8</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">230</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">5</font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5">220</font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5" color="#FF0000"><u>232</u></font></td>
+      <td width="8%" bgcolor="#C0C0C0" align="center"><font size="5" color="#FF0000"><u>230</u></font></td>
+      <td width="8%" bgcolor="#00CCCC" align="center"><font size="5">0</font></td>
+    </tr>
+  </table>
+  </center>
+</div>
+<h3>&nbsp;</h3>
+<h2>Required Textual Fix</h2>
+<p>The problem text occurs in Definition <a href="http://www.unicode.org/reports/tr15/#D2">D2</a>, which defines what it means for a character to be <i>blocked,</i> according to
+the following text:</p>
+<blockquote>
+  <p><b>D2. </b>In any character sequence beginning with a starter S, a character C is <i>blocked</i> from S if and only if there is some character B between S and C, and either B
+  is a starter or it has the same combining class as C.</p>
+</blockquote>
+<p>The implementations that were used to develop normalization, the original design, and the <a href="http://www.unicode.org/reports/tr15/#Code_Sample">sample code</a> in UAX #15
+and <a href="http://www.w3.org/International/charlint/">charlint</a> actually adhere to the following, corrected, language (the missing wording was a glitch that escaped
+examination):</p>
+<blockquote>
+  <p><b>D2'. </b>In any character sequence beginning with a starter S, a character C is <i>blocked</i> from S if and only if there is some character B between S and C, and either B
+  is a starter or it has the same <u>or higher</u> combining class as C.</p>
+</blockquote>
+<p>The following table shows the difference between D2 and D2', where <i>k</i> and <i>i</i> are nonzero canonical combining classes (ccc).</p>
+<table border="1" width="100%" cellspacing="0" cellpadding="4">
+  <caption>
+    <h3>Table 1: <a name="Differences">Differences</a></h3>
+  </caption>
+  <tr>
+    <th>ccc(S)</th>
+    <th>ccc(B)</th>
+    <th>ccc(C)</th>
+    <th>B blocks C?</th>
+    <th>Comments</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>irrelevant</td>
+    <td>impossible: in the algorithm B becomes S as soon as it is seen</td>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>0</td>
+    <td>k</td>
+    <td>irrelevant</td>
+    <td>impossible: in the algorithm B becomes S as soon as it is seen</td>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>i</td>
+    <td>0</td>
+    <td><b><u>yes</u></b></td>
+    <td>was <b><u>no</u></b> in D2</td>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>i</td>
+    <td>k = i</td>
+    <td>yes</td>
+    <td>avoids affecting ordering in both cases</td>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>i</td>
+    <td>k &gt; i</td>
+    <td>no</td>
+    <td>allows combination in both cases</td>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>i</td>
+    <td>i &gt; k</td>
+    <td>irrelevant</td>
+    <td>impossible after canonical reordering</td>
+  </tr>
+</table>
+<p>Here is an example that shows where this makes a difference. In the sequence A below, U+0300 has CCC = 230, while the two Hangul characters have CCC = 0 (and thus are starters):</p>
+<ol type="A">
+  <li>
+    <p class="example">U+1100 (&#4352;) HANGUL CHOSEONG KIYEOK +<br>
+    U+0300 (&#9676;&#768;) COMBINING GRAVE ACCENT +<br>
+    U+1161 (&#4449;) HANGUL JUNGSEONG A</li>
+</ol>
+<p>According to the old language, the NFC form of this would be B:</p>
+<ol type="A" start="2">
+  <li>
+    <p class="example">U+AC00 (&#44032;) HANGUL SYLLABLE GA +<br>
+    U+0300 (&#9676;&#768;) COMBINING GRAVE ACCENT</li>
+</ol>
+<p>That is, last character is not blocked by the accent, and combines with the first character. The corrected language in D2' prevents this, and the NFC form stays the same, as in
+C :</p>
+<ol type="A" start="3">
+  <li>
+    <p class="example">U+1100 (&#4352;) HANGUL CHOSEONG KIYEOK +<br>
+    U+0300 (&#9676;&#768;) COMBINING GRAVE ACCENT +<br>
+    U+1161 (&#4449;) HANGUL JUNGSEONG A</li>
+</ol>
+<p>For examples of where this causes the normalization transform to be unstable, see <a href="#Instability_Example">Instability Example</a>.</p>
+<h2>Recommendations</h2>
+<p>The contradictions in the definition of normalization format must be corrected by correcting D2 to D2'. In detail, the recommended actions for the Unicode Consortium are the
+following:</p>
+<ol>
+  <li>Correct D2 to D2' in a corrigendum that can be applied to any previous versions of Unicode (3.0.1 through 4.0.1), so that people running on those versions of Unicode who want
+    to correct their implementations can do so.</li>
+  <li>Supply an extra NormalizationTest data file, with test cases for each of the rows in <a href="#Problem_Sequences">Problem Sequences</a>. All of the test cases will only
+    contain characters defined in Unicode 3.0, so this can be used on any version of Unicode from 3.0 on.</li>
+  <li>Add a sample test harness for a monkey test, so that people can compare the results of their code against generated sequences compliant with the corrected statement of
+    normalization, so as to check beyond the specific test cases provided for the problem sequences.</li>
+  <li>Clarify the following in the specification:
+    <ol type="a">
+      <li>The role of sample code for purposes of expressing the specification of the standard</li>
+      <li>The importance of <a href="http://www.unicode.org/unicode/reports/tr15/#Design_Goals">Uniqueness and Stability Design Goals (1 and 2)</a> for the specification.</li>
+    </ol>
+  </li>
+  <li>Incorporate all of the above in the next available version of Unicode after 4.0.1 (that is, either 4.0.2 or 4.1).</li>
+  <li>Clarify the following in the <a href="http://www.unicode.org/standard/stability_policy.html">Stability Policies</a>:
+    <ol type="a">
+      <li>What is meant in Stability Policy #3 by &quot;destabilize normalization&quot;</li>
+      <li>That logical inconsistencies may require corrections even under the Stability Policies</li>
+    </ol>
+  </li>
+  <li>Recommend to all other standards and implementers that they update to the corrigendum as soon as possible.</li>
+</ol>
+<h2>Implementations Surveyed</h2>
+<p>For all implementations that we have been able to review, either the code follows the example of the sample code, and needs no changes, <b>OR</b> the code change is quite small,
+typically converting a not-equals (!=) to a less-than (&lt;) on one line of code. As discussed above, in practice no data should be affected.</p>
+<h3><b>Test Cases</b></h3>
+<p>To see whether an implementation has the problem, check the following cases to make sure that they do not change after applying NFC.</p>
+<ul>
+  <li>&lt;U+0B47; U+0300; U+0B3E&gt;</li>
+  <li>&lt;U+1100; U+0300; U+1161&gt;</li>
+</ul>
+<h3><b>Implementations Surveyed</b></h3>
+<ul>
+  <li><a href="http://cvs.sourceforge.net/viewcvs.py/*checkout*/python/python/dist/src/Modules/unicodedata.c?content-type=text%2Fplain&amp;rev=2.29">http://cvs.sourceforge.net/viewcvs.py/*checkout*/python/python/dist/src/Modules/unicodedata.c</a>: 
+	<font color="#FF0000">needs change</font> (checked Python 2.3.4, 2004/10/26 
+	and reported)</li>
+  <li>libidn ( <a href="http://josefsson.org/libidn/">http://josefsson.org/libidn/</a> 
+	): <font color="#FF0000">needs change</font> (checked version 0.5.8, 
+	2004/10/27 and reported)</li>
+  <li>ICU: needs change</li>
+  <li>charlint, perl (http://dev.w3.org/cvsweb/charlint/charlint.pl): no change necessary</li>
+  <li>idnkit ( <a href="http://www.nic.ad.jp/ja/idn/idnkit/download/">http://www.nic.ad.jp/ja/idn/idnkit/download/</a> ): needs change</li>
+  <li>xml1.1test normalization checking code ( <a href="http://dev.w3.org/cvsweb/charlint/xml1.1test/">http://dev.w3.org/cvsweb/charlint/xml1.1test/</a> ): needs change</li>
+  <li>Sybase Unilib and Sybase Adaptive Server Enterprise: no change necessary</li>
+  <li>Verisign: no change necessary (Verisign has a list of implementations on 
+  their site at this URL:
+  <a href="http://www.verisign.com/nds/naming/idn/applications.html">
+  http://www.verisign.com/nds/naming/idn/applications.html</a>)</li>
+</ul>
+<h2><b>Strategies for Maintaining Stability</b></h2>
+<p>If a format or specification (such as for identifiers) uses NFC or NFKC and wants to remain stable across the change, one possible approach is to forbid sequences defined by the
+table <a href="#Problem_Sequences">Problem Sequences</a> below. These sequences should never appear in real data, so the restriction does not cause any lack of expressiveness. Some
+supersets of these sequences are easier to compute, and also will not occur in practice, so could be forbidden instead. For example, one could forbid any <i>last_character</i> that
+is after an <i>intervening_character</i>. This is easy to detect, and any occurrence of <i>last_character</i> itself will be quite rare, so this should not materially affect
+performance.</p>
+<blockquote>
+  <p><b>Note: </b>The characters matching <i>last_character</i> are also defined in the section <a href="http://www.w3.org/TR/charmod/#sec-ComposingChars">ComposingChars</a> in the
+  W3C <a id="title" href="http://www.w3.org/TR/charmod/">Character Model for the World Wide Web 1.0</a>. (The public Working Draft 22 August 2003 version of the table mistakenly
+  includes 0FB5 and 0FB7. Those are to be fixed in the next version.)</p>
+</blockquote>
+<hr>
+<h2><a name="Problem_Sequences">Problem Sequences</a></h2>
+<p>The following table shows all of the problem sequences. Those are of the form</p>
+<p align="center"><i>first_character&nbsp; intervening_character+ last_character</i></p>
+<p>where the <i>first_character </i>and <i>last_character </i>come from the same row in the following table, and there is at least one <i>intervening_character</i> with non-zero <a href="http://www.unicode.org/Public/4.0-Update/extracted/DerivedCombiningClass-4.0.0.txt">Canonical
+Combining Class</a>. (The '+' above means one or more occurrences.) As noted above, these sequences will not occur in practice.</p>
+<table border="1" width="100%" cellspacing="0" cellpadding="4">
+  <caption>
+    <h3>Table 2: Problem Sequences</h3>
+  </caption>
+  <tr>
+    <th align="left"><font size="2">First Character</font>
+    <th align="left"><font size="2">Last Character</font></th>
+  <tr>
+    <td><font size="2">09C7 BENGALI VOWEL SIGN E</font></td>
+    <td><font size="2">09BE BENGALI VOWEL SIGN AA<b> or</b><br>
+      09D7 BENGALI AU LENGTH MARK</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0B47 ORIYA VOWEL SIGN E</font></td>
+    <td><font size="2">0B3E ORIYA VOWEL SIGN AA<b> or</b><br>
+      0B56 ORIYA AI LENGTH MARK<b> or</b><br>
+      0B57 ORIYA AU LENGTH MARK</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0BC6 TAMIL VOWEL SIGN E</font></td>
+    <td><font size="2">0BBE TAMIL VOWEL SIGN AA<b> or</b><br>
+      0BD7 TAMIL AU LENGTH MARK</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0BC7 TAMIL VOWEL SIGN EE</font>
+    <td><font size="2">0BBE TAMIL VOWEL SIGN AA</font></td>
+  <tr>
+    <td><font size="2">0B92 TAMIL LETTER O</font></td>
+    <td><font size="2">0BD7 TAMIL AU LENGTH MARK</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0CC6 KANNADA VOWEL SIGN E</font></td>
+    <td><font size="2">0CC2 KANNADA VOWEL SIGN UU<b> or</b><br>
+      0CD5 KANNADA LENGTH MARK<b> or</b><br>
+      0CD6 KANNADA AI LENGTH MARK</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0CBF KANNADA VOWEL SIGN I or<br>
+      0CCA KANNADA VOWEL SIGN O</font></td>
+    <td><font size="2">0CD5 KANNADA LENGTH MARK</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0D47 MALAYALAM VOWEL SIGN EE</font></td>
+    <td><font size="2">0D3E MALAYALAM VOWEL SIGN AA</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0D46 MALAYALAM VOWEL SIGN E</font></td>
+    <td><font size="2">0D3E MALAYALAM VOWEL SIGN AA<b> or</b><br>
+      0D57 MALAYALAM AU LENGTH MARK</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">1025 MYANMAR LETTER U</font></td>
+    <td><font size="2">102E MYANMAR VOWEL SIGN II</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">0DD9 SINHALA VOWEL SIGN KOMBUVA</font></td>
+    <td><font size="2">0DCF SINHALA VOWEL SIGN AELA-PILLA<b> or</b><br>
+      0DDF SINHALA VOWEL SIGN GAYANUKITTA</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">1100..1112 HANGUL CHOSEONG KIYEOK..HIEUH [19 instances]</font></td>
+    <td><font size="2">1161..1175 HANGUL JUNGSEONG A..I [21 instances]</font></td>
+  </tr>
+  <tr>
+    <td><font size="2">[:HangulSyllableType=LV:]</font></td>
+    <td><font size="2">11A8..11C2 HANGUL JONGSEONG KIYEOK..HIEUH [27 instances]</font></td>
+  </tr>
+</table>
+<h2><a name="Instability_Example">Instability Example</a></h2>
+<p>An example where the existing definition D2 causes failure of stability for repeated normalization is shown in sequence D:</p>
+<ol type="A" start="4">
+  <li>
+    <p class="example">U+1100 (&#4352;) HANGUL CHOSEONG KIYEOK +<br>
+    U+0300 (&#9676;&#768;) COMBINING GRAVE ACCENT +<br>
+    U+1161 (&#4449;) HANGUL JUNGSEONG A +<br>
+    U+0323 (&#9676;&#803;) COMBINING DOT BELOW</li>
+</ol>
+<p>The first NFC normalization produces sequence E:</p>
+<ol type="A" start="5">
+  <li>
+    <p class="example">U+AC00 (&#44032;) HANGUL SYLLABLE GA +<br>
+    U+0300 (&#9676;&#768;) COMBINING GRAVE ACCENT +<br>
+    U+0323 (&#9676;&#803;) COMBINING DOT BELOW</li>
+</ol>
+<p>A subsequent NFC normalization reverses the order of the accents, producing sequence F:</p>
+<ol type="A" start="6">
+  <li>
+    <p class="example">U+AC00 (&#44032;) HANGUL SYLLABLE GA +<br>
+    U+0323 (&#9676;&#803;) COMBINING DOT BELOW +<br>
+    U+0300 (&#9676;&#768;) COMBINING GRAVE ACCENT</li>
+</ol>
+<p>These examples are deliberately contrived, in order to illustrate the problem. Such sequences do not occur in well-formed textual data in any language.</p>
+
+</body>
+
+</html>

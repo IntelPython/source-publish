@@ -1,0 +1,74 @@
+-*- outline -*-
+
+The substance of libunistring is maintained in Gnulib:
+
+  https://git.savannah.gnu.org/gitweb/?p=gnulib.git
+
+This file attempts to describe the procedure of updating Gnulib to the
+latest Unicode release.  Also, a few scripts are included here to make
+the update job easier.  All those scripts respect the following
+environment variables
+
+- GNULIB_SRCDIR, which points to the absolute path of the Gnulib
+- UCD, which points to the directory containing the Unicode UCD
+
+Before updating, read the Unicode release note carefully and
+understand any changes that might affect Gnulib.  In particular,
+changes in the text segmentation algorithms (provided by unilbrk.h,
+uniwbrk.h, unigbrk.h) often require manual adjustment of source files.
+
+The release notes are typically available at:
+
+  https://unicode.org/versions/Unicode<VERSION>/
+
+* Regenerating the Gnulib source code
+
+The source files in Gnulib are updated using a couple of tools:
+'lib/gen-uni-tables.c' and 'lib/uniname/gen-uninames.lisp'.
+
+You can use wrapper scripts included in this directory:
+'gen-uni-tables' and 'gen-uninames' as follows:
+
+  $ export GNULIB_SRCDIR=..
+  $ export UCD=..
+  $ ./gen-uni-tables
+  $ ./gen-uninames
+
+Note that 'gen-uni-tables' sometimes fails when a large portion of
+Unicode data changes.  In that case, errors are reported as assertion
+failures and you will need to adjust 'lib/gen-uni-tables.c'.
+
+Also note that the files under 'lib/uniwidth' and 'tests/uniwidth' are
+currently _not_ updated automatically.  You need to merge the
+generated *.part file by hand.
+
+* Updating the version numbers of modules
+
+The 'libunistring-optional' module in Gnulib allows you to use the
+system libunistring, when possible (i.e., when certain modules are
+equal to or older than the system libunistring).  This is done by
+checking the version specified with gl_LIBUNISTRING_MODULE invocation
+in modules:
+
+  $ cat modules/uniwidth/width
+  ...
+  configure.ac:
+  gl_LIBUNISTRING_MODULE([0.9.6], [uniwidth/width])
+  ...
+
+The version specified as the first argument should be incremented when
+the behavior of the module changes.  Thus, if you regenerate the
+Gnulib source files for the latest Unicode release, you will also need
+to bump the version of affected modules.
+
+To identify affected modules, you can use the following command:
+
+  $ (cd $GNULIB_SRCDIR && git show --oneline --name-only $COMMIT | tail -n+2) \
+    | ./containing | LC_ALL=C sort | uniq \
+    | ./dependent | LC_ALL=C sort | uniq
+
+where $COMMIT is a git commit ID, which points to the regeneration,
+and 'containing' and 'dependent' are scripts included here.  Note that
+this command takes some time to complete.
+
+Daiki Ueno <ueno@gnu.org>

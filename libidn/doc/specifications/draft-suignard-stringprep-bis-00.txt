@@ -1,0 +1,2800 @@
+
+
+
+Network Working Group                                   M. Suignard, Ed.
+Internet-Draft                                     Microsoft Corporation
+Intended status: Standards Track                                M. Davis
+Expires: June 23, 2007                                            Google
+                                                              A. Freytag
+                                                              ASMUS Inc.
+                                                       December 20, 2006
+
+
+         Preparation of Internationalized Strings (stringprep)
+                    draft-suignard-stringprep-bis-00
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on June 23, 2007.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2006).
+
+Abstract
+
+   This document describes a framework for preparing Unicode text
+   strings in order to increase the likelihood that string input and
+   string comparison work in ways that make sense for typical users
+   throughout the world.  The stringprep protocol is useful for protocol
+   identifier values, company and personal names, internationalized
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 1]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   domain names, and other text strings.
+
+   This document does not specify how protocols should prepare text
+   strings.  Protocols must create profiles of stringprep in order to
+   fully specify the processing options.
+
+   This document updates RFC3454 (stringprep).
+
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  5
+     1.1.  Terminology  . . . . . . . . . . . . . . . . . . . . . . .  6
+     1.2.  Using stringprep in protocols  . . . . . . . . . . . . . .  7
+   2.  Preparation Overview . . . . . . . . . . . . . . . . . . . . .  8
+   3.  Mapping  . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+     3.1.  Commonly mapped to nothing . . . . . . . . . . . . . . . . 10
+     3.2.  Case folding . . . . . . . . . . . . . . . . . . . . . . . 11
+   4.  Normalization  . . . . . . . . . . . . . . . . . . . . . . . . 12
+     4.1.  Choice of normalization form . . . . . . . . . . . . . . . 13
+     4.2.  Normalization version  . . . . . . . . . . . . . . . . . . 13
+   5.  Prohibited Output  . . . . . . . . . . . . . . . . . . . . . . 14
+     5.1.  Space characters . . . . . . . . . . . . . . . . . . . . . 15
+     5.2.  Control characters . . . . . . . . . . . . . . . . . . . . 15
+     5.3.  Private use  . . . . . . . . . . . . . . . . . . . . . . . 15
+     5.4.  Non-character code points  . . . . . . . . . . . . . . . . 16
+     5.5.  Surrogate codes  . . . . . . . . . . . . . . . . . . . . . 16
+     5.6.  Inappropriate for plain text . . . . . . . . . . . . . . . 16
+     5.7.  Inappropriate for canonical representation . . . . . . . . 16
+     5.8.  Change display properties or are deprecated  . . . . . . . 16
+     5.9.  Tagging characters . . . . . . . . . . . . . . . . . . . . 17
+     5.10. Hangul filler characters . . . . . . . . . . . . . . . . . 17
+     5.11. Non Identifier code points . . . . . . . . . . . . . . . . 17
+     5.12. Archaic characters . . . . . . . . . . . . . . . . . . . . 17
+   6.  Combining Marks  . . . . . . . . . . . . . . . . . . . . . . . 17
+   7.  Bidirectional Characters . . . . . . . . . . . . . . . . . . . 18
+   8.  Unassigned Code Points in Stringprep Profiles  . . . . . . . . 20
+     8.1.  Categories of code points  . . . . . . . . . . . . . . . . 21
+     8.2.  Reasons for the difference between stored strings and
+           queries  . . . . . . . . . . . . . . . . . . . . . . . . . 22
+     8.3.  Versions of applications and stored strings  . . . . . . . 23
+   9.  Security Considerations  . . . . . . . . . . . . . . . . . . . 24
+     9.1.  Stringprep-specific security considerations  . . . . . . . 24
+     9.2.  Generic Unicode security considerations  . . . . . . . . . 24
+   10. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 25
+   11. Compatibility between stringprep and stringprep-bis-00 . . . . 26
+     11.1. Compatibility using Unicode 3.2 code points  . . . . . . . 27
+     11.2. Compatibility using the Identifier repertoire  . . . . . . 27
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 2]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   12. Considerations concerning IDN revision . . . . . . . . . . . . 28
+     12.1. Permitted Character Identification . . . . . . . . . . . . 29
+     12.2. Strinprep mapping based on Unicode properties  . . . . . . 29
+     12.3. Normalization stability  . . . . . . . . . . . . . . . . . 29
+     12.4. Case folding . . . . . . . . . . . . . . . . . . . . . . . 29
+   13. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 30
+   Appendix A.     Unicode repertoires  . . . . . . . . . . . . . . . 30
+   Appendix A.1.   Unassigned code points in Unicode 3.2  . . . . . . 30
+   Appendix A.2.   Unassigned code points in Unicode 5.0  . . . . . . 30
+   Appendix A.3.   Identifier repertoire  . . . . . . . . . . . . . . 30
+   Appendix B.     Mapping Tables . . . . . . . . . . . . . . . . . . 30
+   Appendix B.1.   Commonly mapped to nothing . . . . . . . . . . . . 31
+   Appendix B.1.1. Commonly mapped to nothing with ZWJ/ZWNJ
+                   special processing . . . . . . . . . . . . . . . . 31
+   Appendix B.2.   Mapping for case-folding used with NFKC  . . . . . 32
+   Appendix B.3.   Mapping for case-folding used with no
+                   normalization  . . . . . . . . . . . . . . . . . . 32
+   Appendix B.4.   Reverse mapping for compability mode . . . . . . . 33
+   Appendix C.     Prohibition tables . . . . . . . . . . . . . . . . 33
+   Appendix C.1.   Space characters . . . . . . . . . . . . . . . . . 33
+   Appendix C.1.1. ASCII space character  . . . . . . . . . . . . . . 33
+   Appendix C.1.2. Non-ASCII space characters . . . . . . . . . . . . 33
+   Appendix C.1.3. Non-ASCII space characters - Compatibility mode  . 33
+   Appendix C.2.   Control characters . . . . . . . . . . . . . . . . 34
+   Appendix C.2.1. ASCII control character  . . . . . . . . . . . . . 34
+   Appendix C.2.2. Non-ASCII control character  . . . . . . . . . . . 34
+   Appendix C.2.3. Non-ASCII control character - Compatibility
+                   mode . . . . . . . . . . . . . . . . . . . . . . . 34
+   Appendix C.3.   Private use  . . . . . . . . . . . . . . . . . . . 35
+   Appendix C.4.   Non-characters code points . . . . . . . . . . . . 35
+   Appendix C.5.   Surrogate codes  . . . . . . . . . . . . . . . . . 35
+   Appendix C.6.   Inappropriate for plain text . . . . . . . . . . . 35
+   Appendix C.7.   Inappropriate for canonical representation . . . . 35
+   Appendix C.8.   Change display properties or are deprecated  . . . 35
+   Appendix C.9.   Tagging characters . . . . . . . . . . . . . . . . 35
+   Appendix C.10.  Hangul filler characters . . . . . . . . . . . . . 36
+   Appendix C.11.  Non identifier code points . . . . . . . . . . . . 36
+   Appendix C.12.  Archaic scripts  . . . . . . . . . . . . . . . . . 36
+   Appendix D.     Bidirectional tables . . . . . . . . . . . . . . . 36
+   Appendix D.1.   Characters with bidirectional property R or AL . . 36
+   Appendix D.2.   Characters with bidirectional property L . . . . . 37
+   Appendix D.3.   Characters with bidirectional property L . . . . . 37
+   Appendix E.     Combining marks  . . . . . . . . . . . . . . . . . 37
+   Appendix E.1.   Combining mark table . . . . . . . . . . . . . . . 37
+   Appendix F.     Normalization tables . . . . . . . . . . . . . . . 37
+   Appendix F.1.   Pre normalization mapping  . . . . . . . . . . . . 37
+   Appendix F.2.   Characters added since the previous stringprep
+                   version  . . . . . . . . . . . . . . . . . . . . . 38
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 3]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   Appendix F.3.   Character sequences reordering . . . . . . . . . . 39
+   Appendix G.     Differences between stringprep and
+                   stringprep-bis-00  . . . . . . . . . . . . . . . . 40
+   14. References . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+     14.1. Normative References . . . . . . . . . . . . . . . . . . . 46
+     14.2. Informative References . . . . . . . . . . . . . . . . . . 47
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 48
+   Intellectual Property and Copyright Statements . . . . . . . . . . 50
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 4]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+1.  Introduction
+
+   Application programs can display text in many different ways.
+   Similarly, a user can enter text into an application program in a
+   myriad of fashions.  Internationalized text (that is, text that is
+   not restricted to the narrow set of US-ASCII characters) has many
+   input and display behaviors that make it difficult to compare text in
+   a consistent fashion.
+
+   This document specifies a framework of processing rules for Unicode
+   text.  Other protocols can create profiles of these rules; these
+   profiles will allow users to enter internationalized text strings in
+   applications and have the highest chance of getting the content of
+   the strings correct.  In this case, "correct" means that if two
+   different people enter what they think is the same string into two
+   different input mechanisms, the strings should match on a character-
+   by-character basis.
+
+   This framework does not describe how data is transcoded from other
+   character sets into Unicode.  In systems that use non-Unicode
+   character sets, the transcoding algorithm is a critical part of
+   enabling secure and "correct" operation of internationalized text
+   strings.
+
+   In addition to helping string matching, profiles of stringprep can
+   also exclude characters that should not normally appear in text that
+   is used in the protocol.  The profile can prevent such characters by
+   changing the characters to be excluded to other characters, by
+   removing those characters, or by causing an error if the characters
+   would appear in the output.  For example, because the backspace
+   character can cause unpredictable display results, a profile can
+   specify that a string containing a backspace character would cause an
+   error.
+
+   A profile of stringprep converts a single string of input characters
+   to a string of output characters, or returns an error if the output
+   string would contain a prohibited character.  Stringprep profiles
+   cannot both emit a string and return an error.
+
+   Stringprep profiles cannot account for all of the variations that
+   might occur or that a user might expect.  In particular, a profile
+   will not be able to account for choice of spellings in all languages
+   for all scripts because the number of alternative spellings of words
+   and phrases is immense.  Users would probably expect all spelling
+   equivalents to be made equivalent, or none of them to be.  Examples
+   of spelling equivalents include "theater" vs. "theatre", and
+   "hemoglobin" vs. "hU+00E6moglobin" in American vs. British English.
+   Other examples are simplified Chinese spellings of names (for
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 5]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   example,"<U+7EDF, U+4E00, U+7801>") vs. the equivalent traditional
+   Chinese spelling (for example, "<U+7D71, U+4E00, U+78BC>").
+   Language-specific equivalences such as "Aepfel" vs. "U+00C4pfel",
+   which are sometimes considered equivalent in German, may not be
+   considered equivalent in other languages.
+
+   This document intends to replace the current version of stringprep
+   [RFC3454].  It covers issues that were raised in the context of
+   Internationalized Domain Names in Applications [RFC3490].  Some of
+   these issues are about bidirectional strings[IDNABidi], others about
+   repertoire[IDNARepertoire], others in all aspects of stringprep
+   [IDNABis].  Issues are addressed in relevant sections of this
+   document.
+
+   Much more than previous version of stringprep[RFC3454], this document
+   uses Unicode character properties to group these characters in
+   classes, instead of using enumerated lists of characters.  Certain
+   key Unicode properties are guaranteed to always be backward
+   compatible.  For the properties that may see modification, stability
+   of this specification is provided by using exception lists.
+
+1.1.  Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in BCP 14, RFC
+   2119[RFC2119].
+
+   Note: A glossary of terms used in the Unicode Standard [Unicode5.0]
+   and ISO/IEC 10646 [ISO10646]can be found in [Glossary].  Information
+   on the 10646/Unicode character encoding model can be found in
+   [CharModel].  The character repertoires of the Unicode Standard and
+   ISO/IEC 10646, and many other features such as the Bidirectional
+   Algorithm and Normalizations are synchronized.  Further references to
+   the common set will be done using the Unicode versions.  Only
+   features that are unique to either standard will be referenced as
+   such.
+
+   Character names in this document use the notation for code points and
+   names from the Unicode Standard.  For example, the letter "a" may be
+   represented as either "U+0061" or "LATIN SMALL LETTER A".  In the
+   lists of mappings and the prohibited characters, the "U+" is left off
+   to make the lists easier to read.  Sequences of characters may be
+   represented using the UCS Sequence Identifiers or USI specified in
+   ISO/IEC 10646 [ISO10646].  A USI has the form:
+
+      <UID1, UID2,...UIDn>
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 6]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   where the UIDi represents the short identifiers for code points --
+   most commonly the U+ notation mentioned above.  The comments for
+   character ranges are shown in square brackets (such as "[CONTROL
+   CHARACTERS]") and do not come from the standards.
+
+1.2.  Using stringprep in protocols
+
+   The stringprep protocol does not stand on its own; it has to be used
+   by other protocols at precisely-defined places in those other
+   protocols.  For example, a protocol that has strings that come from
+   the entire Unicode [Unicode5.0] character repertoire might specify
+   that only strings that have been processed with a particular profile
+   of stringprep are legal.  Another example would be a protocol that
+   does string comparison as a step in the protocol; that protocol might
+   specify that such comparison is done only after processing the
+   strings with a specific profile of stringprep.
+
+   When two protocols that use different profiles of stringprep
+   interoperate, there may be conflict about what characters are and are
+   not allowed in the final string.  Thus, protocol developers should
+   strongly consider re-using existing profiles of stringprep.
+
+   When developers wish to allow users as wide of a range of characters
+   as possible in input text strings, they should, where possible, cause
+   stringprep to convert characters from the input string to a canonical
+   form instead of prohibiting them.
+
+   Although it would be easy to use the stringprep process to "correct"
+   perceived mis-features or bugs in the current character standards,
+   stringprep profiles SHOULD NOT do so.
+
+   A profile of stringprep can create tables different from those in the
+   appendixes of this document, but it will be an exception when they
+   do.  The intention of stringprep is to define the tables and have the
+   profiles of stringprep select among those defined tables.
+
+   A profile of stringprep MUST include all of the following:
+
+   o  The intended applicability of the profile
+
+   o  The character repertoire that is the input and output to
+      stringprep (which is Unicode 5.0 for this version of stringprep)
+
+   o  The mapping tables from this document used (as described in
+      section 3)
+
+   o  Any additional mapping tables specific to the profile
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 7]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  The Unicode normalization used, if any (as described in section 4)
+
+   o  The tables from this document of characters that are prohibited as
+      output (as described in section 5)
+
+   o  The bidirectional string testing used, if any (as described in
+      section 6)
+
+   o  Any additional characters that are prohibited as output specific
+      to the profile
+
+   Each profile MUST state the character repertoire on which the profile
+   will operate.  Appendix A lists the Unicode repertoire that can be
+   selected.  No repertoire is ever complete, and it is expected that
+   characters will be added to the Unicode repertoire for the
+   foreseeable future.  Section 7 of this document describes how to
+   handle characters that are assigned in later versions of the Unicode
+   repertories.  A Subsection of appendix A also references unassigned
+   code points for the Unicode repertoire.
+
+   This document is for Unicode version 5.0, and should not be
+   considered to automatically apply to later Unicode versions.  The
+   IETF, through an explicit standards action, may update this document
+   as appropriate to handle later Unicode versions.
+
+   This document references the unassigned code points in the range 0 to
+   10FFFF for Unicode 5.0 in appendix A.  It also references in the same
+   appendix unassigned code points for Unicode 3.2 to allow profiles to
+   emulate behavior specified by previous version of stringprep[RFC3454]
+
+   Each profile of stringprep MUST be registered with IANA.  The
+   registration procedure is described in the IANA Considerations
+   appendix; basically, the IESG must review each profile of stringprep.
+   Protocol developers are strongly encouraged to look through the IANA
+   profile registry when creating new profiles for stringprep, and to
+   re-use logic from earlier profiles where possible in new profiles.
+   In some cases, an existing profile can be reused by a different
+   protocol.
+
+
+2.  Preparation Overview
+
+   The steps for preparing strings are:
+
+   1.  Map -- For each character in the input, check if it has a mapping
+       and, if so, replace it with its mapping.  This is described in
+       section 3.
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 8]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   2.  Normalize -- Possibly normalize the result of step 1 using
+       Unicode normalization.  This is described in section 4.
+
+   3.  Prohibit -- Check for any characters that are not allowed in the
+       output.  If any are found, return an error.  This is described in
+       section 5.
+
+   4.  Check combining marks -- Check for any starting combining marks.
+       If such an occurence is found, return an error.  This is
+       described in section 6.
+
+   5.  Check bidi -- Possibly check for right-to-left characters, and if
+       any are found, make sure that the whole string satisfies the
+       requirements for bidirectional strings.  If the string does not
+       satisfy the requirements for bidirectional strings, return an
+       error.  This is described in section 7.
+
+   The above steps MUST be performed in the order given to comply with
+   this specification.
+
+   The mappings described in section 3, and the optional Unicode
+   normalization described in section 4, can be one-to-none, one-to-one,
+   one-to-many, many-to-one, or many-to-many.  That is, some characters
+   might be eliminated or replaced by more than one character, and the
+   output of this step might be shorter or longer than the input.
+   Because of this, the system using stringprep MUST be prepared to
+   receive a longer or shorter string than the one input in the
+   stringprep algorithm.
+
+   A profile MAY elect to simplify the preparation by using a Unicode
+   repertoire which is stable through the mapping and normalization
+   processes and does not contain any prohibited characters.  In such
+   case the preparation steps become:
+
+   1.  Map -- All characters map to themselves by definition.
+
+   2.  Normalize -- If normalized output is required by the profile,
+       this step is still required even if the repertoire is stable
+       through normalization.  There are several reasons for this
+       (combining marks, Hangul syllables, etc...).
+
+   3.  Prohibit -- No characters are prohibited by definition.
+
+   4.  Check combining marks -- As specified above.
+
+   5.  Check bidi -- As specificied above.
+
+   Appendix A.3 describes such an Unicode repertoire named "Identifier
+
+
+
+Suignard, et al.          Expires June 23, 2007                 [Page 9]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   repertoire" which can be conveniently referenced by profiles used for
+   identifiers.  For convenience, this document references its own
+   definition of the repertoire in A.3, but the intent is to track the
+   developments made by [IDNARepertoire] or similar initiatives when
+   they become finalized.
+
+
+3.  Mapping
+
+   Each character in the input stream MUST be checked against a mapping
+   table.  The mapping table SHOULD come from this document, although
+   the mapping table MAY be added to or altered by the profile.  The
+   mapping tables are subsections of appendix B.
+
+   The lists in appendix B MUST be used by implementations of this
+   specification.  If there are any discrepancies between the lists in
+   appendix B and subsections below, the lists in appendix B always
+   takes precedence.
+
+   For any individual character, the mapping table MAY specify that a
+   character be mapped to nothing, or mapped to one other character, or
+   mapped to a string of other characters.
+
+   Mapped characters are not re-scanned during the mapping step.  That
+   is, if character A at position X is mapped to character B, character
+   B which is now at position X is not checked against the mapping
+   table.
+
+3.1.  Commonly mapped to nothing
+
+   Some characters are commonly deleted from the input (that is, they
+   are mapped to nothing) because their presence or absence in protocol
+   identifiers should not typically make two strings different.  The
+   list is referenced in appendix B.1.
+
+   Typically, U+200C ZERO WIDTH NON-JOINER (ZWNJ) and U+200D ZERO WIDTH
+   JOINER (ZWJ) should not make two strings different and as such are
+   part of the list referenced in appendix B.1.  However, because in
+   certain languages U+200C ZERO WIDTH NON-JOINER (ZWNJ) and U+200D ZERO
+   WIDTH JOINER (ZWJ) may carry meaning, some profiles MAY want to adopt
+   a special rule by preserving the ZWNJ or ZWJ in the following
+   contexts:
+
+   ZWNJ breaking a cursive connection in Arabic--  An Arabic Right-
+      Joining character, followed by zero or more Transparent
+      characters, followed by a ZWNJ, followed by zero or more
+      Transparent characters, followed by a Left-Joining character.
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 10]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   ZWNJ used in a conjunct context--  A Letter, followed by zero or more
+      Combining Marks, followed by a Virama, followed by a ZWNJ,
+      followed by zero or more Combining Marks, followed by a Letter.
+
+   ZWJ used in a conjunct context--  A Letter, followed by zero or more
+      Combining Marks, followed by a Virama, followed by a ZWJ, followed
+      by zero or more Combining Marks, followed by a Letter.
+
+   These contexts imply that a single script is used within the
+   expression, excluding the Combining Marks and Viramas which may use
+   "Common" or "Inherited" script values.
+
+   The character script value is determined by the "Scripts.txt" file in
+   the Unicode Character Database[UCD].
+
+   The character properties "Right-Joining" (R), "Transparent" (T), and
+   "Left-Joining" (L) are specified by the ArabicShaping.txt file in the
+   Unicode Character Database[UCD].
+
+   The character property "Letter" is the union of all General Category
+   values: "Lu", "Ll", "Lt", "Lm", and "Lo" specified in the
+   UnicodeData.txt file in the Unicode Character Database[UCD].
+
+   The character property "Combining Mark" is the concatenation of all
+   General Category values: "Mc", "Mn", and "Me" specified in the
+   UnicodeData.txt file in the Unicode Character Database[UCD].
+
+   The character property "Virama" is determined by having the
+   Canonical_Combining_Class value equal to 9.  That class is specified
+   in the UnicodeData.txt file in the Unicode Character Database[UCD].
+
+   The profiles that MAY want to process the ZWJ and ZWNJ according to
+   these contexts while mapping the other characters to nothing MUST use
+   the table and property referencing specified in appendix B.1.1.
+
+3.2.  Case folding
+
+   If a profile is going to map characters for case-insensitive
+   comparison, that profile SHOULD map using either appendix B.2 or
+   appendix B.3. appendix B.2 is for profiles that also use Unicode
+   normalization form KC, while appendix B.3 is for profiles that do not
+   use Unicode normalization.  The referenced tables map from uppercase
+   to lowercase characters.  Note that this could have been "change all
+   lowercase characters into uppercase characters".  However, the upper-
+   to-lower folding was chosen because there is a tradition of using
+   lowercase in current Internet applications and protocols.
+
+   If a profile creates its own mapping tables for case folding, they
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 11]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   SHOULD be based on the Case Mappings specified by the Unicode
+   Standard[Unicode5.0], and SHOULD map from uppercase characters to
+   lowercase.  The "CaseFolding.txt" file from the Unicode Character
+   Database[UCD] SHOULD be used to prepare the mapping table.  The
+   profile SHOULD do full case mapping (that is, using statuses C and
+   F).
+
+   If the profile is using Unicode normalization form KC (as described
+   in section 4 of this document), an additional property,
+   FC_NFKC_Closure, is required.  The values specified in the
+   "DerivedNormalizationProps.txt" file in the Unicode Character
+   Database[NormProps]provides the set of mappings that constitute the
+   FC_NFKC_Closure list.
+
+   Appendix B.3 references the CaseFolding.txt file associated with
+   Unicode 5.0; appendix B.2 also references the CaseFolding.txt file
+   from the Unicode Character Database[UCD], but augmented by the
+   entries in the "DerivedNormalizationProps.txt" file[NormProps] with a
+   FC_NFKC value.
+
+   Authors of profiles of this document need to consider the effects of
+   changing the mapping of any currently-assigned character when
+   updating their profiles.  Adding a new mapping for a currently-
+   assigned character, or changing an existing mapping, could cause a
+   variance between the behavior of systems that have been updated and
+   systems that have not been updated.
+
+   Appendix B.4 specifies a reverse mapping table for Unicode 3.2
+   characters which have a new case folding as a result of applying
+   Unicode 5.0 case folding tables.  Applying that mapping table after
+   the previous mapping provides a result compatible with Unicode 3.2
+   case folding.
+
+
+4.  Normalization
+
+   The output of the mapping step is optionally normalized using one of
+   the Unicode normalization forms, as described in [UAX15].  A profile
+   can specify one of three options for Unicode normalization:
+
+   o  no normalization
+
+   o  Unicode normalization with form C using the Normalization Process
+      for Stable Strings (NPSS).  This process adds further stability
+      requirements on normalization.
+
+   o  Unicode normalization with form KC using the Normalization Process
+      for Stable Strings (NPSS).  This process add further stability
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 12]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+      requirements on normalization.
+
+   A profile MAY choose to do no normalization.  However, such a profile
+   can easily yield results that will be surprising to typical users,
+   depending on the input mechanism they use.  For example, some input
+   mechanisms enter compatibility characters that look exactly like the
+   underlying characters, but have different code points.  Another
+   example of where Unicode normalization helps create predictable
+   results is with characters that have multiple combining diacritics:
+   normalization orders those diacritics in a predictable fashion.
+
+   On the other hand, Unicode normalization requires fairly large tables
+   and somewhat complicated character reordering logic.  The size and
+   complexity should not be considered daunting except in the most
+   restricted of environments, and needs to be weighed against the
+   problems of user surprise from comparing un-normalized strings.  Note
+   that the tables used for normalization are not given in this
+   document, but instead must be derived from the Unicode Character
+   Database, as described in [UAX15] and [UCD].
+
+4.1.  Choice of normalization form
+
+   If a profile is going to use a Unicode normalization as one of the
+   options mentioned above, it MUST use Unicode normalization form C or
+   KC (NFC or NFKC).  Form KC maps many "compatibility characters" to
+   their equivalents.  Some user interface systems make it possible to
+   enter compatibility characters instead of the base equivalents.
+   Thus, using form KC instead of form C will cause more strings that
+   users would expect to match to actually match.  For most cases
+   involving string preparation in the context of identifier (such as
+   domain names), the form KC is preferred.
+
+   However, there are cases where the compatibility mapping provided by
+   the form KC may not be desirable because it prevents full
+   representation of some national character set and of some special
+   purpose repertoire (for example the mathematical letters).  In
+   addition, NFC is the preferred normalization form for
+   Internationalized Resource Identifiers (IRIs)[RFC3987].  For all
+   these reasons, some profiles may use form C instead of form KC.
+
+   Finally, because case folding is not closed under form KC, the case
+   folding required in the stringprep mapping step is more complex when
+   that normalization form is used.  See section 3.2.
+
+4.2.  Normalization version
+
+   A profile that specifies Unicode normalization SHOULD use the
+   normalization in [UAX15] that is associated with the version of the
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 13]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   Unicode character set specified for the profile.  However, because
+   the normalization associated with Unicode 3.2 has some well known
+   issues identified in [UAX15] (see its corrigendum section), it is
+   recommended to use the version 5.0 of the normalization even for
+   Unicode 3.2 repertoire.
+
+   The composition process described in [UAX15] requires a fixed
+   composition version of Unicode to ensure that strings normalized
+   under one version of Unicode remain normalized under all future
+   versions of Unicode.  In addition, the NPSS required by stringprep
+   insures that processing unassigned code points through the
+   normalization returns an error.
+
+   Despite best efforts, the Unicode normalization has seen changes that
+   may introduce compatibility issues between this version of stringprep
+   and older version[RFC3454] if not handled correctly.  A profile MAY
+   elect to emulate old behavior while still using the latest version of
+   the Unicode normalization by following these steps prior to the
+   normalization process:
+
+   o  Map the characters specified in appendix F.1.
+
+   o  Filter out characters that were not assigned by the previous
+      version.  Appendix F.2 lists characters added since Unicode 3.2
+      which should be filtered out.
+
+   o  Reorder the sequences listed in appendix F.3 as described in the
+      same appendix.
+
+   None of these steps are needed if the profile is only applicable to
+   the Unicode 5.0 repertoire.
+
+
+5.  Prohibited Output
+
+   Before the text can be emitted, it MUST be checked for prohibited
+   code points.  There are a variety of prohibited code points, as
+   described in this section.  A profile of this document MAY use all or
+   some of the tables in appendix C.
+
+   The stringprep process never emits both an error and a string.  If an
+   error is detected during the checking for prohibited code points,
+   only an error is returned.
+
+   Note that the subsections below describe how the tables in appendix C
+   were formed.  They are here for people who want to understand more,
+   but they should be ignored by implementers.  Implementations that use
+   tables MUST map based on the tables themselves, not based on the
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 14]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   descriptions in this section of how the tables were created.
+
+   The lists in appendix C MUST be used by implementations of this
+   specification.  If there are any discrepancies between the lists in
+   appendix C and subsections below, the lists in appendix C always take
+   precedence.
+
+   Some code points listed in one section may also appear in other
+   sections.
+
+   It is important to note that a profile of this document MAY prohibit
+   additional characters.
+
+   Each subsection of this section has a matching subsection in appendix
+   C. For example, the characters listed in section 5.1 are listed in
+   appendix C.1.
+
+5.1.  Space characters
+
+   Space characters can make accurate visual transcription of strings
+   nearly impossible and could lead to user entry errors in many ways.
+   Note that the list below is split into two tables in appendix C:
+   Table C.1.1 contains the ASCII code points, while Table C.1.2
+   contains the non-ASCII code points.  Most profiles of this document
+   that want to prohibit space characters will want to include both
+   tables.
+
+   For compatibility with the previous version of stringprep, Table
+   C.1.3 is an alternate to C.1.2 containing the non-ASCII code points
+   with some characters removed or added.
+
+5.2.  Control characters
+
+   Control characters (or characters with control function) cannot be
+   seen and can cause unpredictable results when displayed.  Note that
+   the list below is split into two tables in appendix C: Table C.2.1
+   contains the ASCII code points, while Table C.2.2 contains the non-
+   ASCII code points.  Most profiles of this document that want to
+   prohibit control characters will want to include both tables.
+
+   For compatibility with the previous version of stringprep, Table
+   C.2.3 is an alternate to C.2.2 containing the non-ASCII code points
+   with some characters removed or added.
+
+5.3.  Private use
+
+   Because private-use characters do not have defined meanings, they are
+   likely to be prohibited.  The private-use characters are specified in
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 15]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   appendix C.3.
+
+5.4.  Non-character code points
+
+   Non-character code points are code points that have been allocated in
+   Unicode but are not assigned to characters.  They are private use
+   code points not intended for interchange.  They are described in
+   appendix C.4.
+
+5.5.  Surrogate codes
+
+   The surrogate code points are permanently reserved for use as
+   surrogate code values in the UTF-16 encoding, will never be assigned
+   to characters in the Unicode repertoire, and are therefore
+   prohibited.  They are described in appendix C.5.
+
+5.6.  Inappropriate for plain text
+
+   The interlinear annotation characters U+FFF9-U+FFFB do not appear in
+   regular text.  Note that there are also control characters. (see 5.2)
+
+   The Object Replacement character (U+FFFC) is a placeholder for an an
+   otherwise unspecified object.  The replacement character (U+FFFD)
+   might be used when a string is displayed on a system with incomplete
+   rendering capabilities.  Based on these considerations, all these
+   characters are likely to be prohibited.  They are referenced in
+   appendix C.6.
+
+5.7.  Inappropriate for canonical representation
+
+   The ideographic description characters provide a mechanism for the
+   standard interchange of text referencing unencoded ideographs.  They
+   cannot be used to represent an alternate formal encoding of an
+   ideograph.  Based on this, most profiles should exclude them.  These
+   characters are described in appendix C.7.
+
+5.8.  Change display properties or are deprecated
+
+   These characters can cause changes in display or the order in which
+   characters appear when rendered, or are deprecated in Unicode.  These
+   characters are described in appendix C.8.
+
+   Some of these characters are also part of the Control character
+   category. (see 5.2)
+
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 16]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+5.9.  Tagging characters
+
+   The tagging characters are format characters (General Category =
+   "Cf"), included in the TAG code point range (E0000-E007F).  Some
+   profiles may want to treat them separately from control characters.
+   These characters are described in appendix C.9.
+
+5.10.  Hangul filler characters
+
+   The Hangul filler characters are letter characters (General Category
+   = "Lo"), that stands for missing Jamos to make a well-formed Korean
+   syllable.  Most profiles may want to exclude them as they are used in
+   context inappropriate for identifiers.  These characters are
+   described in appendix C.10.
+
+5.11.  Non Identifier code points
+
+   Some profiles may want to further restrict their Unicode repertoire
+   by removing all characters that should not be used in identifiers
+   according to the Unicode UAX#31 Identifier and Pattern Syntax.  These
+   non identifier code points are determined by not having the
+   XID_Continue property in the Unicode Character Database[UCD].  These
+   characters are described in appendix C.11.
+
+   This definition of non identifier code points includes all other
+   categories of prohibited code points specified up to this point.
+
+5.12.  Archaic characters
+
+   Some profiles may want to exclude characters which are rarely found
+   or not all in modern use.  This is determined by their script
+   property.  Appendix C.12 provides a list of these archaic scripts.
+
+
+6.  Combining Marks
+
+   Combining mark is a special character class that typically combines
+   with its possible preceding combining marks back to the first non
+   combining character.  See the Unicode Standard[Unicode5.0] for
+   further details.
+
+   In most contexts, it is undesirable to have a combining mark appear
+   as the first character of a string as it may combine with a character
+   preceding the string, therefore out of context.
+
+   A profile MAY choose to exclude combining marks.  However many
+   scripts and writing systems requires them even for their most basic
+   support.  Therefore excluding the combining marks and ignoring the
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 17]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   requirement below is stringly discouraged.
+
+   For the purpose of the requirement below, a "MCat" character is a
+   character that has the Unicode General Category value of either
+   Spacing Combining Mark (Mc), or Nonspacing Mark (Mn), or Enclosing
+   Mark (Me)
+
+   In any profile that includes these characters, the following
+   requirement MUST be met:
+
+   o  A string must not start with a MCat character.
+
+   The stringprep process never emits both an error and a string.  If an
+   error is detected during the checking of that requirement, only an
+   error is returned.
+
+   Table E.1 references all these combining marks.
+
+
+7.  Bidirectional Characters
+
+   Most characters are displayed from left to right, but some are
+   displayed from right to left.  This feature of Unicode is called
+   "bidirectional text", or "bidi" for short.  The Unicode standard has
+   an extensive discussion of how to reorder glyphs for display when
+   dealing with bidirectional text such as Arabic or Hebrew.  See [UAX9]
+   for more information.  In particular, all Unicode text is stored in
+   logical order.
+
+   A profile MAY choose to ignore bidirectional text.  However, ignoring
+   bidirectional text can cause display ambiguities.  For example, it is
+   quite easy to create two different strings with the same characters
+   (but in different order) that are correctly displayed identically.
+   Therefore, in order to avoid most problems with ambiguous
+   bidirectional text display, profile creators should strongly consider
+   including the bidirectional character handling described in this
+   section in their profile.
+
+   The stringprep process never emits both an error and a string.  If an
+   error is detected during the checking of bidirectional strings, only
+   an error is returned.
+
+   [Unicode5.0] defines several bidirectional categories; each character
+   has one bidirectional category assigned to it.  For the purposes of
+   the requirements below, the following categories are specified:
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 18]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   RCat character  It is a character that has Unicode bidirectional
+      categories "R" or "AL".  These are characters belonging to right
+      to left scripts such as Hebrew, Arabic, Thaana, etc...
+
+   LCat character  It is a character that has Unicode bidirectional
+      category "L".  These are characters belonging to left to right
+      script such as Latin, Greek, Cyrillic, etc...
+
+   NSMCat  It is a character that has Unicode bidirectional category
+      "NSM".  These are combining marks.
+
+   Note that there are many characters which fall in neither of the
+   above definitions; Latin digits (U+0030 through U+0039) are examples
+   of this because they have bidirectional category "EN".
+
+   In any profile that specifies bidirectional character handling, all
+   three of the following requirements MUST be met:
+
+   1.  The characters in section 5.8 MUST be prohibited.
+
+   2.  If a string contains any RCat character, the string MUST NOT
+       contain any LCat character.
+
+   3.  If a string contains any RCat character, a RCat character MUST be
+       the first character of the string, and a RCat character MUST be
+       either the last character of the string or followed only by
+       NSMCat characters.
+
+   Note that requirement 3 prohibits strings such as <U+0627, U+0031>
+   ("aleph 1") but allows strings such as <U+0627, U+0031, U+0628>
+   ("aleph 1 beh"), and <U+078B, U+07A8, U+0788, U+07AC, U+0780, U+07A8>
+   ("Divehi in Thaana script ending with a NSMCat character).  [UAX9]
+   goes into great detail about the display order of strings that
+   contain particular categories of characters in particular sequences.
+
+   Table D.1 references the characters that belong to Unicode
+   bidirectional categories "R" and "AL".  Table D.2 references all the
+   characters that belong to Unicode bidirectonal category "L".  Table
+   D.3 references all the characters that belong to Unicode category
+   "NSM".  These tables are derived from [Unicode5.0].
+
+   Compared to the previous version of stringprep[RFC3454], this version
+   adds the NSMCat category which addresses the right to left issue
+   described in section 2 and 3 of [IDNABidi] and section 9 of
+   [IDNABis].  As recognized by the former document in section 5,
+   addressing that problem creates a new backward compatibility issues
+   in as much as previously invalid strings are now valid.  However, in
+   agreement with it, it is felt that it will be less harmful than
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 19]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   denying use of words commonly used in languages affected by that
+   previous restriction.
+
+   Note that the document [IDNABidi] also describes a confusable string
+   issue in its section 4 which can better addressed by a repertoire
+   restriction which is an IDNA generic issue covered elsewhere in
+   stringprep.
+
+
+8.  Unassigned Code Points in Stringprep Profiles
+
+   This section describes two different types of strings in typical
+   protocols where internationalized strings are used: "stored strings"
+   and "queries".  Of course, different Internet protocols use strings
+   very differently, so these terms cannot be used exactly in every
+   protocol that needs to use stringprep.  In general, "stored strings"
+   are strings that are used in protocol identifiers and named entities,
+   such as names in digital certificates and DNS domain name parts.
+   "Queries" are strings that are used to match against strings that are
+   stored identifiers, such as user-entered names for digital
+   certificate authorities and DNS lookups.
+
+   All code points not assigned in the character repertoire named in a
+   stringprep profile are called "unassigned code points".  Stored
+   strings using the profile MUST NOT contain any unassigned code
+   points.  Queries for matching strings MAY contain unassigned code
+   points.  Note that this is the only part of this document where the
+   requirements for queries differs from the requirements for stored
+   strings.
+
+   Using two different policies for where unassigned code points can
+   appear removes the need for versioning in protocols that use
+   stringprep profiles.  This is very useful since it makes the overall
+   processing simpler and does not impose a "protocol" to handle
+   versioning.  It is expected that the Unicode repertoire will be
+   updated fairly frequently; at the time that this document is being
+   written, it has happened approximately once a year.  Each time a new
+   version of a repertoire appears, a new version of a profile MAY be
+   created.  Some end users will want to use the new code points as soon
+   as they are defined.
+
+   The list of unassigned code points MUST be given in a profile, and
+   that list MUST be used by implementations of the profile.
+
+   The goal of the requirements in this section is to prevent
+   comparisons between two strings that were both permitted to contain
+   unassigned code points.  When two strings X and Y are compared and
+   string Y was prepared in a way that permits unassigned code points, a
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 20]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   negative result to the comparison is not definitive; it's possible
+   that the strings don't match even though they would match if a more
+   recent version of the profile were used for Y. However, if both X and
+   Y were prepared in a way that permits unassigned code points,
+   something worse can happen: even a positive result for the comparison
+   is not definitive.  It is possible that the strings do match even
+   though they would not match if a more recent version of the profile
+   were used (one that prohibits a code point appearing in both X and
+   Y).
+
+   Due to the way that versioning is handled in this section, stored
+   strings that are embedded in structures that cannot be changed (such
+   as the signed parts of digital certificates) MUST NOT contain any
+   unassigned code points.
+
+8.1.  Categories of code points
+
+   Each code point in a repertoire named by a profile of stringprep can
+   be categorized by how it acts in the process described in earlier
+   sections of this document:
+
+   o  AO -- Code points that can be in the output
+
+   o  MN -- Code points that cannot be in the output because they never
+      appear as output from mapping or normalization
+
+   o  D -- Code points that cannot be in the output because they are
+      disallowed in the prohibition step
+
+   o  U -- Unassigned code points
+
+   A subsequent version of a profile that references a newer version of
+   a repertoire with new code points will inherently have some code
+   points move from category U to either D, MN, or AO.  For backwards
+   compatibility, the following rules are provided for a subsequent
+   version of a profile concerning the other code points:
+
+   o  D code points MUST NOT move to another category.
+
+   o  AO and MN code points SHOULD NOT move to another category.
+      Exceptions should be clearly documented in the new versions.
+
+   Stored strings MUST NOT contain any code points outside of AO for the
+   latest version of a profile.  That is, they are forbidden to contain
+   code points from the MN, D, or U categories.
+
+   Applications creating queries MUST treat U code points as if they
+   were AO when preparing the query to be entered in the process
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 21]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   described by a profile of stringprep.  Those applications MAY
+   optionally have a preprocessor that provide stricter checks: treating
+   unassigned code points in the input as errors, or warning the user
+   about the fact that the code point is unassigned in the version of a
+   profile that the software is based on; such a choice is a local
+   matter for the software.
+
+   It should be noted that the code point categories described above are
+   not the only way code point sequences are analyzed during the string
+   preparation process.  The 'check bidi' and 'check combining marks'
+   steps use additional code point properties to determine the validity
+   of an input string.  Furthermore, the position of a code point within
+   a string may also determine that validity.
+
+   A subsequent version of a profile SHOULD minimize code point property
+   changes and positional behavior that modify the result of these
+   preparation steps.  If such changes are made, they MUST be identified
+   in the new version of the profile.
+
+   In general, a profile should minimize its set of AO code points to
+   what is strictly required for its usage.  A subsequent version can
+   easily enlarge its repertoire while the opposite is always
+   problematic.  Using a repertoire that is stable through mapping and
+   normalization is also preferred.  The Identifier repertoire
+   referenced in appendix A.3 is such a case.
+
+8.2.  Reasons for the difference between stored strings and queries
+
+   Different software using different versions of a stringprep profile
+   need to interoperate with maximal compatibility.  The scheme
+   described in this section (stored strings MUST NOT contain unassigned
+   code points, queries MAY include unassigned code points) allows that
+   compatibility without introducing any known security or
+   interoperability issues.
+
+   The list below shows what happens if a query contains a code point
+   from category U that is allowed in a newer version of a profile.  The
+   query either matches the string that was intended, or matches no
+   string at all.  In this list, the query comes from an application
+   using version "oldVersion" of a profile, the stored string was
+   created using version "newVersion" of the same profile, and the code
+   point X was in category U in oldVersion, and has changed category to
+   AO, MN, or D. There are 3 possible scenarios:
+
+   1. X is assigned to AO --  In newVersion, X is in category AO.
+      Because the application passed X through, it gets back a positive
+      match with the stored string.  There is one exceptional case,
+      where X is a combining mark.
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 22]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+      The order of combining marks is normalized, so if another
+      combining mark Y has a lower combining class than X then XY will
+      be put in the canonical order YX.  (Unassigned code points are
+      never reordered, so this doesn't happen in oldVersion).  If the
+      query contains YX, the query will get positive match with the
+      stored string.  However, no string can be stored with XY, so a
+      query with XY will get a negative answer to the test for matching.
+
+   2. X is assigned to MN --  In newVersion, X is normalized to code
+      point "nX" and therefore X is now put in category MN.  This cannot
+      exist in any stored string, so any query containing X will get a
+      negative answer to the test for matching.  Note, however, if the
+      query had contained the letter nX, it would have positively
+      matched.
+
+   3. X is assigned to D --  In newVersion, X is in category D. This
+      cannot exist in any stored string, so any query containing X will
+      get a negative answer to the test for matching.
+
+   In none of the cases does the query get data for a stored string
+   other than the one it actually tried to match against.
+
+   Profiles are stable between versions in the following sense: If a
+   string S has been prepared using newVersion, then it will not change
+   if it is subsequently prepared using oldVersion.
+
+8.3.  Versions of applications and stored strings
+
+   Another way to see that this versioning system works is to compare
+   what happens when an application uses a newer or older version of a
+   profile.
+
+   Newer query application -- Suppose that a querying application is
+   using version newVersion and the stored string was created using
+   version oldVersion.  This case is simple: there will be no characters
+   in the stored string that cannot be queried by the application
+   because the new profile uses a superset of the code points used for
+   making the stored string.
+
+   Newer stored string -- Suppose that a querying application is using
+   oldVersion and the stored string was created using a profile that
+   uses newVersion.  Because the querying application let unassigned
+   code points pass through, the user can query on stored strings that
+   use code points in newVersion.  No stored strings can have code
+   points that are unassigned in newVersion, since that is illegal.  In
+   order to get a match, the querying application has to enter the
+   unassigned code points in the proper order, and has to use unassigned
+   code points that would make it through both the mapping and the
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 23]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   normalization steps.
+
+
+9.  Security Considerations
+
+   Stringprep is used with Unicode characters.  There are security
+   considerations that are specific to stringprep, and others that are
+   generic to using Unicode.
+
+9.1.  Stringprep-specific security considerations
+
+   The Unicode repertoire has many characters that look similar.  In
+   many cases, users of security protocols might do visual matching,
+   such as when comparing the names of trusted third parties.  Because
+   it is impossible to map similar-looking characters without a great
+   deal of context such as knowing the fonts used, stringprep does
+   nothing to map similar-looking characters together nor to prohibit
+   some characters because they look like others.  User applications can
+   help disambiguate some similar-looking characters by showing the user
+   when a string changes between scripts.
+
+   Most profiles of stringprep can cause changes in strings that are
+   input to stringprep.  Because of this, protocols that have sets of
+   non-allowed characters or sequences MUST check for the non-allowed
+   characters or sequences after the stringprep processing.
+
+   This document does not mandate the checking of bidirectional
+   characters in section 6.  If the requirements in section 6 are not
+   used in a profile of stringprep, it is easy to create many strings
+   whose characters are in different order but are displayed
+   identically.  This can cause security-related user confusion similar
+   to look-alike characters, as described above.
+
+   Stringprep does not do anything to assure that any algorithms
+   translating characters from non-Unicode into Unicode produce the same
+   output in all implementations.
+
+   Some Unicode codepoints are invisible.  Protocols that allow these
+   characters (that is, do not map them out or prohibit them in
+   stringprep) can cause users confusion when two identical-looking
+   strings do not match.
+
+9.2.  Generic Unicode security considerations
+
+   Using Unicode characters explicitly forces applications to use multi-
+   octet characters.  Converting an application from one that uses
+   single-octet characters to one that uses multi-octet characters must
+   be done very carefully, particularly in an application that checks
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 24]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   for values of characters or sorts characters.
+
+   Protocols that use stringprep usually also use encodings of Unicode,
+   such as UTF-8 or UTF-16.  Some applications using those encodings
+   have been known to not check for ill-formed sequences in the
+   encodings, and thereby have not detected sequences of octets that
+   would have been detected if they used just ASCII.  For example, in
+   UTF-8 the octet sequence "0xC0 0xAB" is an ill-formed sequence for
+   U+002B (plus sign).  All programs MUST reject any string that is an
+   ill-formed octet sequence for the encoding being used.
+
+   Both Unicode normalization and conversion between Unicode encodings
+   can cause strings to grow or shrink.  Programs that used fixed-size
+   buffers, or that make assumptions that buffers will always be greater
+   than or less than particular sizes, are likely to fail in insecure
+   fashions when using Unicode normalization or encoding conversions.
+
+   Covering an extensive list of security threats and considerations on
+   the use of current and future versions of Unicode is outside of the
+   scope of this document.  Additional considerations are available in
+   [UTR36] and [UTS39].
+
+
+10.  IANA Considerations
+
+   Stringprep profiles MUST have IETF consensus as described in
+   [RFC2434].  Each profile MUST be reviewed by the IESG before it is
+   registered.  The IESG MAY change a profile before registration.
+
+   IANA has set up a registry of stringprep profiles.  This registry is
+   a single text file that lists the known profiles.  Each entry in the
+   registry has three fields:
+
+   o  Profile name
+
+   o  RFC in which the profile is defined
+
+   o  Indicator whether or not this is the newest version of the profile
+
+   Each version of a profile will remain listed in the registry forever.
+   That is, if a new version of a profile supersedes an earlier version,
+   both versions will continue to be listed in the registry, but the
+   current version indicator will be turned off for the earlier version
+   and turned on for the newer version.
+
+   It is probably harmful if a large number of profiles of stringprep
+   proliferate.  Therefore, the IESG may reject proposals for new
+   profiles and instead suggest that protocols reuse existing profiles.
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 25]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+11.  Compatibility between stringprep and stringprep-bis-00
+
+   Despite the migration from Unicode 3.2[Unicode3.2] to Unicode
+   5.0[Unicode5.0] and related properties updates, this framework can be
+   used to create a new version of a profile referencing the previous
+   stringprep version[RFC3454].
+
+   The tables referenced in appendices A to F were updated from the
+   previous version in a way to minimize compatibility issues with the
+   previous version of stringprep[RFC3454].
+
+   Even when the previous version of the profile classified erroneously
+   code points into either space characters (map to nothing) or control
+   characters, these classification were maintained if they did not
+   significantly impact the preparation results.  For example:
+
+   o  U+200B ZERO WIDTH SPACE is not a space character and should not be
+      part of appendix B.1.  But the alternative is to classify it as a
+      control code where it is prohibited.  In both cases it is not part
+      of the output set.
+
+   o  U+180E MONGOLIAN VOWEL SEPARATOR is actually a space character and
+      should have been part of appendix B.1, but its classification as
+      either a space character or a control character (compatibility
+      mode) makes it prohibited.
+
+   In addition, most profiles treat the set of prohibited characters
+   described from appendix C.1 to C.9 as a whole, making classification
+   in a particular appendix less critical as long these prohibited
+   characters are included in the union set.
+
+   Finally, some appendices were created to make easier to describe
+   preparation steps aligned with the previous version of
+   stringprep[RFC3454].
+
+   o  appendix B.4 Reverse mapping for compatibility mode
+
+   o  appendix C.1.3 Non-ASCII space characters - Compatibility mode
+
+   o  appendix C.2.3 Non-ASCII control characters - Compatibility mode
+
+   o  appendix F.1 Pre normalization mapping
+
+   o  appendix F.2 Characters added since the previous stringprep
+      version[RFC3454]
+
+   o  appendix F.3 Character sequence reordering
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 26]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+11.1.  Compatibility using Unicode 3.2 code points
+
+   By restricting its repertoire to Unicode 3.2[Unicode3.2] a profile
+   may limit significantly compatibility issues.  For example, a new
+   version of the nameprep profile[RFC3491] could do the following:
+
+   o  use the Unicode 3.2 repertoire as specified in A.1.
+
+   o  use the mapping tables defined in B.1 and B.2 followed by the
+      mapping in B.4.
+
+   o  normalize according to the compatibility mode using appendix F.1,
+      F.2 and F.3 (see section 4).
+
+   o  prohibit output according to appendix/tables C.1.3, C.2.3, C.3,
+      C.4, C.5, C.6, C.7, C.8, and C.9.
+
+   o  check combining marks according to section 6.
+
+   o  check bidi according to section 7.
+
+   Following these steps provides the results:
+
+   o  all previous prohibited characters stay prohibited
+
+   o  additional characters are prohibited
+
+      17B4-17B5 [KHMER INHERENT VOWELS] (deprecated)
+      17A3 KHMER INDEPENDENT VOWEL QAQ
+      17D3 KHMER SIGN BATHAMASAT
+
+   o  any starting combining mark(s) result in an error.
+
+   o  mixing of RCat characters (see section 7.) with U+0cBF KANNADA
+      VOWEL SIGN I, or U+0CC6 KANNADA VOWEL SIGN E, or U+2800-U+28FF
+      [BRAILLE PATTERNS] is now invalid.
+
+   o  a RCat string may now end with NSMCat character(s).  This
+      combination would have been prohibited with the previous version
+      of stringprep with the bidi option.
+
+11.2.  Compatibility using the Identifier repertoire
+
+   A profile using a restricted repertoire such as the Identifier
+   repertoire referenced in appendix A.3 can reasonably be perceived as
+   a new version of an existing profile based on the prior version of
+   stringprep[RFC3454] without using the compatibility mode tables.
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 27]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   For example, such a new version of nameprep profile[RFC3491] could do
+   the following:
+
+   o  use the Identifier repertoire as specified in A.3.
+
+   o  no mapping, all characters map to themselves.
+
+   o  normalize according to the regular NFKC, no special processing or
+      tables since the repertoire is stable through normalization.
+
+   o  No prohibit, since the repertoire contains no prohibited code
+      points
+
+   o  check combining marks according to section 6.
+
+   o  check bidi according to section 7.
+
+   If the preparation of this repertoire is compared with the original
+   preparation of the same set through the original nameprep[RFC3491]
+   (using the unassigned flag), the following differences should be
+   found:
+
+   o  any starting combining mark(s) would result in an error.
+
+   o  mixing of RCat characters (see section 7.) with U+0cBF KANNADA
+      VOWEL SIGN I, or U+0CC6 KANNADA VOWEL SIGN E is now invalid.
+
+   o  a RCat string may now end with NSMCat character(s).  This would
+      have been prohibited before.
+
+   Therefore, using a restricted repertoire yields the same
+   compatibility benefit that the restriction to a Unicode 3.2 subset
+   but without the complex compatibility steps required in the first
+   example.
+
+   The appendix G shows more in details all the differences introduced
+   by this new version of stringprep.
+
+
+12.  Considerations concerning IDN revision
+
+   Although stringprep is not just covering IDN needs, it is an
+   important part of its mandate.  And because many concerns have been
+   raised in that aspect, especially in [IDNABis], it is important to
+   describe how this new version addresses these issues.  The following
+   text address point by point all issues pertinent to stringprep.
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 28]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+12.1.  Permitted Character Identification
+
+   By offering the choice of the "Identifier repertoire" referenced in
+   appendix A.3, this version of strinprep offers an inclusion-based
+   option.  Furthermore the repertoire is stable under mapping and
+   normalization which makes its implementation much simpler.  Note
+   however that the normalization step is still necessary for reasons
+   explained in section 2.
+
+12.2.  Strinprep mapping based on Unicode properties
+
+   As mentioned in the introduction, this has been one of the clear goal
+   of this revision of stringprep.  This version relies very little on
+   list of Unicode characters, and makes an extensive usage of Unicode
+   properties.  The remaining characters lists are mostly to provide
+   backward compatibility with the previous version of
+   stringprep[RFC3454].
+
+12.3.  Normalization stability
+
+   Many concerns have been raised concerning the real or perceived lack
+   of stability of the Unicode normalization process through its
+   successive versions.  The description of the normalization step in
+   section 4 addresses these concerns in details.  It covers several new
+   mechanisms:
+
+   o  Usage of the newly introduced "normalization Process for Stable
+      Strings (NPSS).  This process returns an error for unassigned code
+      points.
+
+   o  Usage of special tables (F.1, F.2, and F.3) to duplicate the
+      behavior provided by implementation following Unicode
+      3.2[Unicode3.2].
+
+   These various mechanisms provides ways for profile using stringprep
+   to pick and choose behavior based on strict backward compatibility
+   while offering a way for application to interact with platforms
+   offering various level of normalization services.
+
+12.4.  Case folding
+
+   The case folding which is part of the mapping step cannot be fully
+   separated from the normalization step, because case folding is not
+   closed under compatibility normalization such as NFKC.  While the
+   previous version of stringprep was addressing this correctly, it was
+   using hard coded lists of characters derived from original Unicode
+   tables, making transition to a new version unnecessarily difficult.
+   This version references directly the Unicode Character Database[UCD]
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 29]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   files in appendix B.2, making any further upgrade to a new version of
+   Unicode much easier.
+
+
+13.  Acknowledgements
+
+   TBD
+
+
+Appendix A.  Unicode repertoires
+
+   The following are the only repertoires covered in this document:
+
+   o  Unicode 3.2, as defined in Unicode 3.2[Unicode3.2]
+
+   o  Unicode 5.0, as defined in Unicode 5.0[Unicode5.0]
+
+   o  Identifier repertoire
+
+Appendix A.1.  Unassigned code points in Unicode 3.2
+
+   The table A.1 is made of all unassigned code points in Unicode 5.0
+   (see appendix A.2) augmented by all characters specified in appendix
+   F.2 which contains all characters added between Unicode 3.2 and 5.0.
+
+Appendix A.2.  Unassigned code points in Unicode 5.0
+
+   The table A.2 is made of all unassigned code points in Unicode 5.0
+   specified as all code points with general category Gc=Cn except for
+   code points which are listed in the PropList.txt file from the
+   Unicode Character Database in the category:
+   "NonCharacter_Code_Point"[UCD].
+
+Appendix A.3.  Identifier repertoire
+
+   The table A.3 is made of all characters that have the XID_Continue
+   property as referenced by the DerivedCoreProperties.txt file in the
+   Unicode Character Database[UCD] and which map to themselves according
+   to a mapping done using the table described in appendix B.2.
+
+
+Appendix B.  Mapping Tables
+
+   The following are the combination of tables and references for the
+   mapping process from section 3.  When explicitly specified the tables
+   have three columns:
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 30]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  the code point that is mapped from
+
+   o  the zero or more code points that it is mapped to
+
+   o  Character name
+
+   The columns are separated by semicolons.  Note that the second column
+   may be empty, or it may have one code point, or it may have more than
+   one code point, with each code point separated by a space.
+
+Appendix B.1.  Commonly mapped to nothing
+
+   The table B.1 is created by first using the following table:
+
+      00AD; ; SOFT HYPHEN
+      034F; ; COMBINING GRAPHEME JOINER
+      1806; ; MONGOLIAN TODO SOFT HYPHEN
+      200B; ; ZERO WIDTH SPACE
+      200C; ; ZERO WIDTH NON JOINER
+      200D; ; ZERO WIDTH JOINER
+      2060; ; WORD JOINER
+      FEFF; ; ZERO WIDTH NO-BREAK SPACE
+
+   In addition, the variation selector code points listed in the
+   PropList.txt file from the Unicode Character Database[UCD] in the
+   category: "Variation_Selector" are also added to the table B.1.
+
+Appendix B.1.1.  Commonly mapped to nothing with ZWJ/ZWNJ special
+                 processing
+
+   The table B.1.1 is created by first using the following table:
+
+      00AD; ; SOFT HYPHEN
+      034F; ; COMBINING GRAPHEME JOINER
+      1806; ; MONGOLIAN TODO SOFT HYPHEN
+      200B; ; ZERO WIDTH SPACE
+      2060; ; WORD JOINER
+      FEFF; ; ZERO WIDTH NO-BREAK SPACE
+
+   In addition, the variation selector code points listed in the
+   PropList.txt file from the Unicode Character Database[UCD] in the
+   category: "Variation_Selector" are also added to the table B.1.1.
+
+   The additional requirements expressed in 5.1 use the following
+   Unicode properties:
+
+   o  The character script value is determined by the "Scripts.txt" file
+      in the Unicode Character Database[UnicodeScripts].
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 31]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  The character properties "Right-Joining" (R), "Transparent" (T),
+      and "Left-Joining" (L) are specified by the ArabicShaping.txt file
+      in the Unicode Character Database.
+
+   o  The character property "Letter" is the union of all General
+      Category values: "Lu", "Ll", "Lt", "Lm", and "Lo" specified in the
+      UnicodeData.txt file in the Unicode Character Database[UCD].
+
+   o  The character property "Combining Mark" is the concatenation of
+      all General Category values: "Mc", "Mn", and "Me" specified in the
+      UnicodeData.txt file in the Unicode Character Database[UCD].
+
+   o  The character property "Virama" is determined by having the
+      Canonical_Combining_Class value equal to 9.  That class is
+      specified in the UnicodeData.txt file in the Unicode Character
+      Database[UCD].
+
+Appendix B.2.  Mapping for case-folding used with NFKC
+
+   The mapping table is constructed as by using the following steps:
+
+   1.  For each code point entry in the "CaseFolding.txt" file from the
+       Unicode Character Database[UCD] with either a "C" or "F" status
+       field, replace the entry code point with the sequence of code
+       points specified in the third field.
+
+   2.  For each code point entry in the "DerivedNormalizationProps.txt"
+       file[NormProps] with a "CF_NFKC", replace the entry code point
+       with the sequence of code points specified in the third field.
+
+   3.  Other code points map to themselves.
+
+   If a code point entry is present in both the "CaseFolding.txt" file
+   and the "DerivedNormalizationProps.txt" file, the latter entry
+   supersedes the former (example: U+03F9 GREEK CAPITAL LUNATE SIGMA
+   SYMBOL).
+
+Appendix B.3.  Mapping for case-folding used with no normalization
+
+   The mapping table is constructed as following:
+
+   1.  For each code point entry in the "CaseFolding.txt" file from the
+       Unicode Character Database[UCD]with either a "C" or "F" status
+       field, replace the entry code point with the sequence of code
+       points specified in the third field.
+
+   2.  Other code points map to themselves.
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 32]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+Appendix B.4.  Reverse mapping for compability mode
+
+   The mapping table is constructed for the following code points:
+
+      04CF CYRILLIC SMALL LETTER PALOCHKA
+      214E TURNED SMALL F
+      2184 LATIN SMALL LETTER REVERSED C
+      2D00-2D25 [GEORGIAN SUPPLEMENT KHUTSURI]
+
+   by mapping them back to their Simple_Uppercase_Mapping value as
+   specified in the UnicodeData.txt file in the Unicode Character
+   Database[UCD].
+
+
+Appendix C.  Prohibition tables
+
+   The tables in this appendix consist of lines with one prohibited code
+   point per line.  The format of the lines are the value of the code
+   point, a semicolon, and a comment which is the name of the code
+   point.
+
+Appendix C.1.  Space characters
+
+Appendix C.1.1.  ASCII space character
+
+   The table C.1.1 consists of a single code point:
+
+      0020; SPACE
+
+Appendix C.1.2.  Non-ASCII space characters
+
+   The table C.1.2 consists of all character code points with General
+   Category value (Gc) equal to "Zs" as determined by the file
+   UnicodeData.txt in the Unicode Character Database[UCD],
+
+   with the following exception:
+
+        0020; SPACE
+
+Appendix C.1.3.  Non-ASCII space characters - Compatibility mode
+
+   The table C.1.3 consists of all character code points with General
+   Category value (Gc) equal to "Zs" as determined by the file
+   UnicodeData.txt in the Unicode Character Database[UCD],
+
+   with the following addition:
+
+        200B ZERO WIDTH SPACE
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 33]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   and exceptions:
+
+        0020; SPACE
+        180E; MONGOLIAN VOWEL SEPARATOR
+
+Appendix C.2.  Control characters
+
+Appendix C.2.1.  ASCII control character
+
+   The table C.2.1 consists of all character code points with General
+   Category value (Gc) equal to "Cc" as determined by the file
+   UnicodeData.txt in the Unicode Character Database[UCD], within the
+   ASCII range (0000-007F).
+
+Appendix C.2.2.  Non-ASCII control character
+
+   The table C.2.2 consists of all character code pointss with General
+   Category value (Gc) equal to "Cc", "Cf", "Zl", and "Zp" as determined
+   by the file UnicodeData.txt in the Unicode Character Database[UCD],
+
+   with the following exceptions:
+
+      0000-001F; [CONTROL CHARACTERS]
+      007F; DELETE
+      00AD; SOFT HYPHEN
+      E0001; LANGUAGE TAG
+      E0020-E007F; [TAGGING CHARACTERS]
+
+Appendix C.2.3.  Non-ASCII control character - Compatibility mode
+
+   The table C.2.2 consists of all character code pointss with General
+   Category value (Gc) equal to "Cc", "Cf", "Zl", and "Zp" as determined
+   by the file UnicodeData.txt in the Unicode Character Database[UCD],
+
+   with the following additions:
+
+      180E; MONGOLIAN VOWEL SEPARATOR (not a control)
+      FFFC; OBJECT REPLACEMENT CHARACTER (not a control)
+
+   and exceptions:
+
+      0000-001F; [CONTROL CHARACTERS]
+      007F; DELETE
+      00AD; SOFT HYPHEN
+      E0001; LANGUAGE TAG
+      E0020-E007F; [TAGGING CHARACTERS]
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 34]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+Appendix C.3.  Private use
+
+   The table C.3 consists of the following code points:
+
+      E000-F8FF;     [PRIVATE USE, PLANE 0]
+      F0000-FFFFD;   [PRIVATE USE, PLANE 15]
+      100000-10FFFD; [PRIVATE USE, PLANE 16]
+
+Appendix C.4.  Non-characters code points
+
+   The table C.4 is made of the non-character code points as referenced
+   by the PropList.txt file from the Unicode Character Database[UCD] in
+   the category: "Noncharacter_Code_Point".
+
+Appendix C.5.  Surrogate codes
+
+   The table C.5 consists of the following code points:
+
+      D800-DFFF; [SURROGATE CODES]
+
+Appendix C.6.  Inappropriate for plain text
+
+   The table C.6 consists of the following code points:
+
+      FFF9; INTERLINEAR ANNOTATION ANCHOR
+      FFFA; INTERLINEAR ANNOTATION SEPARATOR
+      FFFB; INTERLINEAR ANNOTATION TERMINATOR
+      FFFC; OBJECT REPLACEMENT CHARACTER
+      FFFD; REPLACEMENT CHARACTER
+
+Appendix C.7.  Inappropriate for canonical representation
+
+   The table C.7 is made of the code points as referenced by the
+   PropList.txt file from the Unicode Character Database[UCD] in the
+   categories: "IDS_Binary_Operator" and "IDS_Trinary_Operator".
+
+Appendix C.8.  Change display properties or are deprecated
+
+   The table C.8 is made of the code points as referenced by the
+   PropList.txt file from the Unicode Character Database[UCD] in the
+   categories: "Bidi_Control" and "Deprecated".
+
+Appendix C.9.  Tagging characters
+
+   The table C.9 consists of all characters with General Category value
+   (Gc) equal to "Cf" as determined by the file UnicodeData.txt, from
+   the Unicode Character Database [UCD]and included within the TAG range
+   (E0000-E007F).
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 35]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+Appendix C.10.  Hangul filler characters
+
+   The table C.10 consists of the following code points:
+
+      115F ; HANGUL CHOSEONG FILLER
+      1160 ; HANGUL JUNGSEONG FILLER
+      3164 ; HANGUL FILLER
+      FFA0 ; HALFWIDTH HANGUL FILLER
+
+Appendix C.11.  Non identifier code points
+
+   The table C.11 consists of all characters that do not have the
+   XID_Continue property as referenced by the DerivedCoreProperties.txt
+   file in the Unicode Character Database[UCD].  These are characters
+   that are not letters, marks, or decimal numbers.
+
+Appendix C.12.  Archaic scripts
+
+   The table C.12 consists of all characters that have the following
+   script values as referenced by the Scripts.txt file in the Unicode
+   Character Database[UnicodeScripts].
+
+      Cprt; Cypriot syllabary
+      Dsrt; Deseret alphabet
+      Glag; Glagolitic alphabet
+      Goth; Gothic alphabet
+      Ital; Old Italic alphabet
+      Khar; Kharoshthi abjad
+      Linb; Linear-B syllabary
+      Xpeo; Old Persian cuneiform
+      Phag; Phags-pa alphabet
+      Phnx; Phoenician alphabet
+      Runr; Runic alphabet
+      Shaw; Shavian alphabet
+      Ugar; Ugaritic cuneiform
+
+
+Appendix D.  Bidirectional tables
+
+Appendix D.1.  Characters with bidirectional property R or AL
+
+   The table D.1 consists of all character code points with Bidi_Class
+   value equal to "R" and "Al" as determined by the file UnicodeData.txt
+   in the Unicode Character Database[UCD].
+
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 36]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+Appendix D.2.  Characters with bidirectional property L
+
+   The table D.2 consists of all character code points with Bidi_Class
+   value equal to "L" as determined by the file UnicodeData.txt in the
+   Unicode Character Database[UCD].
+
+Appendix D.3.  Characters with bidirectional property L
+
+   The table D.3 consists of all character code points with Bidi_Class
+   value equal to "NSM" as determined by the file UnicodeData.txt in the
+   Unicode Character Database[UCD].
+
+
+Appendix E.  Combining marks
+
+   The following specifies the combining marks.
+
+Appendix E.1.  Combining mark table
+
+   The table E.1 consists of all character code points with General
+   Category value (Gc) equal to "Mc", "Mn", and "Me" as determined by
+   the file UnicodeData.txt in the Unicode Character Database[UCD].
+
+
+Appendix F.  Normalization tables
+
+   The following tables provide the data set to ensure full
+   compatibility with previous version of this framework.
+
+Appendix F.1.  Pre normalization mapping
+
+   The following is the mapping table from section 4.  The table has two
+   columns:
+
+   o  the code point that is mapped from
+
+   o  the code point that is mapped to
+
+   o  comment
+
+
+   2F868;2136A; would be mapped to 36FC since Unicode 4.0
+   2F874; 5F33; would be mapped to 5F53 since Unicode 4.0
+   2F91F; 43AB; would be mapped to 243AB since Unicode 4.0
+   2F95F; 7AAE; would be mapped to 7AEE since Unicode 4.0
+   2F9BF; 4D57; would be mapped to 45D7 since Unicode 4.0
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 37]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+Appendix F.2.  Characters added since the previous stringprep version
+
+   The following is the list in code points and code point ranges of all
+   characters added since Unicode 3.2.  Some of them are inappropriate
+   for use in stringprep, such as the variation selectors in the range
+   U+E0100-U+E01FF which are mapped to nothing in the mapping process.
+
+     0221, 0234-024F, 02AE-02AF, 02EE-02FF,
+     0350-035F, 037B-037D, 03F7-03FF,
+     04CF, 04F6-04F7, 04FA-04FF,
+     0510-0513, 05A2, 05BA, 05C5-05C7,
+     0600-0603, 060B, 060D-0615, 061E, 0656-065E, 06EE-06EF, 06FF,
+     072D-072F, 074D-076D, 07C0-07FA,
+     0904, 097B-097F, 09BD, 09CE,
+     0A01, 0A03, 0A8C, 0AE1-0AE3, 0AF1,
+     0B35, 0B71, 0BB6, 0BE6, 0BF3-0BFA,
+     0CBC-0CBD, 0CE2-0CE3, 0CF1-0CF2,
+     0FD0-0FD1,
+     10F9-10FA, 10FC,
+     1207, 1247, 1287, 12AF, 12CF, 12EF,
+     130F, 131F, 1347, 135F-1360, 1380-1399,
+     17DD, 17F0-17F9,
+     1900-191C, 1920-192B, 1930-193B, 1940, 1944-194F, 1950-196D,
+       1970-1974, 1980-19A9, 19B0-19C9, 19D0-19D9, 19DE-19FF,
+     1A00-1A1B, 1A1E-1A1F,
+     1B00-1B4B, 1B50-1B7C,
+     1D00-1DCA, 1DFE-1DFF,
+     2053-2056, 2058-205E, 2090-2094, 20B2-20B5, 20EC-20EF,
+     213B-213C, 214E, 2184,
+     23CF-23E7,
+     24FF,
+     2614-2615, 2618, 267E-267F, 268A-269C, 26A0-26B2,
+     27C0-27CA,
+     2B00-2B1A, 2B20-2B23,
+     2C00-2C2E, 2C30-2C5E, 2C60-2C6C, 2C74-2C77, 2C80-2CEA, 2CF9-2CFF,
+     2D00-2D25, 2D30-2D65, 2D6F, 2D80-2D96, 2DA0-2DA6, 2DA8-2DAE,
+       2DB0-2DB6, 2DB8-2DBE, 2DC0-2DC6, 2DC8-2DCE, 2DD0-2DD6, 2DD8-2DDE,
+     2E00-2E17, 2E1C-2E1D,
+     31C0-31CF,
+     321D-321E, 3250, 327C-327E, 32CC-32CF,
+     3377-337A, 33DE-33DF, 33FF,
+     4DC0-4DFF,
+     9FA6-9FBB,
+     A700-A71A, A720-A721,
+     A800-A82B, A840-A877,
+     FA70-FAD9,
+     FDFD,
+     FE10-FE19, FE47-FE48,
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 38]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+     10000-1000B, 1000D-10026, 10028-1003A, 1003C-1003D, 1003F-1004D,
+       10050-1005D, 10080-100FA,
+     10100-10102, 10107-10133, 10137-1013F, 10140-1018A,
+     10380-1039D, 103C3, 103C8-103D5,
+     10426-10427, 1044E-1047F, 10480-1049D, 104A0-104A9,
+     10800-10805, 10808, 1080A-10835, 10837-10838, 1083C, 1083F,
+     10900-10919, 1091F,
+     10A00-10A03, 10A05-10A06, 10A0C-10A13, 10A15-10A17, 10A19-10A33,
+       10A38-10A3A, 10A3F-10A47, 10A50-10A58,
+     12000-1236E, 12400-12462, 12470-12473,
+     1D200-1D245,
+     1D300-1D356, 1D360-1D371
+     1D4C1,
+     1D6A4-1D6A5,
+     1D7CA-1D7CB,
+     E0100-E01EF
+
+Appendix F.3.  Character sequences reordering
+
+   To ensure full compatibility with previous version of this framework
+   some profiles may elect, prior to normalization, to reorder the
+   sequences made of a character from the "First character" column,
+   followed by one or more characters with a non-zero Canonical
+   Combining Class property (intervening characters), followed by the
+   character from the 'Last character" column located in the same row.
+
+   +---------------------------+---------------------------------------+
+   | First character           | Last character                        |
+   +---------------------------+---------------------------------------+
+   | 09C7 BENGALI VOWEL SIGN E | 09BE BENGALI VOWEL SIGN AA or 09D7    |
+   |                           | BENGALI AU LENGTH MARK                |
+   | 0B47 ORIYA VOWEL SIGN E   | 0B3E ORIYA VOWEL SIGN AA or 0B56      |
+   |                           | ORIYA AI LENGTH MARK or 0B57 ORIYA AU |
+   |                           | LENGTH MARK                           |
+   | 0BC6 TAMIL VOWEL SIGN E   | 0BBE TAMIL VOWEL SIGN AA or 0BD7      |
+   |                           | TAMIL AU LENGTH MARK                  |
+   | 0BC7 TAMIL VOWEL SIGN EE  | 0BBE TAMIL VOWEL SIGN AA              |
+   | 0B92 TAMIL LETTER O       | 0BD7 TAMIL AU LENGTH MARK             |
+   | 0CC6 KANNADA VOWEL SIGN E | 0CC2 KANNADA VOWEL SIGN UU or 0CD5    |
+   |                           | KANNADA LENGTH MARK or 0CD6 KANNADA   |
+   |                           | AI LENGTH MARK                        |
+   | 0CBF KANNADA VOWEL SIGN I | 0CD5 KANNADA LENGTH MARK              |
+   | or 0CCA KANNADA VOWEL     |                                       |
+   | SIGN O                    |                                       |
+   | 0D47 MALAYALAM VOWEL SIGN | 0D3E MALAYALAM VOWEL SIGN AA          |
+   | EE                        |                                       |
+   | 0D46 MALAYALAM VOWEL SIGN | 0D3E MALAYALAM VOWEL SIGN AA or 0D57  |
+   | E                         | MALAYALAM AU LENGTH MARK              |
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 39]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   | 1025 MYANMAR LETTER U     | 102E MYANMAR VOWEL SIGN II            |
+   | 0DD9 SINHALA VOWEL SIGN   | 0DCF SINHALA VOWEL SIGN AELA-PILLA or |
+   | KOMBUVA                   | 0DDF SINHALA VOWEL SIGN GAYANUKITTA   |
+   | 1100-1112 HANGUL CHOSEONG | 1161-1175 HANGUL JUNGSEONG A..I [21   |
+   | KIYEOK..HIEUH [19         | instances]                            |
+   | instances]                |                                       |
+   | [HangulSyllableType=LV]   | 11A8-11C2 HANGUL JONGSEONG            |
+   |                           | KIYEOK..HIEUH [27 instances]          |
+   +---------------------------+---------------------------------------+
+
+   [:HangulSyllableType=LV:] is specified as the set of Hangul syllables
+   that do not have a syllable-final character (also known as
+   Jongseong).  The determination of the structure of a Hangul syllable
+   is done by following the process specified by the Hangul Syllable
+   Decomposition in the Unicode standard [Unicode5.0].
+
+   The reordering consists in moving the intervening combining marks
+   after the character from the "Last character" column.
+
+   The Canonical Combining Class property value for each code point is
+   specified by the Canonical_Combining_Class value within the
+   UnicodeData.txt file in the Unicode Character Database[UCD].
+
+
+Appendix G.  Differences between stringprep and stringprep-bis-00
+
+   This appendix describes in details differences with the previous
+   version of stringprep[RFC3454].
+
+   Unicode repertoire
+
+   Added a Unicode 5.0 repertoire and an Identifier repertoire.
+
+   Map to nothing
+
+   o  Added E0100-E01FF [VARIATION SELECTOR-17 TO 256] (new) to the
+      list.
+
+   Case Folding
+
+   o  04C0 CYRILLIC LETTER PALOCHKA now maps to 04CF CYRILLIC SMALL
+      LETTER PALOCHKA (new) instead of itself.
+
+   o  10A0..10C5 [GEORGIAN CAPITAL LETTERS] now map to 2D00-2D25
+      [GEORGIAN SUPPLEMENT KHUTSURI] (new) instead of themselves.
+
+   o  2132 TURNED CAPITAL F now maps to 214E TURNED SMALL F (new)
+      instead of itself.
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 40]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  2183 ROMAN NUMERAL REVERSED ONE HUNDRED now maps to 2184 LATIN
+      SMALL LETTER REVERSED C (new) instead of itself.
+
+   o  Case mapping added for new characters: 023A, 023B, 023D, 0241,
+      0243-0236, 0248, 024A, 024C, 024E,03F7, 03F9-03FA, 03FD-03FF,
+      04F6, 04FA, 04FC, 04FE, 0510, 0512, 1D2C-1D2E, 1D30-1D3A, 1D3C-
+      1D42, 213B, 2C00-2C2E, 2C60, 2C62-2C64, 2C67, 2C69, 2C6B, 2C75,
+      2C80, 2C82, 2C84, 2C86, 2C88, 2C8A, 2C8C, 2C8E, 2C90, 2C92, 2C94,
+      2C96, 2C98, 2C9A, 2C9C, 2C9E, 2CA0, 2CA2, 2CA4, 2CA6, 2CA8, 2CAA,
+      2CAC, 2CAE, 2CB0, 2CB2, 2CB4, 2CB6, 2CB8, 2CBA, 2CBC, 2CBE, 2CC0,
+      2CC2, 2CC4, 2CC6, 2CC8, 2CCA, 2CCC, 2CCE, 2CD0, 2CD2, 2CD4, 2CD6,
+      2CD8, 2CDA, 2CDC, 2CDE, 2CE0, 2CE2, 3250, 32CC, 32CE-32CF, 337A,
+      33DE, 33DF, 10426-10427, 1D7CA.
+
+   Note that Unicode 3.2 did not guarantee the stability of case
+   folding.  Unicode 5.0 does guarantee the future stability, so that
+   subsequent versions will only add case foldings for new characters.
+
+   Space characters.  In compatibility mode (C.1.3), there is no change.
+   In regular mode (C.1.2), changes are as follows:
+
+   o  Added
+
+   180E MONGOLIAN VOWEL SEPARATOR (space)
+
+   o  Removed
+
+   200B ZERO WIDTH SPACE (not a space but control)
+
+   Control characters.  In compatibility mode (C.2.3), only additions
+   are made to the Control character list.  In regular mode (C.2.2),
+   both additions and removals are done.
+
+   o  Added the following characters:
+
+      0600-0603 [ARABIC SUBTENDING MARKS] (new)
+      17B4-17B5 [KHMER INHERENT VOWELS] (deprecated)
+      200B ZERO WIDTH SPACE (not a space but control)
+      200E LEFT-TO-RIGHT MARK (bidi control)
+      200F RIGHT-TO-LEFT MARK (bidi control)
+      202A LEFT-TO-RIGHT EMBEDDING (bidi control)
+      202B RIGHT-TO-LEFT EMBEDDING (bidi control)
+      202C POP DIRECTIONAL FORMATTING (bidi control)
+      202D LEFT-TO-RIGHT OVERRIDE (bidi control)
+      202E RIGHT-TO-LEFT OVERRIDE (bidi control)
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 41]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  Removed the following characters:
+
+      180E MONGOLIAN VOWEL SEPARATOR (not a control)
+      FFFC OBJECT REPLACEMENT CHARACTER (not a control)
+
+   Deprecated characters (C.8)
+
+   o  Added the following characters:
+
+      17A3 KHMER INDEPENDENT VOWEL QAQ
+      17D3 KHMER SIGN BATHAMASAT
+
+   Character with bidirectional property R or AL (D.1)
+
+   o  Added the following characters with property R (new):
+
+      05C6 HEBREW PUNCTUATION NUN HAFUKHA
+      07C0-07C9 [NKO DIGITS]
+      07CA-07E7 [NKO LETTERS]
+      07E8-07EA [NKO ARCHAIC LETTERS]
+      07F4 NKO HIGH TONE APOSTROPHE
+      07F5 NKO LOW TONE APOSTROPHE
+      07FA NKO LAJANYALAN
+      10800-10805 [CYPRIOT SYLLABLES A to JA]
+      10808 CYPRIOT SYLLABLE JO
+      1080A-10835 [CYPRIOT SYLLABLES KA to WO]
+      10837-10838 [CYPRIOT SYLLABLES XA to XE]
+      1083C CYPRIOT SYLLABLE ZA
+      1083F CYPRIOT SYLLABLE ZO
+      10900-10919 [PHOENICIAN LETTERS]
+      10A00 KHAROSHTHI LETTER A
+      10A10-10A13 [KHAROSHTHI LETTERS KA to GHA]
+      10A15-10A17 [KHAROSHTHI LETTERS CA to JA]
+      10A19-10A33 [KHAROSHTHI LETTERS NYA to TTTHA]
+      10A40-10A43 [KHAROSHTHI DIGITS]
+      10A44-10A47 [KHAROSHTHI NUMBERS]
+      10A50-10A58 [KHAROSHTHI PUNCTUATION]
+
+   o  Added the following characters with property AL (new):
+
+      0600-0603 [ARABIC SUBTENDING MARKS]
+      060B AFGHANI SIGN
+      060D ARABIC DATE SEPARATOR
+      061E ARABIC TRIPLE DOT PUNCTUATION MARK
+      06EE-06EF [EXTENDED ARABIC LETTERS FOR PARKARI]
+      06FF ARABIC LETTER HEH WITH INVERTED V
+      072D-072F [SYRIAC PERSIAN LETTERS]
+      074D-074F [SYRIAC SODGIAN LETTERS]
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 42]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+      0750-076D [EXTENDED ARABIC LETTERS]
+
+   Character with bidirectional property L (D.2)
+
+   o  Changed the bidirectional property to L for the following
+      characters:
+
+      0CBF KANNADA VOWEL SIGN I (from NSM in 3.2)
+      0CC6 KANNADA VOWEL SIGN E (from NSM in 3.2)
+      2800-28FF [BRAILLE PATTERNS] (from ON in 3.2)
+
+   o  Added the following new COMMON characters with property L:
+
+      213C, 26AC, 10100, 10102, 10107-10133, 10137-1013F, 1D360-1D371,
+      1D4C1, 1D6A4-1D6A5, 1D7CA-1D7CB
+
+   o  Added the following new LATIN characters with property L:
+
+      0221, 0234-024F, 02AE-02AF, 1D00-1D25, 1D2C-1D5C, 1D62-1D65,
+      1D6B-1D77, 1D79-1DBE, 2090-2094, 2132, 214E, 2184, 2C60-2C6C,
+      2C74-2C77
+
+   o  Added the following new GREEK characters with property L:
+
+      037B-037D, 03F7-03FF, 1D26-1D2A, 1D5D-1D61, 1D66-1D6A, 1DBF
+
+   o  Added the following new CYRILLIC characters with property L:
+
+      04CF, 04F6-04F7, 04FA-04FF, 0510-0513, 1D2B, 1D78
+
+   o  Added the following new DEVANAGARI characters with property L:
+
+      0904, 097B-097F
+
+   o  Added the following new BENGALI characters with property L:
+
+      09BD, 09CE
+
+   o  Added the following new GURMUKHI characters with property L:
+
+      0A03
+
+   o  Added the following new GUJARATI characters with property L:
+
+      0A8C, 0AE1
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 43]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  Added the following new ORIYA characters with property L:
+
+      0B35,0B71
+
+   o  Added the following new TAMIL characters with property L:
+
+      0BB6, 0BE6
+
+   o  Added the following new KANNADA characters with property L:
+
+      0CBD
+
+   o  Added the following new TIBETAN characters with property L:
+
+      0FD0-0FD1
+
+   o  Added the following new GEORGIAN characters with property L:
+
+      10F9-10FA, 10FC, 2D00-2D25
+
+   o  Added the following new ETHIOPIC characters with property L:
+
+      1207, 1247, 1287, 12AF, 12CF, 12EF, 130F, 131F, 1347, 1360,
+      1380-138F, 2D80-2D96, 2DA0-2DA6, 2DA8-2DAE, 2DB0-2DB6,
+      2DB8-2DBE, 2DC0-2DC6, 2DC8-2DCE, 2DD0-2DD6, 2DD8-2DDE
+
+   o  Added the following new script LIMBU characters with property L:
+
+      1900-191C, 1923-1926, 1930-1931, 1933-1938, 1946-194F
+
+   o  Added the following new script TAI LE characters with property L:
+
+      1950-196D, 1970-1974
+
+   o  Added the following new script NEW TAI LUE characters with
+      property L:
+
+      1980-19A9, 19B0-19C9, 19D0-19D9
+
+   o  Added the following new scripT BUGINESE characters with property
+      L:
+
+      1A00-1A16, 1A19-1A1B, 1A1E-1A1F
+
+   o  Added the following new script BALINESE characters with property
+      L:
+
+      1B04-1B33, 1B35, 1B3B, 1B3D-1B41, 1B43-1B4B, 1B50-1B6A, 1B74-1B7C
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 44]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  Added the following new script GLAGOLITIC characters with property
+      L:
+
+      2C00-2C2E, 2C30-2C5E
+
+   o  Added the following new script COPTIC characters with property L:
+
+      2C80-2CE4
+
+   o  Added the following new script TIFINAGH characters with property
+      L:
+
+      2D30-2D65, 2D6F
+
+   o  Added the following new HAN characters with property L:
+
+      9FA6-9FBB, FA70-FAD9
+
+   o  Added the following new script SYLOTI NAGRI characters with
+      property L:
+
+      A800-A801, A803-A805, A807-A80A, A80C-A824, A827
+
+   o  Added the following new script PHAGS-PA characters with property
+      L:
+
+      A840-A873
+
+   o  Added the following new script LINEAR B characters with property
+      L:
+
+      10000-1000B, 1000D-10026, 10028-1003A, 1003C-1003D, 1003F-1004D,
+      10050-1005D, 10080-100FA
+
+   o  Added the following new script UGARATIC characters with property
+      L:
+
+      10380-1039D, 1039F
+
+   o  Added the following new script OLD PERSIAN characters with
+      property L:
+
+      103A0-103C3, 103C8-103D5
+
+   o  Added the following new DESERET characters with property L:
+
+      10426-10427, 1044E-1044F
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 45]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   o  Added the following new script SHAVIAN characters with property L:
+
+      10450-1047F
+
+   o  Added the following new script OSMANYA characters with property L:
+
+      10480-1049D, 104A0-104A9
+
+   o  Added the following new script CUNEIFORM characters with property
+      L:
+
+      12000-1236E, 12400-12462, 12470-12473
+
+   Check combining marks.  This is a preparation step in stringprep.
+   This will obviously restrict any repertoire containing NSMCat
+   characters further than any profile based on the former version of
+   stringprep[RFC3454].
+
+   Check Bidi.  Allowing NSMCat at the end of Rcat string relaxes
+   restrictions.
+
+
+14.  References
+
+14.1.  Normative References
+
+   [NormProps]
+              The Unicode Consortium, "Unicode Derived Normalization
+              Properties",  , June 2006, <http://www.unicode.org/Public/
+              5.0.0/ucd/DerivedNormalizationProps.txt>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [UAX15]    Davis, M. and M. Duerst, "Unicode Normalization Forms",
+              Unicode Standard Annex #15, March 2001,
+              <http://www.unicode.org/unicode/reports/tr15/
+              tr15-22.html>.
+
+   [UAX9]     Davis, M., "The Bidirectional Algorithm", Unicode Standard
+              Annex #9, September 2006,
+              <http://www.unicode.org/unicode/reports/tr9/tr9-17.html>.
+
+   [UCD]      The Unicode Consortium, "Unicode Character Database",  ,
+              July 2006,
+              <http://www.unicode.org/Public/5.0.0/ucd/UCD.html>.
+
+   [Unicode3.2]
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 46]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+              The Unicode Consortium, "The Unicode Standard Version
+              3.2",  is defined by The Unicode Standard, Version 3.0
+              (Reading, MA, Addison-Wesley, 2000. ISBN 0-201-61633-5),
+              as amended by the Unicode Standard Annex #27: Unicode 3.1
+              (http://www.unicode.org/reports/tr27/) and by the Unicode
+              Standard Annex #28: Unicode 3.2
+              (http://www.unicode.org/reports/tr28/)., March 2002.
+
+   [Unicode5.0]
+              The Unicode Consortium, "The Unicode Standard Version
+              5.0", Addison-Wesley, Reading, MA , October 2006.
+
+   [UnicodeScripts]
+              The Unicode Consortium, "Unicode Scripts data file",  ,
+              March 2006,
+              <http://www.unicode.org/Public/5.0.0/ucd/Scripts.txt>.
+
+14.2.  Informative References
+
+   [CharModel]
+              Whistler, K., Davis, M., and A. Freytag, "Character
+              Encoding Model.", Unicode Technical Report #17,
+              September 2004,
+              <http://www.unicode.org/unicode/reports/tr17/tr17-5.html>.
+
+   [Glossary]
+              The Unicode Consortium, "Unicode Glossary", Unicode
+              Glossary , September 2006,
+              <http://www.unicode.org/glossary/>.
+
+   [IDNABidi]
+              Alvestrand, H. and C. Karp, "An IDNA problem in right-to-
+              left scripts", Internet-Draft , October 2006, <http://
+              www.ietf.org/internet-drafts/
+              draft-alvestrand-idna-bidi-00.txt>.
+
+   [IDNABis]  Klensin, J., "Proposed Issues and Changes for IDNA - An
+              Overview", Internet-Draft , October 2006, <http://
+              www.ietf.org/internet-drafts/
+              draft-klensin-idnabis-issues-00.txt>.
+
+   [IDNARepertoire]
+              Falstrom, P., "The Unicode Codepoints and IDN", Internet-
+              Draft , October 2006, <http://www.ietf.org/
+              internet-drafts/draft-faltstrom-idnabis-tables-01.txt>.
+
+   [ISO10646]
+              International Organization for Standardization,
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 47]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+              "Information Technology - Universal Multiple-Octet Coded
+              Character Set (UCS)", ISO Standard 10646-1, with
+              amendments 1 and 2, 2003.
+
+   [RFC2434]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
+              IANA Considerations Section in RFCs", BCP 26, RFC 2434,
+              October 1998.
+
+   [RFC3454]  Hoffman, P. and M. Blanchet, "Preparation of
+              Internationalized Strings ("stringprep")", RFC 3454,
+              December 2002.
+
+   [RFC3490]  Faltstrom, P., Hoffman, P., and A. Costello,
+              "Internationalizing Domain Names in Applications (IDNA)",
+              RFC 3490, March 2003.
+
+   [RFC3491]  Hoffman, P. and M. Blanchet, "Nameprep: A Stringprep
+              Profile for Internationalized Domain Names (IDN)",
+              RFC 3491, March 2003.
+
+   [RFC3987]  Duerst, M. and M. Suignard, "Internationalized Resource
+              Identifiers (IRIs)", RFC 3987, January 2005.
+
+   [UTR36]    Davis, M. and M. Suignard, "Unicode Security
+              Considerations", Unicode Technical Report #36,
+              August 2006,
+              <http://www.unicode.org/reports/tr36/tr36-5.html>.
+
+   [UTS39]    Davis, M. and M. Suignard, "Unicode Security Mechanisms",
+              Unicode Technical Standard #36, August 2006,
+              <http://www.unicode.org/reports/tr39/tr39-2.html>.
+
+
+Authors' Addresses
+
+   Michel Suignard (editor)
+   Microsoft Corporation
+   One Microsoft Way
+   Redmond, WA  98052
+   U.S.A.
+
+   Phone: +1 425 882-8080
+   Email: michelsu@microsoft.com
+   URI:   http://www.suignard.com
+
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 48]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+   Mark Davis
+   Google
+   U.S.A.
+
+   Email: mark.davis@macchiato.com or mark.davis@google.com
+
+
+   Asmus Freytag
+   ASMUS Inc.
+   U.S.A.
+
+   Email: asmus@unicode.org
+   URI:   http://home.ix.netcom.com/~asmus-inc/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 49]
+
+Internet-Draft                 stringprep                  December 2006
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2006).
+
+   This document is subject to the rights, licenses and restrictions
+   contained in BCP 78, and except as set forth therein, the authors
+   retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is provided by the IETF
+   Administrative Support Activity (IASA).
+
+
+
+
+
+Suignard, et al.          Expires June 23, 2007                [Page 50]
+

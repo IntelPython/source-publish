@@ -1,0 +1,1402 @@
+
+
+
+
+Network Working Group                                         J. Klensin
+Internet-Draft
+Expires: June 5, 2006                                       P. Faltstrom
+                                                                     IAB
+                                                        December 2, 2005
+
+
+  Review and Recommendations for Internationalized Domain Names (IDN)
+                     draft-iab-idn-nextsteps-00.txt
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on June 5, 2006.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2005).
+
+Abstract
+
+   This note describe issues raised by the deployment and use of
+   Internationalized Domain Names.  It describes problems both at the
+   time of registration and those for use of those names for use in the
+   DNS.  It recommends that IETF should update the IDN related RFCs and
+   a framework to be followed in doing so, as well as summarizing and
+   identifying some work that is required outside the IETF.  In
+   particular, it proposes that some changes be investigated for the
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 1]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   IDNA standard and its supporting tables, based on experience gained
+   since those standards were completed.
+
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  4
+     1.1.  Status of this Document and its Recommendations  . . . . .  4
+     1.2.  The IDNA Standard  . . . . . . . . . . . . . . . . . . . .  4
+     1.3.  Unicode Documents  . . . . . . . . . . . . . . . . . . . .  5
+     1.4.  Definitions  . . . . . . . . . . . . . . . . . . . . . . .  5
+       1.4.1.  language . . . . . . . . . . . . . . . . . . . . . . .  6
+       1.4.2.  script . . . . . . . . . . . . . . . . . . . . . . . .  6
+       1.4.3.  multilingual . . . . . . . . . . . . . . . . . . . . .  6
+       1.4.4.  localization . . . . . . . . . . . . . . . . . . . . .  6
+       1.4.5.  internationalization . . . . . . . . . . . . . . . . .  6
+     1.5.  Statements and Guidelines  . . . . . . . . . . . . . . . .  7
+       1.5.1.  IESG Statement . . . . . . . . . . . . . . . . . . . .  7
+       1.5.2.  ICANN statements . . . . . . . . . . . . . . . . . . .  7
+   2.  Problem  . . . . . . . . . . . . . . . . . . . . . . . . . . .  9
+     2.1.  Examples of issues . . . . . . . . . . . . . . . . . . . .  9
+       2.1.1.  Language specific character matching . . . . . . . . .  9
+       2.1.2.  Multiple scripts . . . . . . . . . . . . . . . . . . .  9
+       2.1.3.  Normalization and Character Mappings . . . . . . . . . 10
+       2.1.4.  URL on a bus . . . . . . . . . . . . . . . . . . . . . 11
+       2.1.5.  Bidirectional text . . . . . . . . . . . . . . . . . . 12
+       2.1.6.  Confusable Character Issues  . . . . . . . . . . . . . 12
+       2.1.7.  The IESG Statement and IDNA issues . . . . . . . . . . 13
+       2.1.8.  Versions of Unicode  . . . . . . . . . . . . . . . . . 14
+   3.  Conclusions from the IAB IDN ad-hoc committee  . . . . . . . . 15
+     3.1.  Issues within the scope of the IETF  . . . . . . . . . . . 15
+       3.1.1.  Review of IDNA . . . . . . . . . . . . . . . . . . . . 15
+       3.1.2.  Non-DNS and Above-DNS Internationalization
+               Approaches . . . . . . . . . . . . . . . . . . . . . . 16
+       3.1.3.  Security issues, certificates, etc.  . . . . . . . . . 16
+       3.1.4.  Non US-ASCII in local part of email addresses  . . . . 17
+       3.1.5.  Use of the Unicode Character Set in the IETF . . . . . 18
+     3.2.  Issues that fall within the purview of ICANN . . . . . . . 18
+       3.2.1.  Dispute resolution . . . . . . . . . . . . . . . . . . 18
+       3.2.2.  Policy at registries . . . . . . . . . . . . . . . . . 18
+       3.2.3.  IDN TLDs . . . . . . . . . . . . . . . . . . . . . . . 18
+   4.  Specific Recommendations for Action  . . . . . . . . . . . . . 19
+     4.1.  Reduction of permitted character list  . . . . . . . . . . 19
+     4.2.  Elimination of all non-language characters . . . . . . . . 19
+     4.3.  Elimination of word-separation punctuation . . . . . . . . 19
+     4.4.  Updating to new versions of Unicode  . . . . . . . . . . . 20
+     4.5.  Combining Characters and Character Components  . . . . . . 20
+     4.6.  Role and Uses of the DNS . . . . . . . . . . . . . . . . . 20
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 2]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   5.  Security Considerations  . . . . . . . . . . . . . . . . . . . 21
+   6.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 21
+   7.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+     7.1.  Normative References . . . . . . . . . . . . . . . . . . . 21
+     7.2.  Non-normative References . . . . . . . . . . . . . . . . . 22
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 24
+   Intellectual Property and Copyright Statements . . . . . . . . . . 25
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 3]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+1.  Introduction
+
+1.1.  Status of this Document and its Recommendations
+
+   This document reviews the IDN landscape from an IETF perspective and
+   presents the recommendations and conclusions of an IAB-convened ad
+   hoc committee charged with reviewing IDN issues and the path forward
+   (See Section 6).  Its recommendations are recommendations to the
+   IETF, or in a few cases to other bodies, for topics to be examined
+   and actions to be taken if those bodies, after their examinations,
+   consider those actions appropriate.
+
+   Neither the IAB nor the members of the ad hoc committee have yet
+   reached consensus that this document is ready for final publication.
+   However, the IAB concluded that it was appropriate to expose it, as a
+   working draft, for community comment and feedback.  Such comments
+   should be sent to iab@iab.org (relevant material will be forwarded to
+   the IAB IDN Ad Hoc committee).
+
+1.2.  The IDNA Standard
+
+   During 2002 IETF created the following RFCs that, together, define
+   IDNs:
+
+   RFC 3454 Preparation of Internationalized Strings ("stringprep")
+      [RFC3454].
+      Stringprep is a generic mechanism for taking a Unicode string and
+      converting it into a canonical format.  Stringprep itself is just
+      a collection of rules, tables, and operations.  Any protocol or
+      algorithm that uses it must define a "stringprep profile", which
+      specifies which of those rules are applied, how, and with which
+      characteristics.
+
+   RFC 3490 Internationalizing Domain Names in Applications (IDNA)
+      [RFC3490].
+      IDNA is the base specification in this group.  It specifies that
+      Nameprep is used as the stringprep profile for domain names, and
+      that Punycode is the relevant the encoding mechanism use for use
+      in generating an ASCII-compatible ("ACE") form of the name.  It
+      also applies some additional conversions and character filtering
+      that are not part of Nameprep.
+
+   RFC 3491 Nameprep: A Stringprep Profile for Internationalized Domain
+      Names (IDN) [RFC3491].
+      Nameprep is one such profile.  It is designed to meet the specific
+      needs of IDNs and, in particular, to support case-folding for
+      scripts that support what are traditionally known as upper and
+      lower case forms of the same letters.  The result of the nameprep
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 4]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+      algorithm is a string containing a subset of the Unicode Character
+      set, normalized and case folded so that case insensitive
+      comparison can be made.
+
+   RFC 3492 Punycode: A Bootstring encoding of Unicode for
+      Internationalized Domain Names in Applications (IDNA) [RFC3492].
+      Punycode is a mechanism for encoding a Unicode string in ASCII
+      characters.  The characters used are the same the subset of
+      characters that are allowed in the hostname definition of DNS,
+      i.e., the "letter, digit, and hyphen" characters, sometimes known
+      as "LDH".
+
+1.3.  Unicode Documents
+
+   Unicode is used as the base, and defining, character set for IDN.
+   Unicode is standardized by the Unicode Consortium, and synchronized
+   with ISO to create ISO/IEC 10646 [ISO10646].  At the time the RFCs
+   mentioned earlier were created, Unicode was at version 3.2.  For
+   reasons explained later, the RFCs explicitly use Unicode version 3.2
+   [Unicode32] and no other version (see Section 2.1.8).
+
+   Unicode is a very large and complex character set.  (The term
+   "character set" or "charset" is used in a way that is peculiar to the
+   IETF and may not be the same as the usage in other bodies and
+   contexts.)  The Unicode Standard and related documents are created
+   and maintained by the Unicode Technical Committee (UTC), one of the
+   committees of the Unicode Consortium.
+
+   The Consortium first published The Unicode Standard [Unicode10] in
+   1991, and continues to develop standards based on that original work.
+   Unicode is developed in conjunction with the International
+   Organization for Standardization, and it shares its character
+   repertoire with ISO/IEC 10646.  Unicode and ISO/IEC 10646 function
+   equivalently as character encodings, but The Unicode Standard
+   contains much more information for implementers, covering -- in depth
+   -- topics such as bitwise encoding, collation, and rendering.  The
+   Unicode Standard enumerates a multitude of character properties,
+   including those needed for supporting bidirectional text.  The two
+   standards do use slightly different terminology.
+
+1.4.  Definitions
+
+   The following terms and their meanings are criticial to understanding
+   of IDNs and the rest of this document.  These terms are derived from
+   [RFC3536], which contains additional discussion of some of them.
+
+
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 5]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+1.4.1.  language
+
+   A language is a way that humans interact.  The use of language occurs
+   in many forms, the most common of which are speech, writing, and
+   signing.
+
+   Some languages have a close relationship between the written and
+   spoken forms, while others have a looser relationship.  RFC 3066
+   [RFC3066] discusses languages in more detail and provides identifiers
+   for languages for use in Internet protocols.  Note that computer
+   languages are explicitly excluded from this definition.
+
+1.4.2.  script
+
+   A set of graphic characters used for the written form of one or more
+   languages.  This definition is the one used in [ISO10646].
+
+   Examples of scripts are Latin, Cyrillic, Greek, Arabic, and Han (the
+   ideographs used in writing Chinese, Japanese, and Korean).  RFC 2277
+   [RFC2277] discusses scripts in detail.
+
+1.4.3.  multilingual
+
+   The term "multilingual" has many widely-varying definitions and thus
+   is not recommended for use in standards.  Some of the definitions
+   relate to the ability to handle international characters; other
+   definitions relate to the ability to handle multiple charsets; and
+   still others relate to the ability to handle multiple languages.
+
+1.4.4.  localization
+
+   The process of adapting an internationalized application platform or
+   application to a specific cultural environment.  In localization, the
+   same semantics are preserved while the syntax or presentation forms
+   may be changed.
+
+   Localization is the act of tailoring an application for a different
+   language or script or culture.  Some internationalized applications
+   can handle a wide variety of languages.  Typical users only
+   understand a small number of languages, so the program must be
+   tailored to interact with users in just the languages they know.
+
+1.4.5.  internationalization
+
+   In the IETF, "internationalization" means to add or improve the
+   handling of non-ASCII text in a protocol.
+
+   Many protocols that handle text only handle one script (often, a
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 6]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   subset of the characters used in writing English text), or leave the
+   question of what character set is used up to local guesswork (which
+   leads, of course, to interoperability problems).  Adding non-ASCII
+   text to such a protocol allows the protocol to handle more scripts,
+   with the intention of being able to include all of the scripts that
+   are useful in the world.  It should be noted that many English words
+   cannot be written in ASCII, various mythologies notwithstanding.
+
+1.5.  Statements and Guidelines
+
+   When the IDN RFCs were published, IESG and ICANN made statements that
+   were intended to guide deployment and future work.  In recent months,
+   ICANN has updated its statement and others have also made
+   contributions.
+
+1.5.1.  IESG Statement
+
+   The IESG made a statement on IDNA
+   (http://www.ietf.org/IESG/STATEMENTS/IDNstatement.txt):
+
+       IDNA, through its requirement of Nameprep [RFC3491], uses
+       equivalence tables that are based only on the characters
+       themselves; no attention is paid to the intended language (if any)
+       for the domain name. However, for many domain names, the intended
+       language of one or more parts of the domain name actually does
+       matter to the users.
+
+       Similarly, many names cannot be presented and used without
+       ambiguity unless the scripts to which their characters belong are
+       known. In both cases, this additional information should be of
+       concern to the registry.
+
+   The statement is longer than this, but these paragraphs are the
+   important ones.  The rest of the statement are explanations and
+   examples.
+
+1.5.2.  ICANN statements
+
+1.5.2.1.  Initial ICANN Guidelines
+
+   Soon after the IDNA standard was adopted, ICANN produced an initial
+   version of "IDN Guidelines", which appears at
+   http://www.icann.org/general/idn-guidelines-20jun03.htm.  There are
+   some additional notes and comments, but the key guideline text is:
+
+   Guidelines
+   1.  Top-level domain registries that implement internationalized
+   domain name capabilities will do so in strict compliance with the
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 7]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   technical requirements described in RFCs 3490, 3491, and 3492
+   (collectively, the "IDN standards").
+
+   2.  In implementing the IDN standards, top-level domain registries
+   will employ an "inclusion-based" approach (meaning that code points
+   that are not explicitly permitted by the registry are prohibited) for
+   identifying permissible code points from among the full Unicode
+   repertoire.
+
+   3.  In implementing the IDN standards, top-level domain registries
+   will (a) associate each registered internationalized domain name with
+   one language or set of languages, (b) employ language-specific
+   registration and administration rules that are documented and
+   publicly available, such as the reservation of all domain names with
+   equivalent character variants in the languages associated with the
+   registered domain name, and, (c) where the registry finds that the
+   registration and administration rules for a given language would
+   benefit from a character variants table, allow registrations in that
+   language only when an appropriate table is available.
+
+   4.  Registries will work collaboratively with relevant and interested
+   stakeholders to develop language-specific registration policies
+   (including, where the registry determines appropriate, character
+   variant tables), with the objective of achieving consistent
+   approaches to IDN implementation for the benefit of DNS users
+   worldwide.  Registries will work collaboratively with each other to
+   address common issues, through, for example, ad hoc groups, regional
+   groups, and global fora, such as the ICANN IDN Registry
+   Implementation Committee.
+
+   5.  In implementing the IDN standards, top-level domain registries
+   should, at least initially, limit any given domain label (such as a
+   second-level domain name) to the characters associated with one
+   language or set of languages only.
+
+   6.  Top-level domain registries (and registrars) should provide
+   informational resources and services in all languages for which they
+   offer internationalized domain name registrations.
+
+1.5.2.2.  Revised ICANN Guidelines, version 2.0
+
+   In November 2005, ICANN adopted, on a temporary basis, a revised
+   version of the Guidelines [ICANNv2] with the expectation that a new
+   process would review and either extend or further modify them.
+
+   Key new points of the revised form of the Guidelines include
+   exclusions of graphical elements (such as those in the Unicode Box
+   Drawing block) and other non alphanumeric or ideographic language
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 8]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   characters and provision for entering tables in the IANA registry
+   (http://www.iana.org/assignments/idn/) on a per-script as well as
+   per-language basis.
+
+
+2.  Problem
+
+   People use "words" when they want to think of things.  For example
+   "orange", "tree", "restaurant" or "Acme Inc".  Words are normally in
+   a specific language, such as English or Swedish.  The DNS, however,
+   supports character-string labels, not "words".  While it is useful,
+   especially for mnemonic value or to identify objects, for actual
+   words to be used as DNS labels, other constraints on the DNS make it
+   impossible to guarantee that it will be possible to represent every
+   word in every language as a DNS label, internationalized or not.
+
+   When writing or typing the label (or word), a script must be selected
+   and a charset must be picked for use with that script.  If that
+   charset, or the local charset being used by the relevant operating
+   system or application software, is not Unicode, a further conversion
+   must be performed to produce Unicode.  Since not all charsets define
+   their characters in the same way, the conversion to Unicode
+   potentially may lose information.  The resulting Unicode string is
+   then used as input to IDNA.
+
+2.1.  Examples of issues
+
+2.1.1.  Language specific character matching
+
+   There are similar words that can be expressed in multiple languages.
+   For example the name Torbjorn in Norwegian and Swedish.  In Norwegian
+   it is spelled with the character U+00F8 (LATIN SMALL LETTER O WITH
+   STROKE) while in Swedish it is spelled with U+00FC (LATIN SMALL
+   LETTER U WITH DIAERESIS).  Those characters are not treated as equal
+   according to the Unicode consortium while most people speaking
+   Swedish, Danish and Norwegian probably think they are the same.
+
+2.1.2.  Multiple scripts
+
+   There are languages in the world that can be expressed using multiple
+   scripts.  For example some Eastern European and Central Asian
+   languages can be expressed in either Cyrillic or Roman characters,
+   some African and Southeast Asian language can be expressed in either
+   Arabic or Roman characters, and Vietnamese can be expressed in
+   Chinese or Roman characters.  A few languages can even be written in
+   three different scripts.  Because of this, the same word, in the same
+   language, can be expressed in different ways.
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                  [Page 9]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+2.1.3.  Normalization and Character Mappings
+
+   Unicode contains several different models for representing
+   characters.  The Chinese (Han)-derived characters of the "CJK"
+   languages are "unified", i.e., characters with common derivation and
+   similar appearances are assigned to the same code point.  European
+   characters derived from a Greek-Roman base are separated into
+   separate code blocks for "Latin", Greek and Cyrillic even when
+   individual characters are identical in both form and semantics.
+   Separate code points based on font differences alone are generally
+   prohibited, but a large number of characters for "mathematical" use
+   have been assigned separate code points even though they differ from
+   base ASCII characters only by font attributes such as "script",
+   "bold", or "italic".  Some characters that often appear together are
+   treated as typographical digraphs with specific code points assigned
+   to the combination, others simply require that the two-character
+   sequences be used.  Some Roman-based letters that were developed as
+   decorated variations on the basic Latin letter collection (e.g., by
+   addition of diacritical marks) are assigned code points as individual
+   characters, others must be built up as two (or more) character
+   sequences using "composing characters".
+
+   Many of these differences result from the desire to maintain backward
+   compatibility while the standard evolved historically, and are hence
+   understandable.  However, the DNS requires precise knowledge of which
+   codes and code sequences represent the same character and which ones
+   do not.  Limiting the potential difficulties with confusable
+   characters (see Section 2.1.6) requires even more knowledge of which
+   characters might look alike in some fonts but not in others.  These
+   variations make it difficult or impossible to apply a single set of
+   rules to all of Unicode.  Instead, more or less complex mapping
+   tables, defined on a character by character basis, are required to
+   "normalize" different representations of the same character to a
+   single form so that matching is possible.
+
+   Unless normalization rules, such as those that underlie Nameprep, are
+   applied, characters that are essentially identical will not match in
+   the DNS, creating many opportunities for problems.  The most common
+   one is that, due to the process above before a word ends up being a
+   Unicode string, a single word can end up being expressed as more than
+   one unique unicode string.
+
+   IDNA attempts to compensate for some of these problems by using a
+   normalization algorithm defined by the Unicode Consortium.  This
+   algorithm can change a sequence of one or more Unicode characters to
+   another set of characters.  One example is that the base character
+   U+0061 (LATIN SMALL LETTER A) followed by U+0308 (COMBINING
+   DIAERESIS) is changed to the single Unicode character U+00E4 (LATIN
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 10]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   SMALL LETTER A WITH DIAERESIS).
+
+   However, this Unicode normalization process accounts only for simple
+   character equivalences, not equivalences that are language or script
+   dependent.  For example, as mentioned above, the characters U+00F8
+   (LATIN SMALL LETTER O WITH STROKE) and U+00FC (LATIN SMALL LETTER U
+   WITH DIAERESIS) are considered to match in Swedish (and some other
+   languages), but not for all languages than use either of the
+   characters.
+
+   If we leave Roman-based scripts and examine Chinese ones, we see
+   there is also an absence of specific, lexigraphic, rules for
+   transformations between Traditional and Simplified Chinese.  Even if
+   there were such rules, unification of Japanese and Korean characters
+   with Chinese ones would make it impossible to normalize Traditional
+   Chinese into Simplified Chinese ones without causing problems in
+   Japanese and Korean use of the same characters.
+
+   More generally, while some mappings, such as those between
+   precomposed Roman-based characters and the equivalent multiple code
+   point composed character sequences, depend only on the characters
+   themselves, in many or most cases, such as the case with Swedish
+   above, the mapping is language dependent.  There are discussions
+   whether the rules for what is normalized should be, or could be, are
+   applied differently to different scripts.  The fact that scripts have
+   been added to Unicode one at a time has impact on the optimization of
+   these algorithms and on forward compatibility.  Even if the language
+   is known and language-specific rules can be defined, dependencies on
+   the language do not disappear.  Normalization is not possible to do
+   without context.  DNS lookups and many other operations do not have a
+   way to capture and utilize the language information that would be
+   needed to give them context.
+
+   More details on the creation of the normalization algorithms can be
+   found in the Unicode Specification and the associated Technical
+   Reports [UTR] and Annexes.  Technical Report #36 [UTR36] is
+   specifically related to the IDN discussion.
+
+2.1.4.  URL on a bus
+
+   Another problem is called "the side of the bus problem".  In short,
+   two Unicode strings that are different might actually look exactly
+   the same.  This because some glyphs in for example Cyrillic, Greek
+   and Latin do look the same, but are different codepoints in Unicode
+   as Unicode was created script by script.  Worse, one needs to be
+   reasonably familiar with a script and how it is used to understand
+   how much characters can reasonably vary as the result of artistic
+   fonts and typography.  For example, there are a few fonts for Latin
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 11]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   characters that are sufficiently highly ornamented that an observer
+   might easily confuse some of the characters with characters in Thai
+   script.
+
+2.1.5.  Bidirectional text
+
+   Some scripts (and because of that some words in some languages) are
+   written not left to right, but right to left.  And, to complicate
+   things, one might have something written in Arabic characters right
+   to left that includes some characters in Latin characters, such as
+   Indo-Arabic digits.  The Latin character part is written left to
+   right, which implies some texts might have a mixed left to right AND
+   right to left order (even though in most implementations all texts
+   have a major direction, with the other as an exception).  IDNA
+   prohibits these mixed-directional (or bidirectional) strings in IDN
+   labels, but the prohibition causes other problems such as the
+   rejection of some otherwise linguistically and culturally sensible
+   strings.  As Unicode and conventions for handling so-called
+   bidirectional ("BIDI") strings evolve, the prohibition in IDNA should
+   be reviewed and reevaluated.
+
+2.1.6.  Confusable Character Issues
+
+   Similar-looking characters in identifiers can cause actual problems
+   in the Internet since they can result, deliberately or accidentally,
+   in people being directed to the wrong host or mailbox by believing
+   that they are typing, or clicking on, intended characters which are
+   different from those that actually appear in the domain name or
+   reference.  See Section 3.1.3 for further discussion of this issue.
+
+   IDNs complicate these issues, not only by providing many additional
+   characters that look sufficiently alike to be potentially confused,
+   but by raising new policy questions.  For example, if a language can
+   be written in two different scripts, is a label constructed from a
+   word written in one script equivalent to a label constructed from the
+   same word written in the other script?  Is the answer the same for
+   words two different languages that translate into each other?
+
+   It is now generally understood that, in addition to the collision
+   problems of possibly-equivalent words and hence labels, it is
+   possible to utilize characters that look alike -- "confusable"
+   characters -- to spoof names in order to mislead or defraud users.
+   That issue, driven by particular attacks known as "phishing" and
+   "pharming", has introduced stronger requirements for registry efforts
+   to prevent problems than were previously generally recognized as
+   important.
+
+   One proposed path forward is to say a registry (for example .SE)
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 12]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   "only accepts registrations in Swedish, using LATIN script, and
+   because of this, Unicode glyphs a, b, c,...".  But, because there is
+   no 1:1 mapping between country and language, even a ccTLD like .SE
+   might have to accept registrations in other languages.  For example,
+   there may be a requirement for Finnish (the second most-used language
+   in Sweden).  What rules and codepoints are then defined for Finnish?
+   Does it have special mappings that collide with those that are
+   defined for Swedish?  And what does one do in countries that use more
+   than one script?  (Finnish and Swedish use the same script.)  In all
+   cases, the dispute will ultimately be about whether two strings are
+   the same (or confusingly similar) or not.  That, in turn, will
+   generate a discussion of how one defines "what is the same" and "what
+   is similar enough to be a problem".
+
+   These difficulties can never be completely eliminated by algorithmic
+   means.  Some of the problem can be addressed by appropriate tuning of
+   the protocols and their tables, other parts by registry actions to
+   reduce confusion and conflicts, and still other parts can be
+   addressed by careful design of user interfaces in application
+   programs.  But, ultimately, some responsibility to avoid being
+   tricked or harmfully confused will inevitably rest with the user.
+
+   One registry technique that has been extensively explored involves
+   looking at confusable characters and confusion between complete
+   labels, restricting the labels that can be registered based on
+   relationships to what is registered already.  Registries that adopt
+   this approach might establish special mapping rules such as:
+
+   1.  If you register something with codepoint A, domain names with B
+       instead of A will be blocked from registration by others.
+   2.  If you register something with codepoint A, you also get domain
+       name with B instead of A.
+
+   These approaches are discussed in more detail for "CJK" characters in
+   RFC 3743 [RFC3743] and more generally in RFC 4290 [RFC4290].
+
+2.1.7.  The IESG Statement and IDNA issues
+
+   The issues above, at least as they were understood at the time,
+   provided the background for the IESG statement (which, in turn, was
+   part of the basis for the initial ICANN Guidelines) that a registry
+   should have a policy about the scripts, languages, codepoints and
+   text directions for which registrations will be accepted.  While
+   "accept all" might be an acceptable policy, it implies there is also
+   a dispute resolution process that takes the problems listed above
+   into account.  The dispute resolution process must be designed so
+   that all types of potential disputes must be able to be resolved: for
+   example, issues might arise between registrant and registry over a
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 13]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   decision by the registry on collisions with already registered domain
+   names and between registrant and trade mark holder (that a domain
+   name infringes on a trademark).  In both cases the parties
+   disagreeing have different views on whether two strings are
+   "equivalent" or not.  They may believe that a string that is not
+   allowed to be registered is actually different from one that is
+   already registered.  Or they might believe that two strings are the
+   same, even though the rules adopted by the registry to prevent
+   confusion define them as two different domain names.
+
+2.1.8.  Versions of Unicode
+
+   While opinions differ about how important the issues are in practice,
+   the use of Unicode and its supporting tables to support IDNs appears
+   to be far more sensitive to subtle changes than typical Unicode
+   applications.  This may be, at least in part, because many other
+   applications are internally sensitive only to the appearance of
+   characters and not to their representation.  Or those applications
+   may be able to take effective advantage of script, language, or
+   character class identification.  The working group that developed
+   IDNA concluded that attempting to encode any ancillary character
+   information into the DNS label would be impractical and unwise, and
+   the current ad hoc committee saw no reason to review that decision.
+
+   This sensitivity to changes has made it quite difficult to migrate
+   IDNA from one version of Unicode to the next if any changes are made
+   that are not strictly additive.  A change in a code point assignment
+   or definition may be extremely disruptive if DNS labels have been
+   defined using the earlier form.  Ironically, while Unicode
+   normalization tables, tables of scripts or languages and characters
+   that belong to them, and even tables of confusable characters as an
+   adjunct to security recommendations may be very helpful in designing
+   registry restrictions on registrations and applications provisions
+   for avoiding or identifying suspicious names, they also broaden the
+   scope of materials for which IDNA and its implementations are
+   sensitive to changes of any variety between one version of Unicode
+   and the next and, consequently, make Unicode version migration more
+   difficult.
+
+   This situation leads to a dilemma.  On the one hand, it is completely
+   unacceptable to freeze Unicode at a version level that excludes more
+   recently-defined characters and scripts which are important to those
+   who use them.  On the other hand, it is completely unacceptable to
+   migrate from one version of Unicode to the next if such migration
+   might invalidate an existing registered DNS name or some of its
+   registered properties or might make the string or representation of
+   that name ambiguous.  If IDNA is to be modified to accommodate new
+   versions of Unicode, the IETF will need to work with the Unicode
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 14]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   Consortium and other relevant bodies to find an appropriate balance
+   in this area, but progress will be possible only if all relevant
+   parties are able to fairly consider and discuss possible decisions
+   that may be very difficult and unpalatable.
+
+
+3.  Conclusions from the IAB IDN ad-hoc committee
+
+3.1.  Issues within the scope of the IETF
+
+3.1.1.  Review of IDNA
+
+   The IETF should consider reviewing RFCs 3454, 3490, 3491 and/or 3492,
+   and update, replace or supplement them to meet the criteria of this
+   paragraph (one or more of them may prove impractical after further
+   study).  Any new versions or additional specifications should be
+   adapted to the version of Unicode that is current when they are
+   created.  Ideally, they should specify a path for adapting to future
+   versions of Unicode (some suggestions below may facilitate this).
+   The IETF should also consider whether there are significant
+   advantages to mapping some groups of characters, such as code points
+   assigned to font variations, into others or whether clarity and
+   comprehensibility for the user would be better served by simply
+   prohibiting those characters.  More generally, it appears that it
+   would be worthwhile for the IETF to review whether the Unicode
+   normalization rules now invoked by the Stringprep profile in Nameprep
+   are optimal for the DNS or whether more restrictive rules, or an even
+   more restrictive set of permitted character combinations, would
+   provide better support for DNS internationalization.
+
+   There appears to be a consensus within both the ad hoc committee and
+   the broader community that lists of codepoints should be specified by
+   the use of an inclusion based mechanism (i.e., identifying the
+   characters that are permitted), rather than by excluding a small
+   number of characters from the total Unicode set as Stringprep and
+   Nameprep do today.  That conclusion should be reviewed by the IETF
+   community and action taken as appropriate.
+
+   We suggest that the individuals doing the review of the codepoints
+   should work as a specialized design team.  To the extent possible,
+   that work should be done jointly by people with experience from the
+   IETF and deep knowledge of the constraints of the DNS and application
+   design, participants from the Unicode Consortium, and other people
+   necessary to be able to reach a generally-accepted result.  Because
+   any work along these lines would be modifications and updates to
+   standards-track documents, final review and approval of any proposals
+   would necesarily follow normal IETF processes.
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 15]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+3.1.2.  Non-DNS and Above-DNS Internationalization Approaches
+
+   The IETF should once again examine the extent to which it is
+   appropriate to try to solve internationalization problems via the DNS
+   and what place the many varieties of so-called "keyword systems" or
+   other Internet navigational techniques might have.  Those techniques,
+   as a group, impose fewer constraints, or at least different
+   constraints, than IDNA and the DNS.  As discussed elsewhere in this
+   document, IDNA cannot support information about scripts, languages,
+   or Unicode versions on lookup.  As a consequence of the character of
+   DNS lookups, characters and labels either match or do not match, a
+   near-match is simply not a possible concept even though it commonly
+   occurs in practice.  The DNS is further constrained by a fairly rigid
+   internal aliasing system (via CNAME and DNAME resource records),
+   while some applications of international naming may require more
+   flexibility.  Finally, the rigid hierarchy of the DNS --and the
+   tendency in practice for it to become flat at levels nearest the
+   root-- and the need for names to be unique are more suitable for some
+   purposes than others and may not be a good match for some purposes
+   for which people wish to use IDNs.  Each of these constraints can be
+   relaxed or altered by one or more alternate systems that would
+   provide alternatives to direct use of the DNS by users.  Some of the
+   issues involved are discussed further in Section 4.6 and various
+   ideas have been discussed in detail in the IETF or IRTF.  Many of
+   those ideas have even been described in Internet Drafts or other
+   documents.  As experience with IDNs and with expectations for them
+   accumulates, it will probably become appropriate for the IETF or IRTF
+   to revisit the underlying questions and possibilities.
+
+3.1.3.  Security issues, certificates, etc.
+
+   Some characters look like others, often as the result of common
+   origins.  The problem with these "confusable" characters, often
+   incorrectly called homographs, have always existed when characters
+   are presented to humans that interpret what is displayed and then
+   make decisions based on what the person sees.  This is not a problem
+   that exists only when working with internationalized domain names,
+   but it make the problem worse.  The result of a survey that would
+   explain what the problems are might be interesting.  Many of these
+   issues are mentioned in Unicode Technical Report #36 [UTR36].
+
+   In this, and other issues, associated with IDNs, precise use of
+   terminology is important lest even more confusion result.  The
+   definition of the term 'homograph' that normally appears in
+   dictionaries and linguistic texts states that homographs are
+   different words which are spelled identically (for example, the
+   adjective 'brief' meaning short, the noun 'brief' meaning a document,
+   and the verb 'brief' meaning to inform).  By definition, letters in
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 16]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   two different alphabets are not the same, regardless of similarities
+   in appearance.  This means that sequences of letters from two
+   different scripts that appear to be identical on a computer display
+   cannot be homographs in the accepted sense, even if they are both
+   words in the dictionary of some language.  Assuming that there is a
+   language written with Cyrillic script in which "cap" is a word,
+   regardless of what it might mean, it is not a homograph of the Latin-
+   script English word "cap".
+
+   When the security implications of visually confusable characters were
+   brought to the forefront earlier this year, the term homograph was
+   used to designate any instance of graphic similarity, even when
+   comparing individual characters.  This usage is not only incorrect,
+   but risks introducing even more confusion and hence should be
+   avoided.  The current preferred terminology is to describe these
+   similar-looking characters as "confusable characters" or even
+   "confusables".
+
+   It is unclear what a secure setup for end user is.  Today, in the web
+   browser, a padlock is a traditional way of describing some level of
+   security for the end user.  Is this binary signalling enough?  Should
+   there be any connection between a risk for a displayed string include
+   confusable characters and the padlock or similar signalling to the
+   user?
+
+   Many web browsers have adopted the convention, based on a
+   "whitelist", that IDNs within top-level domains that are deemed to
+   practice safe practices about registration of confusable labels are
+   displayed as native characters, while IDNs from other domains are
+   displayed as punycode.  These techniques clearly are not sensitive to
+   different policies between top-level domains and their subdomains
+   and, while clearly helpful, may not be adequate.  Are other methods
+   of dealing with confusable characters possible?  Would other methods
+   of identifying and listing policies about avoiding confusing
+   registrations be feasible and helpful?
+
+   It would be interesting to see a more coordinated effort to have
+   guidelines in the form of user interface guidelines.
+
+3.1.4.  Non US-ASCII in local part of email addresses
+
+   Work is going on in the IETF related to the local part of email
+   addresses.  It should be noted that the local part of email addresses
+   has much different syntax and constraints than a domain name label,
+   so to directly apply IDNA on the local part is not possible.
+
+
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 17]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+3.1.5.  Use of the Unicode Character Set in the IETF
+
+   Unicode, and the closely-related ISO 10646, are the only coded
+   character set that aspires to include all of the world's characters.
+   As such, it permits use of international characters without having to
+   identify particular character coding standards or tables.  The
+   requirement for a single character set is particularly important for
+   use with the DNS since there is no place to put character set
+   identification.  The decision to use Unicode as the base for IETF
+   protocols going forward is discussed in [RFC2277].  The group did not
+   see any reason to revisit the decision to use Unicode in IETF
+   protocols.
+
+3.2.  Issues that fall within the purview of ICANN
+
+3.2.1.  Dispute resolution
+
+   IDN creates new types of collisions between trademarks and domain
+   names as well as collisions between domain names.  This have impact
+   on dispute resolution processes used by registries and otherwise.  It
+   is important that deployment of IDN evolve in parallel with review
+   and updating of ICANN or registry-specific dispute resolution
+   processes.
+
+3.2.2.  Policy at registries
+
+   Registries must use an inclusion based model when choosing what
+   characters to allow at the time of registration.  This list of
+   characters is in turn to be a subset of what is allowed according to
+   the updated IDNA standard.  This policy must be developed in parallel
+   with dispute resolution process at the registry itself.  Unlike most
+   established dispute resolution policies, we recommend that policies
+   be developed to constrain IDN registrations by registries and zone
+   administrators at all levels of the DNS tree.  Of course, many of
+   these policies will be less formal than others and there is no
+   requirement for complete global consistency, but the arguments for
+   reduction of confusable characters and other issues in TLDs should
+   apply to all zones below that specific TLD.
+
+3.2.3.  IDN TLDs
+
+   The group sees that the IDN TLD issue can be divided into at least
+   two very separate ones.  The first is to decide what TLD's are to be
+   created, and the second is to decide how the TLD is to be encoded and
+   deployed in the root zone.  Only the second might have implications
+   to the work in the IETF.  However, part of the desire for IDNs at the
+   root level is to provide actual aliases, in national languages, for
+   existing domains.  The IETF may need to consider whether the use of
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 18]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   DNAME records in the root is appropriate to meet that need, what
+   constraints, if any, are needed and whether alternate approaches,
+   such as those of [RFC4185], are appropriate.
+
+
+4.  Specific Recommendations for Action
+
+   Apart from the general conclusions of the ad hoc committee, described
+   above, the committee also formulated several specific recommendations
+   for action.  The IAB endorses these recommendations as steps for
+   further consideration in the identified groups.
+
+4.1.  Reduction of permitted character list
+
+   The IAB ad hoc believes there is a need to generalize from the
+   original "hostname" rules to non-ASCII characters, permitting as few
+   characters as possible to do that job.  This would represent a
+   restriction of the model of characters permitted in IDN labels, and
+   it contrasts with the approach used to develop the original IDNA/
+   nameprep tables: that approach was to include all Unicode characters
+   that there was not a clear reason to exclude.
+
+   The specific recommendation here is to specify such internationalized
+   hostnames.  Such an activity would fall to the IETF, although the
+   task of developing the appropriate list of permitted characters will
+   require effort both in the IETF and elsewhere.  The effort should be
+   as linguistically and culturally sensitive as possible, but smooth
+   and effective operation of the DNS, including minimizing of
+   complexity, should be primary goals.  The following should be
+   considered as possible mechanisms for achieving an appropriate
+   minimum number of characters.
+
+4.2.  Elimination of all non-language characters
+
+   Unicode characters that are not needed to write words in any of the
+   world's languages should be eliminated from the list of characters
+   that are appropriate in DNS labels.  In addition to such characters
+   as those used for box-drawing and sentence punctuation, this should
+   exclude punctuation for word structure and other delimiters: while
+   DNS labels may conveniently be used to express words in many
+   circumstances, the goal is not to express words (or sentences or
+   phrases), but to permit the creation of unambiguous labels with good
+   mneumonic value.
+
+4.3.  Elimination of word-separation punctuation
+
+   The inclusion of the hyphen in the original hostname rules is an
+   historical artifact from an older, flat, name space.  The community
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 19]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   should consider whether it is appropriate to consider it a simple
+   legacy property of ASCII names and not attempt to generalize it to
+   other scripts.  We might, for example, prohibit any use of hyphen in
+   IDNs as well as not permitting its equivalents in other scripts (or
+   deciding on what those equivalents might be).
+
+4.4.  Updating to new versions of Unicode
+
+   As new scripts and languages contine to be added to Unicode, it is
+   important that IDNA track updates.  If it does not do so, but remains
+   "stuck" at 3.2 or some single later version, languages that have
+   been, and will be, added later will not be able to be expressed in
+   DNS labels.  Making those upgrades is difficult, and will continue to
+   be difficult, as long as new versions require, not just addition of
+   characters, but changes to normalization tables and matching
+   procedures (see Section 2.1.8).  Anything that can be done to lower
+   complexity and simplify forward transitions should be seriously
+   considered.
+
+4.5.  Combining Characters and Character Components
+
+   One thing that increases IDNA complexity and the need for
+   normalization is that combining characters are permitted.  Without
+   them, complexity might be reduced enough to permit more easy
+   transitions to new versions.  The community should consider whether
+   combining characters should be prohibited entirely from IDNs.  A
+   consequence of this, of course, is that each new language or script
+   would require that all of its characters have Unicode assignments to
+   specific, precomposed, code points, a model that the Unicode
+   Consortium has rejected for Roman-based scripts.  For non-Roman
+   scripts, it seems to be the Unicode trend to define such code points.
+   At some level, telling the users and proponents of scripts that now
+   require composing characters to work the issues out with the Unicode
+   Consortium in a way that severely constraints the need for those
+   characters seems only appropriate.  The IAB and the IETF should
+   examine whether it is appropriate to press the Unicode Consortium to
+   revise these policies or otherwise to recommend actions that would
+   reduce the need for normalization and the related complexities.
+
+4.6.  Role and Uses of the DNS
+
+   We wish to remind the community that there are boundaries to the
+   appropriate uses of the DNS.  It was designed and implemented to
+   serve some specific purposes.  There are other things that it does
+   well, other things that it does badly, and still other things it
+   cannot do at all.  No amount of protocol work on IDNs will solve
+   problems with alternate spellings, near-matches, searching for
+   appropriate names, and so on.  Registration restrictions can be used
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 20]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   to reduce the risk and pain of attempts to do some of these things
+   gone wrong, as well as to reduce the risks of various sort of
+   deliberate bad behavior, but, beyond a certain point, use of the DNS
+   because it is available becomes a bad tradeoff, especially since
+   internationalization of DNS names does not eliminate, e.g., the ASCII
+   protocol identifiers and structure of URIs and even IRIs.
+
+   These issues are discussed at more length, and alternatives
+   presented, in [RFC3467], [INDNS], and [DNS-Choices].
+
+
+5.  Security Considerations
+
+   This document is simply a discussion of IDNs and IDN issues; it
+   raises no new security concerns.  However, if some of its
+   recommendations to reduce IDNA complexity, the number of available
+   characters, and various approaches to constraining the use of
+   confusable characters, are followed and prove successful, the risks
+   of name spoofing and other problems may be reduced.
+
+
+6.  Acknowledgements
+
+   Members of the IAB-IDN ad-hoc committee were:
+
+   Rob Austein, Leslie Daigle, Tina Dam, Mark Davis, Patrik Faltstrom,
+   Scott Hollenbeck, Cary Karp, John Klensin, Gervase Markham, David
+   Meyer, Thomas Narten, Michael Suignard, Sam Weiler, Bert Wijnen, Kurt
+   Zeilenga and Lixia Zhang.
+
+   Members of the IAB at the time of approval of this document were:
+
+   Bernard Aboba, Loa Andersson, Brian Carpenter, Leslie Daigle, Patrik
+   Faltstrom, Bob Hinden, Kurtis Lindqvist, David Meyer, Pekka Nikander,
+   Eric Rescorla, Pete Resnick, Jonathan Rosenberg and Lixia Zhang.
+
+
+7.  References
+
+7.1.  Normative References
+
+   [ISO10646]
+              International Organization for Standardization,
+              "Information Technology - Universal Multiple- Octet Coded
+              Character Set (UCS) - Part 1: Architecture and Basic
+              Multilingual Plane"", ISO/IEC 10646-1:2000, October 2000.
+
+   [RFC3454]  Hoffman, P. and M. Blanchet, "Preparation of
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 21]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+              Internationalized Strings ("stringprep")", RFC 3454,
+              December 2002.
+
+   [RFC3490]  Faltstrom, P., Hoffman, P., and A. Costello,
+              "Internationalizing Domain Names in Applications (IDNA)",
+              RFC 3490, March 2003.
+
+   [RFC3491]  Hoffman, P. and M. Blanchet, "Nameprep: A Stringprep
+              Profile for Internationalized Domain Names (IDN)",
+              RFC 3491, March 2003.
+
+   [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
+              for Internationalized Domain Names in Applications
+              (IDNA)", RFC 3492, March 2003.
+
+   [Unicode32]
+              The Unicode Consortium, "The Unicode Standard, Version
+              3.0", 2000.
+
+              (Reading, MA, Addison-Wesley, 2000.  ISBN 0-201-61633-5).
+              Version 3.2 consists of the definition in that book as
+              amended by the Unicode Standard Annex #27: Unicode 3.1
+              (http://www.unicode.org/reports/tr27/) and by the Unicode
+              Standard Annex #28: Unicode 3.2
+              (http://www.unicode.org/reports/tr28/).
+
+7.2.  Non-normative References
+
+   [DNS-Choices]
+              Faltstrom, P., "Design Choices When Expanding DNS",
+              draft-iab-dns-choices-02 (work in progress), June 2005.
+
+   [ICANNv2]  ICANN, "Guidelines for the Implementation of
+              Internationalized Domain Names, Draft Version 2.0",
+              September 2005,
+              <http://www.icann.org/general/idn-guidelines-20sep05.htm>.
+
+   [INDNS]    National Research Council, "Signposts in Cyberspace: The
+              Domain Name System and Internet Navigation", National
+              Academy Press ISBN 0309-09640-5 (Book) 0309-54979-5 (PDF),
+              2005,
+              <http://www7.nationalacademies.org/cstb/pub_dns.html>.
+
+   [RFC2277]  Alvestrand, H., "IETF Policy on Character Sets and
+              Languages", BCP 18, RFC 2277, January 1998.
+
+   [RFC3066]  Alvestrand, H., "Tags for the Identification of
+              Languages", BCP 47, RFC 3066, January 2001.
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 22]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+   [RFC3467]  Klensin, J., "Role of the Domain Name System (DNS)",
+              RFC 3467, February 2003.
+
+   [RFC3536]  Hoffman, P., "Terminology Used in Internationalization in
+              the IETF", RFC 3536, May 2003.
+
+   [RFC3743]  Konishi, K., Huang, K., Qian, H., and Y. Ko, "Joint
+              Engineering Team (JET) Guidelines for Internationalized
+              Domain Names (IDN) Registration and Administration for
+              Chinese, Japanese, and Korean", RFC 3743, April 2004.
+
+   [RFC4185]  Klensin, J., "National and Local Characters for DNS Top
+              Level Domain (TLD) Names", RFC 4185, October 2005.
+
+   [RFC4290]  Klensin, J., "Suggested Practices for Registration of
+              Internationalized Domain Names (IDN)", RFC 4290,
+              December 2005.
+
+   [UTR]      Unicode Consortium, "Unicode Technical Reports",
+              <http://www.unicode.org/reports/>.
+
+   [UTR36]    Davis, M. and M. Suignard, "Unicode Technical Report #36:
+              Unicode Security Considerations", November 2005,
+              <http://www.unicode.org/reports/tr36/>.
+
+              Working Draft for Proposed Update
+
+   [Unicode10]
+              The Unicode Consortium, "The Unicode Standard, Version
+              1.0", 1991.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 23]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+Authors' Addresses
+
+   John C Klensin
+   1770 Massachusetts Ave, #322
+   Cambridge, MA  02140
+   USA
+
+   Phone: +1 617 491 5735
+   Email: john-ietf@jck.com
+
+
+   Patrik Faltstrom
+   IAB
+
+   Email: paf@cisco.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 24]
+
+Internet-Draft              Framework for IDN              December 2005
+
+
+Intellectual Property Statement
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Disclaimer of Validity
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Copyright Statement
+
+   Copyright (C) The Internet Society (2005).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+Klensin & Faltstrom       Expires June 5, 2006                 [Page 25]
+
+

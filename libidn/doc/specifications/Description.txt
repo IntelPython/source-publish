@@ -1,0 +1,226 @@
+1: Simple conversion and display tests
+	1-1: Basic lookups
+		# In the IDNConnect event, we tested IDNs in the TLDs, but these
+		#   tests are just for lower levels
+		# Each IDN has a single non-ASCII Latin character
+		1-1-1 Has one IDN: example.<00ED>dn
+		1-1-2 Has two IDNs: <00EB>x.<00ED>dn
+	# For the tables below, scripts that are used by more than
+	#    one million people are used
+	1-2: Latin, non-ASCII
+		1-2-1 Latin-1: example.<00E5><00FE><00E7>
+		1-2-2 Latin Extended A: example.<0103>b<0109>
+		1-2-3 Latin Extended B: example.<0227><0180><0188>
+		1-2-4 Latin Extended Additional: example.<1E01><1E03><1E09>
+	1-3: Non-Latin simple characters
+		1-3-1 Han: example.<4E3F><4EBA><5C38>
+		1-3-2 Hiragana: example.<304B><304C><304D>
+		1-3-3 Katakana: example.<30AB><30AC><30AD>
+		1-3-4 Hangul Jamo: example.<1100><1161><11A8>
+		1-3-5 Hangul: example.<AC69><B4C6><C03A>
+		1-3-6 Yi: example.<A00A><A020><A2B8>
+		1-3-7 Greek: example.<03B1><03B2><03B3>
+		1-3-8 Greek Extended: example.<1F02><1F26><1F55>
+		1-3-9 Cyrillic: example.<0430><0431><0432>
+		1-3-10 Armeian: example.<0561><0562><0563>
+		1-3-11 Georgian: example.<10D0><10D1><10D2>
+	1-4: Non-alphanumeric
+		1-4-1 Symbols: example.<2221><21BA><2282>
+	1-5: Scripts with special rendering
+		1-5-1 Devanagari: example.<0915><0916><0917>
+		1-5-2 Bengali: example.<0995><0996><0997>
+		1-5-3 Gurmukhi: example.<0A15><0A16><0A17>
+		1-5-4 Gujarati: example.<0A95><0A96><0A97>
+		1-5-5 Oriya: example.<0B15><0B16><0B17>
+		1-5-6 Tamil: example.<0B95><0B99><0B9A>
+		1-5-7 Telugu: example.<0C15><0C16><0C17>
+		1-5-8 Kannada: example.<0C95><0C96><0C97>
+		1-5-9 Malayalam: example.<0D15><0D16><0D17>
+		1-5-10 Sinhala: example.<0D9A><0D9B><0D9C>
+		1-5-11 Thai: example.<0E01><0E02><0E03>
+		1-5-12 Lao: example.<0E81><0E82><0E84>
+		1-5-13 Tibetan: example.<0F40><0F41><0F42>
+		1-5-14 Myanmar: example.<1000><1001><1002>
+		1-5-15 Khmer: example.<1780><1781><1782>
+		1-5-16 Mongolian: example.<1820><1821><1822>
+	1-6: Right-to-left scripts
+		1-6-1 Arabic: example.<0627><0628><0629>
+		1-6-2 Hebrew: example.<05D0><05D1><05D2>
+		1-6-3 Syriac: example.<0710><0711><0712>
+	1-7: Mixtures of scripts
+		1-7-1 ASCII and non-Latin: example.abc<30AB><30AC><30AD>
+		1-7-2 Latin (non-ASCII) and non-Latin: example.<00E5><00FE><00E7><30AB><30AC><30AD>
+
+
+2: ToASCII failure tests
+	# General question for each application:
+	#    what does the program do if ToASCII fails?
+	2-1: Step 1 -- All ASCII check
+		# No failure possible
+	2-2: Step 2 -- Nameprep
+		# See section 4 for these tests
+		# Fail for things in 4-3 and 4-4
+	2-3: Step 3: Checks if UseSTD3ASCIIRules is in place
+		# All of these are failures
+		2-3-1: Name includes non-LDH ASCII before Nameprep
+			2-3-1-1 !: <00ED><0021>dn.example
+			2-3-1-2 $: <00ED><0024>dn.example
+			2-3-1-3 +: <00ED><002B>dn.example
+		2-3-2: Name has leading or trailing hyphen before Nameprep
+			2-3-2-1 <002D><00ED>dn.example
+			2-3-2-2 <00ED>dn<002D>.example
+		2-3-3: Name includes non-LDH ASCII after Nameprep
+			2-3-3-1 Gets a +: <00ED><FF0B>dn.example
+			2-3-3-2 Gets a =: <00ED><207C>dn.example
+		2-3-4: Name has leading or trailing hyphen after Nameprep
+			2-3-4-1 <FE63><00ED>dn.example
+			2-3-4-2 <00ED>dn<FF0D>.example
+	2-4: Step 4 -- All ASCII check
+		# Started with non-ASCII but changed to all-ASCII in Nameprep
+		# None of these are failures
+		2-4-1 <00B9>1.example
+		2-4-2 <2165>vi.example
+		2-4-3 <00DF>ss.example
+	2-5: Step 5 -- Pre-existing ACE prefix
+		# All of these are failures
+		2-5-1 ACE prefix exits before Nameprep: xn--<00ED>dn.example
+		2-5-2 ACE prefix appears after Nameprep: <2179>n--<00ED>dn.example
+	2-6: Step 6 -- Encode with Punycode
+		# No failure possible
+	2-7: Step 7 -- Appending ACE prefix
+		# No failure possible
+	2-8: Step 8 -- Size check
+		# This is a failure
+		2-8-1 Zero-length label after Nameprep
+		# All of these would be failures, but we can't actually test any of them
+		#    in BIND because it won't load the zones
+		2-8-2 Post-punycode size is 64:
+			<00ED>dnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn64.example
+		2-8-3 Post-punycode size is 65:
+			<00ED>dnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn65.example
+		2-8-4 All-ASCII iput size is 64:
+			idnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn64.example
+		2-8-5 All-ASCII input size is 65:
+			idnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn65.example
+	2-9: After ToASCII
+		# Make sure output has ASCII periods
+		2-9-1 U+3002 acts as a label separator: 3002-test<3002><00ED>dn
+		2-9-2 U+FF0E acts as a label separator: ff0e-test<FF0E><00ED>dn
+		2-9-3 U+FF61 acts as a label separator: ff61-test<FF61><00ED>dn
+
+
+3: ToUnicode failure tests
+	# Testing is done by creating HTTP redirects
+	# All failures should return original string
+	# These tests will be done by returning an HTTP redirect
+	3-1: Step 1 -- All ASCII check
+		# No failure possible
+	3-2: Step 2 -- Nameprep
+		# Make sure they are doing Nameprep mappings
+		3-2-1 Sharp S conversion: xn--m<00DF>-jma.example -> m<00EB>ss.example
+	3-3: Step 3 -- Check for ACE prefix
+		# Make sure these don't display as Unicode
+		3-3-1 Old prefix: iesg--dn-mja.example
+		3-3-2 Old prefix: iesgdn-mja.example
+		3-3-3 Old prefix: bq--dn-mja.example
+	3-4: Step 4 -- Remove the ACE prefix
+		# No failure possible
+	3-5: Step 5 -- Decode with Punycode
+		# All of these are failures; should not display as Unicode
+		3-5-1 Non-ASCII code point before the last hyphen: xn--d<00F1>-mja.example
+		3-5-2 Non-alphanumeric code point after the last hyphen:
+			xn--dn-mj+.example
+		3-5-3 Ends in the middle of an encoded delta value: xn--dn-mj.example
+	3-6: Step 6 -- Apply ToASCII
+		# All of these are failures; should not display as Unicode
+		3-6-1 Nameprep -- prohibited character U+E000: xn--e000dn-l704a.example
+		3-6-2 If using UseSTD3ASCIIRules, Step 3b -- leading hyphen: xn---dn-rma.example
+		3-6-3 If using UseSTD3ASCIIRules, Step 3b -- trailing hyphen: xn--dn--qma.example
+		3-6-4 Step 5 -- prefix exists: xn--xn--dn-6va.example
+	3-7: Step 7 -- Verify the result of step 6 vs. Step 3
+		# All of these are failures.
+		3-7-1 Punycode was not necessary (run ToASCII on an ASCII
+				input but skip step 4 in ToASCII): xn--idn-.example
+		3-7-2 String did not go through Nameprep (run ToASCII
+				with a non-Nameprepped input and skip step 2): xn--dn-vga.example
+	3-8: Step 8 -- Return the result from Step 5
+		# No failure possible
+		3-8-1 Should show the Unicode <00ED>4dn.example: xn--4dn-qma.example
+
+
+4: Nameprep
+	4-1: Mapping
+		4-1-1: Table B.1 -- Mapped out
+			4-1-1-1 00adout<00AD><00ED>dn.example -> 00adout<00ED>dn.example
+			4-1-1-2 200dout<200D><00ED>dn.example -> 200dout<00ED>dn.example
+		4-1-2: Table B.2 -- Mappings
+			4-1-2-1 Simple capitalization:
+				simplecap<0044><00ED>dn.example -> simplecap<0064><00ED>dn.example
+			4-1-2-2 Latin to Greek:
+				latintogreek<00B5><00ED>dn.example -> latintogreek<03BC><00ED>dn.example
+			4-1-2-3 Latin extended:
+				latinext<00C7><00ED>dn.example -> latinext<00E7><00ED>dn.example
+			4-1-2-4 Sharp S:
+				sharps<00DF><00ED>dn.example -> sharpsss<00ED>dn.example
+			4-1-2-5 Turkish dotted i:
+				turkishi<0130><00ED>dn.example -> turkishi<0069><0307><00ED>dn.example
+			4-1-2-6 Expands to two characters: 
+				exptwo<0149><00ED>dn.example -> exptwo<02BC><006E><00ED>dn.example
+			4-1-2-7 Additional folding:
+				addfold<03D2><00ED>dn.example -> addfold<03C5><00ED>dn.example
+			4-1-2-8 Expands to three characters:
+				expthree<1F52><00ED>dn.example -> expthree<03C5><0313><0300><00ED>dn.example
+			4-1-2-9 Outside of BMP:
+				nonbmp<10400><00ED>dn.example -> nonbmp<10428><00ED>dn.example
+			4-1-2-10 Outside of BMP to ASCII:
+				nonbmptoascii<1D400><00ED>dn.example -> nonbmptoasciia<00ED>dn.example
+	4-2: Normalizing
+		4-2-1: Regular normalizing
+			4-2-1-1 Combining:
+				regcomb<0065><0301><00ED>dn.example -> regcomb<00E9><00ED>dn.example
+			4-2-1-2 Combining and case map:
+				combandcase<0045><0301><00ED>dn.example -> combandcase<00E9><00ED>dn.example
+			4-2-1-3 Adjacent combinations:
+				adjcomb<00BA><0301><00ED>dn.example -> adjcomb<00F3><00ED>dn.example
+			4-2-1-4 Latin extended combo:
+				extcombo<0063><0301><00ED>dn.example -> extcombo<0107><00ED>dn.example
+			4-2-1-5 Double diacritic, ordering 1:
+				doublediac1<0075><0308><0301><00ED>dn.example -> doublediac2<01D8><00ED>dn.example
+			4-2-1-6 Double diacritic, ordering 2:
+				doublediac2<0075><0301><0308><00ED>dn.example -> doublediac2<01D8><00ED>dn.example
+		4-2-2: Characters whose normalization have changed in Unicode 4.0
+			4-2-2-1 newnorm<2F874><00ED>dn.example -> newnorm<5F33><00ED>dn.example should not become <5F53>
+	4-3: Prohibited characters
+		# All of these are failures
+		4-3-1 Spacing: <2000><00ED>dn.example
+		4-3-2 Control: <06DD><00ED>dn.example
+		4-3-3 Private use: <E0005><00ED>dn.example
+		4-3-4 Private use, non-BMP: <F0005><00ED>dn.example
+		4-3-5 Non-character: <FDDD><00ED>dn.example
+		4-3-6 Non-character, non-BMP: <1FFFE><00ED>dn.example
+		4-3-7 Surrogate points: <D805><00ED>dn.example
+		4-3-8 Inappropriate for plain: <FFFA><00ED>dn.example
+		4-3-9 Inappropriate for canonical: <2FF5><00ED>dn.example
+		4-3-10 Change display simple: <206A><00ED>dn.example
+		4-3-11 Change display RTL: <200F><00ED>dn.example
+		4-3-12 Language tags: <E0001><E0045><E004E><0068><0069>idn.example
+	4-4: Bidi
+		# All of these are failures
+		4-4-1 Arabic RandALCat-LCat-RandALCat: <0628><006F><0638>.example
+		4-4-2 Arabic RandALCat-RandALCat-other: <0628><0638><006F>.example
+		4-4-3 Arabic other-RandALCat-RandALCat: <006F><0628><0638>.example
+		4-4-4 Hebrew RandALCat-LCat-RandALCat: <05D1><006F><05E1>.example
+		4-4-5 Hebrew RandALCat-RandALCat-other: <05D1><05E1><006F>.example
+		4-4-6 Hebrew other-RandALCat-RandALCat: <006F><05D1><05E1>.example
+
+
+5: Use of unassigned characters
+	# Web clients should be able to query on unassigned characters
+	# Zone editors should reject unassigned characters
+	5-1: Unassigned characters in both 3.2 an 4.0
+		5-1-1 Unassigned in BMP: <0237><00ED>dn.example
+		5-1-2 Unassinged outside BMP: <10205><00ED>dn.example
+	5-2: Newly assigned in Unicode 4.0
+		# Should be treated as unassigned in IDNA
+		5-2-1 Newly assigned in BMP: <0234><00ED>dn.example
+		5-2-2 Newly assigned outside of BMP: <10005><00ED>dn.example

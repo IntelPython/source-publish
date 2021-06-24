@@ -1,0 +1,519 @@
+Internet Draft                                          Paul Hoffman
+draft-hoffman-stringprep-00.txt                           IMC & VPNC
+September 27, 2001                                     Marc Blanchet
+Expires in six months                                       ViaGenie
+
+        Preparation of Internationalized Strings ("stringprep")
+
+Status of this memo
+
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 of RFC2026.
+
+Internet-Drafts are working documents of the Internet Engineering Task
+Force (IETF), its areas, and its working groups. Note that other groups
+may also distribute working documents as Internet-Drafts.
+
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time. It is inappropriate to use Internet-Drafts as reference material
+or to cite them other than as "work in progress."
+
+To view the list Internet-Draft Shadow Directories, see
+http://www.ietf.org/shadow.html.
+
+
+Abstract
+
+This document describes a framework for preparing text strings in order
+to increase the likelihood that string input and string comparison work
+in ways that make sense for typical users throughout the world. The
+stringprep protocol is useful for protocol identifier values, company
+and personal names, internationalized domain names, and other text
+strings.
+
+This document does not specify how protocols should prepare text
+strings. Protocols must create profiles of stringprep in order to fully
+specify the processing options.
+
+
+1. Introduction
+
+Application programs can display text in many different ways. Similarly,
+a user can enter text into an application program in a myriad of
+fashions. Internationalized text (that is, text that is not restricted
+to the narrow set of US-ASCII characters) has many input and display
+behaviors that make it difficult to compare text in a consistent
+fashion.
+
+This document specifies a framework of text processing rules. Other
+protocols can create profiles of these rules; these profiles will
+allow users to enter internationalized text strings in applications and
+have the highest chance of getting the content of the strings correct.
+In this case, "correct" means that if two different people enter what
+they think is the same string into two different input mechanisms, the
+strings should match on a character-by-character basis.
+
+In addition to helping string matching, profiles of stringprep can also
+exclude characters that should not normally appear in text that is used
+in the protocol. The profile can prevent such characters by changing the
+characters to be excluded to other characters, by removing those
+characters, or by causing an error if the characters would appear in the
+output. For example, because the backspace character can cause
+unpredictable display results, a profile can specify that a string that
+would have a backspace character in it cause an error.
+
+A profile of stringprep converts a single string of input characters to
+a string of output characters, or returns an error if the output string
+would contain a prohibited character. Stringprep profiles cannot both
+emit a string and return an error. Inputs to stringprep are always
+specified in network byte order (big-endian).
+
+Stringprep profiles cannot account for all of the variations that may
+occur or that a user might expect. In particular, a profile will not be
+able to account for choice of spellings in all languages for all scripts
+because the number of alternative spellings of words and phrases is
+immense. Users would probably expect all spelling equivalents to be made
+equivalent, or none of them to be. Examples of spelling equivalents
+include "theater" vs. "theatre", and "hemoglobin" vs.
+"h<U+00E6>moglobin" in American vs. British English. Other examples are
+simplified Chinese spellings of names (for example,
+"<U+7EDF><U+4E00><U+7801>") vs. the equivalent traditional Chinese
+spelling (for example, "<U+7D71><U+4E00><U+78BC>"). Language-specific
+equivalences such as "aepfel" vs. "<U+00E4>pfel.com", considered
+equivalent in German, may not be considered equivalent in other
+languages.
+
+1.2 Terminology
+
+The key words "MUST", "SHALL", "REQUIRED", "SHOULD", "RECOMMENDED", and
+"MAY" in this document are to be interpreted as described in RFC 2119
+[RFC2119].
+
+Note: A glossary of terms used in Unicode and ISO/IEC 10646 can be found
+in [Glossary]. Information on the 10646/Unicode character encoding model
+can be found in [CharModel].
+
+1.3 Using stringprep in protocols
+
+The stringprep protocol does not stand on its own; it must be used by
+other protocols at precisely-defined places in those other protocols.
+For example, a protocol that has names that come from the entire ISO/IEC
+10646 [ISO10646] character repertoire might specify that only names that
+have been processed with a particular profile of stringprep are legal.
+Another example would be a protocol that does string comparison as a
+step in the protocol; that protocol might specify that such comparison
+is done only after processing the strings with a specific profile of
+stringprep.
+
+When developing a stringprep profile, the protocol developer should,
+where possible, cause stringprep to convert characters from the input
+string to a canonical form instead of prohibiting them. This allows
+users as wide of a range of characters as possible in input text
+strings.
+
+Although it would be easy to use the stringprep process to "correct"
+perceived mis-features or bugs in the current character standards,
+stringprep profiles SHOULD NOT do so.
+
+A profile of stringprep MUST include all of the following:
+
+- The intended applicability of the profile
+
+- The character repertoire that is the input and output to stringprep
+
+- The list of unassigned code points for the repertoire
+
+- The mappings used (as described in Section 3)
+
+- The Unicode normalization used, if any (as described in Section 4)
+
+- The characters that are prohibited as output (as described in Section 5)
+
+Each profile MUST state the character repertoire on which the profile
+will operate. The repertoire SHOULD be either the Unicode repertoire or
+the ISO/IEC 10646 repertoire that is current at the time that the
+profile is created. Neither of these repertoires are complete, and it is
+expected that characters will be added to them for the foreseeable
+future. Section 6 of this document describes how to handle characters
+that are assigned in later versions of either standard.
+
+Each profile of stringprep MUST be registered with IANA. The
+registration procedure is described in the IANA Considerations appendix;
+basically it says that each profile must be an RFC. This provides the
+IESG with a mechanism for reviewing all profiles to stringprep. Protocol
+developers are strongly encouraged to look through the IANA profile
+registry when creating new profiles for stringprep, and to re-use logic
+from earlier profiles where possible in new profiles. In some cases, an
+existing profile can be reused by a different protocol.
+
+1.4 Mailing list
+
+The stringprep protocol (but not profiles of the protocol) is discussed
+on the ietf-stringprep mailing list. Information on subscribing to the
+mailing list and the mailing list's archive can be found at
+<http://www.imc.org/ietf-stringprep/>.
+
+
+2. Preparation Overview
+
+The steps for preparing strings are:
+
+1) Map -- For each character in the input, check if it has a mapping
+and, if so, replace it with its mapping. This is described in Section 4.
+
+2) Normalize -- Possibly normalize the result of step 1 using Unicode
+normalization. This is described in Section 5.
+
+3) Look for prohibited output -- Check for any characters that are not
+allowed in the output. If any are found, return an error. This is
+described in Section 6.
+
+The above steps MUST be performed in the order given to comply with this
+specification.
+
+The mappings described in Section 3, and the optional Unicode
+normalization described in Section 4, can be one-to-none, one-to-one, or
+one-to-many. That is, some characters may be eliminated or replaced by
+more than one character, and the output of this step might be shorter or
+longer than the input. Because of this, the system using stringprep MUST
+be prepared to receive a longer or shorter string than the one input in
+the stringprep algorithm.
+
+
+3. Mapping
+
+Each character in the input stream MUST be checked against a mapping
+table that is specified in the profile. For any individual character,
+the mapping table in the profile MAY specify that a character be mapped
+to nothing, or mapped to one other character, or mapped to a string of
+other characters.
+
+If a profile is going to map characters for case-insensitive comparison,
+that profile SHOULD create mapping tables based on [UTR21], and SHOULD
+map from uppercase characters to lowercase. In addition, the
+"CaseFolding.txt" file from the Unicode database should used to prepare
+the mapping table. Note that this could have been "change all lowercase
+characters into uppercase characters". However, the upper-to-lower
+folding was chosen because there is a tradition of using lowercase in
+current Internet applications and protocols.
+
+If the profile is using Unicode normalization form KC (as described in
+Section 4 of this document), it is important to note that there are some
+characters that do not have mappings in [UTR21] but still need
+processing. These characters include a few Greek characters and many
+symbols that contain Latin characters. The list of characters to add to
+the mapping table can determined by the following algorithm:
+
+b = NormalizeWithKC(Fold(a));
+c = NormalizeWithKC(Fold(b));
+if c is not the same as b, add a mapping for "a to c".
+
+Because NormalizeWithKC(Fold(c)) always equals c, the table is stable
+from that point on.
+
+If the profile is using Unicode normalization form C with lowercasing,
+the above step is not needed.
+
+
+4. Normalization
+
+The output of the mapping step is optionally normalized using one of the
+Unicode normalization forms, as described in [UAX15]. A profile can
+specify one of three options for Unicode normalization:
+
+- no normalization
+
+- Unicode normalization with form C
+
+- Unicode normalization with form KC
+
+A profile MAY choose to do no normalization. However, such a profile can
+easily yield results that will be surprising to typical users, depending
+on the input mechanism they use. For example, some input mechanisms
+enter compatibility characters that look exactly like the underlying
+characters, but have different code points. Another example of where
+Unicode normalization helps create predictable results is with
+characters that have multiple combining diacritics: normalization orders
+those diacritics in a predictable fashion. Using form KC instead of form
+C causes many characters that are identical or near-identical to be
+converted into a single character.
+
+On the other hand, Unicode normalization requires fairly large tables
+and somewhat complicated character reordering logic. The size and
+complexity should not be considered daunting except in the most
+restricted of environments, and needs to be weighed against the problems
+of user surprise from comparing unnormalized strings.
+
+If a profile is going to use a Unicode normalization, it SHOULD use
+Unicode normalization for KC. For KC maps many "compatibility
+characters" to their equivalents. Many user interface systems enter
+compatibility characters instead of the base equivalents. Thus, using
+form KC instead of form C will cause more strings that users would
+expect to match to actually match.
+
+A profile MUST refer to a specific version of [UAX15]. If a later
+version of [UAX15] changes the algorithm used for normalization, that
+later version MUST NOT be used with the same version of the profile.
+
+[[[[[ Patrik asks: Is not addition of unassigned codepoints regarded an
+update of UAX15? This is relevant here. ]]]]]
+
+5. Prohibited Output
+
+Before the text can be emitted, it must be checked for prohibited code
+points. There is a variety of prohibited code points, as described in
+this section.
+
+The stringprep process never emits both an error and a string. If an
+error is detected during the checking for prohibited code points, only
+an error is returned.
+
+Profiles of stringprep SHOULD allow the widest possible set of
+characters in a string as long as those characters do not cause other
+problems, such as the display problems that formatting characters
+would cause or the matching problems that invisible characters would
+cause.
+
+
+6. Unassigned Code Points in Stringprep Profiles
+
+This section describes two different types of strings in typical
+protocols where internationalized strings are used: "stored strings" and
+"queries". Of course, different Internet protocols use strings very
+differently, so these terms cannot be used exactly in every protocol
+that needs to use stringprep. In general, "stored strings" are strings
+that are used in protocol identifiers and named entities, such as names
+in digital certificates, DNS domain name parts, and names of SNMP objects.
+"Queries" are strings that are used to match against strings that are
+stored identifiers, such as user-entered names for digital certificate
+authorities, DNS lookups, and SNMP requests.
+
+All code points not assigned in the character repertoire named in the
+stringprep profile are called "unassigned code points". Stored strings
+using the profile MUST NOT contain any unassigned code points. Queries
+for matching strings MAY contain unassigned code points. Note that this
+is the only part of this document where the requirements for queries
+differs from the requirements for stored strings.
+
+Using two different policies for where unassigned code points can appear
+prevents the need for versioning in protocols that use stringprep
+profiles. This is very useful since it makes the overall processing
+simpler and does not impose a "protocol" to handle versioning. It is
+expected that the ISO/IEC 10646 and Unicode repertoires will be updated
+fairly frequently; at the time that this document is being written, it
+has happened approximately once a year. Each time a new version of a
+repertoire appears, a new version of a profile MAY be created. Some end
+users will want to use the new code points as soon as they are defined.
+
+The list of unassigned code points MUST be given in a profile, and that
+list MUST be used by implementations of the profile.
+
+Due to the way that versioning is handled in this section, stored
+strings that are embedded in structures that cannot be changed (such as
+the signed parts of digital certificates) MUST NOT contain any
+unassigned code points.
+
+6.1 Categories of code points
+
+Each code point in a repertoire named by a profile of stringprep can be
+categorized by how it acts in the process described in earlier sections
+of this document:
+
+AO      Code points that may be in the output
+
+MN      Code points that cannot be in the output because they are
+         never appear as output from mapping or normalization
+
+D       Code points that cannot be in the output because they are
+         disallowed in the prohibition step
+
+U       Unassigned code points
+
+A subsequent version of a profile that references a newer version of a
+repertoire with new code points will inherently have some code points
+move from category U to either D, MN, or AO. For backwards
+compatibility, a subsequent version of a profile MUST NOT move code
+points from any other category. That is, current AO, MN, or D code
+points MUST NOT ever change to a different category.
+
+Stored strings MUST NOT contain any code points outside of
+AO for the latest version of a profile. That is, they are forbidden to
+contain code points from the MN, D, or U categories.
+
+Applications creating queries MUST treat U code points as if they were
+AO when preparing the query to be entered in the process described by a
+profile of stringprep. Those applications MAY optionally have a
+preprocessor that provide stricter checks: treating unassigned code
+points in the input as errors, or warning the user about the fact that
+the code point is unassigned in the version of a profile that the
+software is based on; such a choice is a local matter for the software.
+
+6.2 Reasons for difference between stored strings and requests
+
+Different software using different versions of a stringprep profile need
+to interoperate with maximal compatibility. The scheme described in this
+section (stored strings MUST NOT contain unassigned code points,
+requests MAY include unassigned code points) allows that compatibility
+without introducing any known security or interoperability issues.
+
+The list below shows what happens if a request contains a code point
+from category U that is allowed in a newer version of a profile. The
+request either matches the string that was intended, or matches no
+string at all. In this list, the request comes from an application using
+version "oldVersion" of a profile, the stored string was created using
+version "newVersion" of the same profile, and the code point X was in
+category U in oldVersion, and has changed category to AO, MN, or D.
+There are 3 possible scenarios:
+
+1. X is assigned to AO -- In newVersion, X is in category AO. Because
+the application passed X through, it gets back a correct match with the
+stored string. There is one exceptional case, where X is a combining
+mark.
+
+The order of combining marks is normalized, so if another combining mark
+Y has a lower combining class than X then XY will be put in the
+canonical order YX. (Unassigned code points are never reordered, so this
+doesn't happen in oldVersion). If the request contains YX, the request
+will get correct match with the stored string. However, no string can be
+stored with XY, so a request with XY will correctly get a negative
+answer to the test for matching.
+
+2. X is assigned to MN -- In newVersion, X is normalized to code point
+"nX" and therefore X is now put in category MN. This cannot exist in any
+stored string, so any request containing X will correctly get a negative
+answer to the test for matching. Note, however, if the request had
+contained the letter nX, it would have correctly matched.
+
+3. X is assigned to D -- In newVersion, X is in category D. This cannot
+exist in any stored string, so any request containing X will correctly
+get a negative answer to the test for matching.
+
+In none of the cases does the request get data for a stored string other
+than the one it actually tried to match against.
+
+The processing in this document is always stable. If a string S is the
+result of processing on newVersion, then it will remain the same when
+processed on oldVersion.
+
+6.3 Versions of applications and stored strings
+
+Another way to see that this versioning system works is to compare what
+happens when an application uses a newer or older version of this
+document.
+
+Newer query application -- Suppose that a requesting application is
+using version newVersion and the stored string was created using version
+oldVersion. This case is simple: there will be no characters in the
+stored string that cannot be requested by the application because the
+new profile uses a superset of the code points used for making the
+stored string.
+
+Newer stored string -- Suppose that an requesting application is using
+oldVersion and the stored string was created using a profile that uses
+newVersion. Because the requesting application passed through any
+unassigned code points, the user can query on stored strings that use
+code points in newVersion. No stored strings can have code points that
+are unassigned in newVersion, since that is illegal. In this case, the
+querying application has to enter the unassigned code points in the
+correct order, and has to use unassigned code points that would make it
+through both the mapping and the normalization steps.
+
+
+7. Security Considerations
+
+The Unicode and ISO/IEC 10646 repertoires have many characters that look
+similar. In many cases, users of security protocols might do visual
+matching, such as when comparing the names of trusted third parties.
+Stringprep does nothing to map similar-looking characters together.
+
+
+8. References
+
+[CharModel] Unicode Technical Report;17, Character Encoding Model.
+<http://www.unicode.org/unicode/reports/tr17/>.
+
+[Glossary] Unicode Glossary, <http://www.unicode.org/glossary/>.
+
+[Normalize] Character Normalization in IETF Protocols,
+draft-duerst-i18n-norm-03
+
+[RFC2119] Scott Bradner, "Key words for use in RFCs to Indicate
+Requirement Levels", March 1997, RFC 2119.
+
+[UAX15] Mark Davis and Martin Duerst. Unicode Standard Annex #15:
+Unicode Normalization Forms, Version 3.1.0.
+<http://www.unicode.org/unicode/reports/tr15/tr15-21.html>
+
+[UTR21] Mark Davis. Case Mappings. Unicode Technical Report;21.
+<http://www.unicode.org/unicode/reports/tr21/>.
+
+
+A. Acknowledgements
+
+Many people from the IETF IDN Working Group and the Unicode Technical
+Committee contributed ideas that went into the first draft of this
+document. Mark Davis and Patrik Faltstrom were particularly helpful in
+some of the ideas, such as the versioning description.
+
+The IDN namprep design team made many useful changes to the first
+draft. That team and its advisors include:
+
+Asmus Freytag
+Cathy Wissink
+Francois Yergeau
+James Seng
+Marc Blanchet
+Mark Davis
+Martin Duerst
+Patrik Faltstrom
+Paul Hoffman
+
+Additional significant improvements were proposed by:
+
+Jonathan Rosenne
+Kent Karlsson
+Scott Hollenbeck
+Dave Crocker
+
+
+B. IANA Considerations
+
+[[ More is obviously needed here. The next version will be done after
+talking to the folks at IANA. ]]
+
+Stringprep profiles MUST be RFCs. This ensures that the IESG will have
+an opportunity to review and possibly change a profile before it is
+registered.
+
+IANA will start a registry of stringprep profiles. The registry will be
+a single text file that lists the known profiles. Each entry in the
+registry will have three fields:
+
+- Profile name
+
+- RFC in which the profile is defined
+
+- Indicator whether or not this is the most current version of the
+profile
+
+Each version of a profile will remain listed in the registry forever.
+That is, if a new version of a profile supersedes an earlier version,
+both versions will continue to be listed in the registry, but the
+current version indicator will be turned off for the earlier version and
+turned on for the newer version.
+
+
+C. Author Contact Information
+
+Paul Hoffman
+Internet Mail Consortium and VPN Consortium
+127 Segre Place
+Santa Cruz, CA  95060 USA
+paul.hoffman@imc.org and paul.hoffman@vpnc.org
+
+Marc Blanchet
+Viagenie inc.
+2875 boul. Laurier, bur. 300
+Ste-Foy, Quebec, Canada, G1V 2M2
+Marc.Blanchet@viagenie.qc.ca

@@ -1,0 +1,235 @@
+From owner-idn@ops.ietf.org Tue Feb 11 18:29:56 2003
+Return-path: <owner-idn@ops.ietf.org>
+Envelope-to: idn-data@psg.com
+Delivery-date: Tue, 11 Feb 2003 18:29:56 -0800
+Received: from lserv by psg.com with local (Exim 3.36 #1)
+	id 18imbT-000PWE-00
+	for idn-data@psg.com; Tue, 11 Feb 2003 18:26:27 -0800
+Received: from santee.icann.org ([192.0.35.122])
+	by psg.com with esmtp (Exim 3.36 #1)
+	id 18imbQ-000PVy-00
+	for idn@ops.ietf.org; Tue, 11 Feb 2003 18:26:24 -0800
+Received: from tarim (tarim.icann.org [192.0.35.80])
+	by santee.icann.org (8.11.6/8.11.6) with SMTP id h1C2QML07613;
+	Tue, 11 Feb 2003 18:26:23 -0800
+From: "IANA" <iana@iana.org>
+To: <idn@ops.ietf.org>
+Cc: "IESG" <iesg@ietf.org>
+Subject: [idn] Results of IANA Selection of IDNA Prefix
+Date: Tue, 11 Feb 2003 18:17:31 -0800
+Message-ID: <HEEHIJAAIOLDCMKIFMKLIEDLCDAA.iana@iana.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3 (Normal)
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook IMO, Build 9.0.2416 (9.0.2911.0)
+X-MIMEOLE: Produced By Microsoft MimeOLE V6.00.2800.1106
+Importance: Normal
+X-Spam-Status: No, hits=0.9 required=5.0
+	tests=LINES_OF_YELLING,LINES_OF_YELLING_2,SPAM_PHRASE_01_02,
+	      USER_AGENT_OUTLOOK
+	version=2.43
+X-Spam-Level: 
+Sender: owner-idn@ops.ietf.org
+Precedence: bulk
+
+
+Results of IANA Selection of IDNA Prefix
+
+As described in section B of the Protocol and Schedule
+(see below), today 11 February 2003 (Tuesday), is the
+Selection Day.
+
+The IANA followed the steps described in section 4 (see
+below).
+
+The twelve stocks and their trading volumes (in 100s) were:
+
+(NYSE) IMS Hlth RX            22157
+(NYSE) IL Tool ITW            11795
+(NYSE) IntRectifr IRF          5742
+(NYSE) IBM IBM                78719
+(NYSE) IntPaper IP            16609
+(NYSE) Interpublic IPG        34961
+(NASDAQ) Inamed IMDC           1567
+(NASDAQ) Informatica INFA      4357
+(NASDAQ) Inktomi INKT          6085
+(NASDAQ) i2 Tch ITWO          37777
+(NASDAQ) IDEC Pharm IDPH      18754
+(NASDAQ) Intel INTC          524545
+
+These trading volumes have been used to generate a key
+string in the manner specified on page 5 of RFC 2777.
+
+The key string is
+
+
+22157./11795./5742./78719./16609./34961./1567./4357./6085./37777./18754./524
+545./
+
+The hex value of MD5 is
+
+  BDEC8317C50316D67B688D1C9A34C682
+
+The hex value of MD5 was then divided by eighteen. The remainder
+of the division (10) plus one (11) is the position of the
+selected candidate in the ordered list below.
+
+According to the ordered list, the selected code is "XN".
+
+1. XB   7. XH  13. XQ
+2. XC   8. XJ  14. XR
+3. XD   9. XK  15. XT
+4. XE  10. XM  16. XW
+5. XF  11. XN  17. XX
+6. XG  12. XP  18. XY
+
+As stated in section 6 of our message below:
+
+If anyone disagrees with the computation of the result under the
+above protocol as announced by the IANA on the Selection Day, please
+send a note to <iana@iana.org> no later than the day before the
+Notification Day.  The RFC Editor will be notified of the selected code
+on the Notification Day (Friday, 14 February 2003).
+
+Thank you,
+
+The Internet Assigned Numbers Authority
+
+
+************************************************************************
+
+-----Original Message-----
+From: IANA [mailto:iana@iana.org]
+Sent: Monday, February 10, 2003 2:44 PM
+To: idn@ops.ietf.org
+Subject: FW: IANA Selection of IDNA Prefix
+
+This document sets forth the protocol by which the IANA will select
+a two-character code to be used as the first two characters of
+the ACE prefix referred to as "IESG--" in Section 5 of
+draft-ietf-idn-idna-14.txt. It also specifies the schedule for
+the selection.
+
+This document is based on the IANA's proposed Protocol and Schedule
+distributed on 30 January 2003 and reflects changes to address
+comments received by 6 February 2003.  The IANA thanks Adam Costello
+and Simon Josefsson for their comments.
+
+A. Protocol
+
+The following steps will be used to select the two-character code:
+
+1. The code will be selected from among a subset of the entries on
+the ISO 3166-1:1997, clause 8.1.3 User-assigned alpha-2 code elements:
+AA, QM to QZ, XA to XZ, and ZZ.  The selection is limited to these
+codes because of the following:
+
+  a)  The use of numeric characters, while permitted by the
+      Internet-Draft, would create visual ambiguities concerning the
+      digits "0", "1", and "5".  (For similar reasons, codes including
+      the letters O, I, L, and S are eliminated in step 3.)
+
+  b)  The use of ISO 3166-1 the user-assigned elements removes the
+      possibility that the code will duplicate a present or future
+      ccTLD code.
+
+2. An eligible subset of that list of 42 entries will be determined
+by eliminating the following codes due to their use, in one or more
+top-level domain zone files that have been reviewed, as the first two
+characters of second-level domain labels that have hyphens in their
+third and fourth character positions:
+AA, QM to QZ, XA, XZ, and ZZ.
+
+3. This leaves the following subset of twenty-four candidate codes:
+XB, XC, XD, XE, XF, XG, XH, XI, XJ, XK, XL, XM, XN, XO, XP, XQ, XR, XS,
+XT, XU, XV, XW, XX, and XY.  Of those codes, XI, XL, XO, and XS are
+eliminated due to potential confusion with X1, X1, X0, and X5, and XU
+and XV are eliminated due to potential confusion with each other.
+This leaves eighteen candidate codes.
+
+4. A random selection will be made from among the eighteen
+candidates. The algorithm for the random selection will generally
+follow that stated in RFC 2777.
+
+First, the eighteen candidates will be arranged in an ordered list
+as follows:
+
+1. XB   7. XH  13. XQ
+2. XC   8. XJ  14. XR
+3. XD   9. XK  15. XT
+4. XE  10. XM  16. XW
+5. XF  11. XN  17. XX
+6. XG  12. XP  18. XY
+
+Next, the trading volume of twelve stocks on the Reference Day (see
+schedule below), as listed in the U.S. National Edition of the Wall
+Street Journal on the Selection Day (see schedule below), will be used
+to generate a key string in the manner specified on page 5 of RFC 2777.
+The twelve stocks are:
+
+(NYSE) IMS Hlth RX
+(NYSE) IL Tool ITW
+(NYSE) IntRectifr IRF
+(NYSE) IBM IBM
+(NYSE) IntPaper IP
+(NYSE) Interpublic IPG
+(NASDAQ) Inamed IMDC
+(NASDAQ) Informatica INFA
+(NASDAQ) Inktomi INKT
+(NASDAQ) i2 Tch ITWO
+(NASDAQ) IDEC Pharm IDPH
+(NASDAQ) Intel INTC
+
+Although the IANA's investigation indicates that all copies of the U.S.
+National Edition (on any day other than a Wednesday) of the Wall Street
+Journal should be identical, to eliminate any ambiguity the IANA will
+purchase a copy, which will be authoritative, on the morning of the
+Selection Day at a local store.
+
+In the event that the trading volume of any of the above twelve stocks
+is not reported in that paper, the value 0 will be used for that stock.
+In the event that more than six of the stocks then have a zero value,
+the selection will be deemed invalid and re-run in a manner decided
+according to the circumstances.
+
+A key string will be constructed with the numeric trading volumes of the
+twelve stocks (denoted in 100s and not including any
+thousands-separating punctuation), in the order stated above, according
+to page 5 of RFC 2777.  An MD5 hash [RFC 1321] of the string, prefixed
+and suffixed with a zero byte, will be calculated.  That value will be
+divided by eighteen, and the remainder of the division plus one will be
+the position of the selected candidate in the ordered list above. (Note:
+The Wall Street Journal currently reports share volumes in 100s. Thus,
+a volume of 7,660,900 shares would be reported in the Wall Street
+Journal as "76609" and would be represented as "76609" within the key.)
+The selection mechanism uses the reference implementation in RFC 2777
+and the reference MD5 implementation from RFC 1321.
+
+5. A message will be sent to the IETF Announce list to announce
+the selected code as well as the details of the selection. This
+message will be sent immediately after the selection is made on
+the Selection Day, according to the schedule described below.
+
+6. If anyone disagrees with the computation of the result under the
+above protocol as announced by the IANA on the Selection Day, please
+send a note to <iana@iana.org> no later than the day before the
+Notification Day.  The RFC Editor will be notified of the selected code
+on the Notification Day.
+
+B. Schedule
+
+The following schedule will be followed for the selection process:
+
+30 January 2003 - Protocol and Schedule published, including to IETF
+Announce list. Comments invited to <iana@iana.org>.
+
+6 February 2003 - Last day for comments.
+
+10 February 2003 (Monday) - Reference Day (see above).
+
+11 February 2003 (Tuesday) - Selection Day (see above).
+
+14 February 2003 (Friday) - Notification Day.
