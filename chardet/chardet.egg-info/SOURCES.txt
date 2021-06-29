@@ -28,10 +28,10 @@ chardet/hebrewprober.py
 chardet/jisfreq.py
 chardet/jpcntx.py
 chardet/langbulgarianmodel.py
-chardet/langcyrillicmodel.py
 chardet/langgreekmodel.py
 chardet/langhebrewmodel.py
 chardet/langhungarianmodel.py
+chardet/langrussianmodel.py
 chardet/langthaimodel.py
 chardet/langturkishmodel.py
 chardet/latin1prober.py
@@ -51,6 +51,8 @@ chardet.egg-info/entry_points.txt
 chardet.egg-info/top_level.txt
 chardet/cli/__init__.py
 chardet/cli/chardetect.py
+chardet/metadata/__init__.py
+chardet/metadata/languages.py
 docs/.gitignore
 docs/Makefile
 docs/README.md
@@ -289,8 +291,6 @@ tests/UTF-16/bom-utf-16-be.srt
 tests/UTF-16/bom-utf-16-le.srt
 tests/UTF-32/bom-utf-32-be.srt
 tests/UTF-32/bom-utf-32-le.srt
-tests/__pycache__/__init__.cpython-35.pyc
-tests/__pycache__/test_chardet.cpython-35-PYTEST.pyc
 tests/ascii/_chromium_iso-8859-1_with_no_encoding_specified.html
 tests/ascii/_mozilla_bug638318_text.html
 tests/ascii/howto.diveintomark.org.xml
