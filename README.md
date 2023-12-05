@@ -9,4 +9,3 @@ tagged with the release of Intel Python that uses it.
 
 If you need the sources for a component that is not included here, please
 contact scripting@intel.com
-
